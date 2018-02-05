@@ -18,6 +18,6 @@ func (c RebootCtrl) build() *Controller {
 
 func (c RebootCtrl) makeHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		exec.Command("reboot", "-f")
+		exec.Command("/sbin/reboot", "-f").Run()
 	}
 }
