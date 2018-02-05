@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"net/http"
 	"github.com/labstack/echo"
+	"net/http"
 )
 
 type Controller struct {
 	Methods []string
-	Path string
+	Path    string
 	Handler http.HandlerFunc
 }
 

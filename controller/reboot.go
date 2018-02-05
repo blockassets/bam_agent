@@ -6,12 +6,12 @@ import (
 )
 
 // Implements Controller interface
-type RebootCtrl struct {}
+type RebootCtrl struct{}
 
 func (c RebootCtrl) build() *Controller {
 	return &Controller{
 		Methods: []string{http.MethodGet},
-		Path: "/reboot",
+		Path:    "/reboot",
 		Handler: c.makeHandler(),
 	}
 }

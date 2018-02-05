@@ -2,15 +2,15 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
-	"fmt"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/lookfirst/bam_agent/controller"
 	"net/http"
-	"github.com/GeertJohan/go.rice"
 )
 
 var (
