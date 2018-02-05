@@ -1,0 +1,5 @@
+.idea
+*.iml
+bam_agent
+vendor
+workers.txt
