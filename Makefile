@@ -4,9 +4,6 @@ VERSION=main.version=${TRAVIS_BUILD_NUMBER} ${COMMIT} ${DATE}
 BINARY=bam_agent
 COMPILE_FLAGS=-o ${BINARY} -ldflags="-X '${VERSION}'"
 
-rice-install:
-	@go get github.com/GeertJohan/go.rice/rice
-
 rice:
 	@rice append --exec ${BINARY}
 
@@ -24,6 +21,7 @@ test:
 
 dep:
 	@dep ensure
+	@go get github.com/GeertJohan/go.rice/rice
 
 clean:
 	@rm -f bam_agent
