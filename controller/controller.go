@@ -7,7 +7,9 @@ import (
 
 type BAMStatus struct {
 	Status string
+	Error error
 }
+
 type Controller struct {
 	Methods []string
 	Path    string
