@@ -1,11 +1,10 @@
 package controller
 
 import (
-	"encoding/json"
+	"log"
 	"net/http"
 	"os/exec"
 	"time"
-	"log"
 )
 
 // Implements Controller interface
@@ -24,7 +23,7 @@ func (c RebootCtrl) makeHandler() http.HandlerFunc {
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 
-			resp, _ := json.Marshal(BAMStatus{"OK"})
+			resp, _ := json.Marshal(BAMStatus{"OK", nil})
 			w.Write(resp)
 
 			go reboot()

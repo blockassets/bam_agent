@@ -4,12 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"net/http"
+	"os"
+
 	"github.com/GeertJohan/go.rice"
+	"github.com/blockassets/bam_agent/controller"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/blockassets/bam_agent/controller"
 )
 
 var (
