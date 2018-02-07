@@ -18,20 +18,20 @@ func (c RebootCtrl) build() *Controller {
 	}
 }
 
-
 func (c RebootCtrl) makeHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		bamStat := BAMStatus{"OK"}
-		resp, _ := json.Marshal(bamStat)
-		w.Header().Set("Content-Type", "application/json; charset=utf-8") // normal header
-		w.WriteHeader(http.StatusOK)
-		w.Write(resp)
-		go reboot()
-	}
+	return makeJsonHandler(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+
+			resp, _ := json.Marshal(BAMStatus{"OK"})
+			w.Write(resp)
+
+			go reboot()
+		})
 }
 
 func reboot() {
 	time.Sleep(5 * time.Second)
+	log.Printf("Reboot Requested")
 	exec.Command("/sbin/reboot", "-f").Run()
-
 }

@@ -19,7 +19,12 @@ type Builder interface {
 	makeHandler() http.HandlerFunc
 }
 
-
+func makeJsonHandler(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8") // normal header
+		handler.ServeHTTP(w, r)
+	}
+}
 
 func Init(e *echo.Echo) {
 	// TODO: Make this more automated once there are more controllers
