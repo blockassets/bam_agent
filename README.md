@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/lookfirst/bam_agent.svg?branch=master)](https://travis-ci.org/lookfirst/bam_agent)
+[![Build Status](https://travis-ci.org/blockassets/bam_agent.svg?branch=master)](https://travis-ci.org/blockassets/bam_agent)
 
 # Block Assets Manager (BAM) Agent
 
@@ -24,7 +24,7 @@ Install [dep](https://github.com/golang/dep) and the dependencies...
 
 ### Install onto miner
 
-The [releases tab](https://github.com/lookfirst/bam_agent/releases) has `master` binaries cross compiled for ARM suitable for running on the miner. These are built automatically on [Travis](https://travis-ci.org/lookfirst/bam_agent).
+The [releases tab](https://github.com/blockassets/bam_agent/releases) has `master` binaries cross compiled for ARM suitable for running on the miner. These are built automatically on [Travis](https://travis-ci.org/blockassets/bam_agent).
 
 Download the latest release and copy the `bam_agent` binary to `/usr/bin`
 
