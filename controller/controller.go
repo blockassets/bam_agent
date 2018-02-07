@@ -29,7 +29,9 @@ func makeJsonHandler(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func Init(e *echo.Echo) {
-	// TODO: Make this more automated once there are more controllers
-	ctrl := RebootCtrl{}.build()
-	e.Match(ctrl.Methods, ctrl.Path, echo.WrapHandler(ctrl.Handler))
+	ctrls := []*Controller{RebootCtrl{}.build(), CGQuitCtrl{}.build()}
+
+	for _, ctrl := range ctrls {
+		e.Match(ctrl.Methods, ctrl.Path, echo.WrapHandler(ctrl.Handler))
+	}
 }
