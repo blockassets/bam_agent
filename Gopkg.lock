@@ -12,6 +12,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/blockassets/cgminer_client"
+  packages = ["."]
+  revision = "0ec09a014e3778852ff59a687473a2df514e8bae"
+
+[[projects]]
+  branch = "master"
   name = "github.com/daaku/go.zipexe"
   packages = ["."]
   revision = "a5fe2436ffcb3236e175e5149162b41cd28bd27d"
@@ -21,6 +27,12 @@
   packages = ["."]
   revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
   version = "v3.1.0"
+
+[[projects]]
+  name = "github.com/json-iterator/go"
+  packages = ["."]
+  revision = "28452fcdec4e44348d2af0d91d1e9e38da3a9e0a"
+  version = "1.0.5"
 
 [[projects]]
   branch = "master"
@@ -47,12 +59,6 @@
   ]
   revision = "57409ada9da0f2afad6664c49502f8c50fbd8476"
   version = "0.2.3"
-
-[[projects]]
-  name = "github.com/lookfirst/bam_agent"
-  packages = ["controller"]
-  revision = "059d2e4790d526c5aad44404cf9a9d6074068a0d"
-  version = "20180205-145714-059d2e4-arm"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -96,6 +102,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "17e620ac8806d3ff7066c7af449e474d4737be957f362f016b6e44d17905898d"
+  inputs-digest = "16bda85e124d2ef006a35e9a9d31da9364aba8b5313d1d426684c1a847e2ae51"
   solver-name = "gps-cdcl"
   solver-version = 1
