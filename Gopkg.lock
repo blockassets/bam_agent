@@ -4,7 +4,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/GeertJohan/go.rice"
-  packages = [".","embedded"]
+  packages = [
+    ".",
+    "embedded"
+  ]
   revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
 
 [[projects]]
@@ -27,15 +30,29 @@
 
 [[projects]]
   name = "github.com/labstack/echo"
-  packages = [".","middleware"]
+  packages = [
+    ".",
+    "middleware"
+  ]
   revision = "b338075a0fc6e1a0683dbf03d09b4957a289e26f"
   version = "3.2.6"
 
 [[projects]]
   name = "github.com/labstack/gommon"
-  packages = ["bytes","color","log","random"]
+  packages = [
+    "bytes",
+    "color",
+    "log",
+    "random"
+  ]
   revision = "57409ada9da0f2afad6664c49502f8c50fbd8476"
   version = "0.2.3"
+
+[[projects]]
+  name = "github.com/lookfirst/bam_agent"
+  packages = ["controller"]
+  revision = "059d2e4790d526c5aad44404cf9a9d6074068a0d"
+  version = "20180205-145714-059d2e4-arm"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -64,7 +81,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["acme","acme/autocert"]
+  packages = [
+    "acme",
+    "acme/autocert"
+  ]
   revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
 
 [[projects]]
@@ -76,6 +96,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2b984b53a47223638aea8058d5b830e63931641d8008e3b4e11a264a2363a2ff"
+  inputs-digest = "17e620ac8806d3ff7066c7af449e474d4737be957f362f016b6e44d17905898d"
   solver-name = "gps-cdcl"
   solver-version = 1

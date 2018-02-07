@@ -3,8 +3,12 @@ package controller
 import (
 	"github.com/labstack/echo"
 	"net/http"
-)
 
+)
+type BAMStatus struct {
+	Status string
+
+}
 type Controller struct {
 	Methods []string
 	Path    string
@@ -15,6 +19,8 @@ type Builder interface {
 	build() *Controller
 	makeHandler() http.HandlerFunc
 }
+
+
 
 func Init(e *echo.Echo) {
 	// TODO: Make this more automated once there are more controllers
