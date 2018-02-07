@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"time"
-	"net/http"
 	"log"
+	"net/http"
+	"time"
+
 	"github.com/blockassets/cgminer_client"
-	)
+)
 
 // Implements Controller interface
 type CGQuitCtrl struct{}
@@ -27,7 +28,7 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			httpStat := http.StatusOK
 
 			err := cgmQuit()
-			if  err != nil {
+			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
 			}
@@ -38,7 +39,6 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 }
 
 func cgmQuit() error {
-	clnt := cgminer_client.New( "localhost", 4028, 5*time.Second)
+	clnt := cgminer_client.New("localhost", 4028, 5*time.Second)
 	return clnt.Quit()
-
 }

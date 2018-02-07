@@ -13,7 +13,7 @@ var (
 
 type BAMStatus struct {
 	Status string
-	Error error
+	Error  error
 }
 
 type Controller struct {
