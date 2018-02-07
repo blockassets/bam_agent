@@ -1,10 +1,13 @@
 package controller
 
 import (
-	"github.com/labstack/echo"
 	"net/http"
+	"github.com/labstack/echo"
 )
 
+type BAMStatus struct {
+	Status string
+}
 type Controller struct {
 	Methods []string
 	Path    string
@@ -14,6 +17,13 @@ type Controller struct {
 type Builder interface {
 	build() *Controller
 	makeHandler() http.HandlerFunc
+}
+
+func makeJsonHandler(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8") // normal header
+		handler.ServeHTTP(w, r)
+	}
 }
 
 func Init(e *echo.Echo) {

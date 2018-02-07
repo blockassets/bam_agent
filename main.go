@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-
+	"net/http"
 	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/lookfirst/bam_agent/controller"
-	"net/http"
+	"github.com/blockassets/bam_agent/controller"
 )
 
 var (

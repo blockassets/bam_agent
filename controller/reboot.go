@@ -1,8 +1,11 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 	"os/exec"
+	"time"
+	"log"
 )
 
 // Implements Controller interface
@@ -17,7 +20,19 @@ func (c RebootCtrl) build() *Controller {
 }
 
 func (c RebootCtrl) makeHandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		exec.Command("/sbin/reboot", "-f").Run()
-	}
+	return makeJsonHandler(
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+
+			resp, _ := json.Marshal(BAMStatus{"OK"})
+			w.Write(resp)
+
+			go reboot()
+		})
+}
+
+func reboot() {
+	time.Sleep(5 * time.Second)
+	log.Printf("Reboot Requested")
+	exec.Command("/sbin/reboot", "-f").Run()
 }
