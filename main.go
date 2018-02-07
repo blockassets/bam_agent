@@ -25,14 +25,13 @@ func main() {
 	e.HideBanner = true
 
 	e.Use(middleware.Logger())
-
 	e.Use(middleware.Recover())
 
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
 
 	controller.Init(e)
 
-	log.Printf("bam_agent %s %s", os.Args[0], version)
+	log.Printf("%s %s", os.Args[0], version)
 
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", *port)))
