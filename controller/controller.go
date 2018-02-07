@@ -2,7 +2,13 @@ package controller
 
 import (
 	"net/http"
+
+	"github.com/json-iterator/go"
 	"github.com/labstack/echo"
+)
+
+var (
+	json = jsoniter.ConfigDefault
 )
 
 type BAMStatus struct {

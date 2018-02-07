@@ -2,7 +2,6 @@ package controller
 
 import (
 	"time"
-	"encoding/json"
 	"net/http"
 	"log"
 	"github.com/blockassets/cgminer_client"
