@@ -3,14 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
-	//"log"
+	"net/http"
 	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/blockassets/bam_agent/controller"
-	"net/http"
-	"log"
 )
 
 var (
