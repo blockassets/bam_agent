@@ -1,10 +1,11 @@
 package controller
 
 import (
-	"time"
+	"encoding/json"
 	"net/http"
 	"os/exec"
-	"encoding/json"
+	"time"
+	"log"
 )
 
 // Implements Controller interface
