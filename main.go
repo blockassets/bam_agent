@@ -19,6 +19,10 @@ var (
 )
 
 func main() {
+	startServer()
+}
+
+func startServer() {
 	port := flag.String("port", "1111", "The address to listen on.")
 	flag.Parse()
 
