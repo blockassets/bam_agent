@@ -32,35 +32,32 @@ func procFilePath(name string) string {
 }
 
 // Read loadavg from /proc.
-func (LinuxStatRetriever) getLoad() (loads LoadAvgs, err error) {
+func (LinuxStatRetriever) getLoad() (LoadAvgs, error) {
 	data, err := ioutil.ReadFile(procFilePath("loadavg"))
 	if err != nil {
-		return loads, err
+		return LoadAvgs{}, err
 	}
-
-	loadsAsArray, err := parseLoad(string(data))
-	if err != nil {
-		return loads, err
-	}
-	loads.oneMinAvg = loadsAsArray[0]
-	loads.fiveMinAvg = loadsAsArray[1]
-	loads.fifteenMinAvg = loadsAsArray[2]
-
-	return loads, nil
+	return parseLoad(string(data))
 }
 
 // Parse /proc loadavg and return 1m, 5m and 15m.
-func parseLoad(data string) (loads []float64, err error) {
-	loads = make([]float64, 3)
+func parseLoad(data string) (LoadAvgs, error) {
+	loadsAsArray := make([]float64, 3)
 	parts := strings.Fields(data)
 	if len(parts) < 3 {
-		return nil, fmt.Errorf("unexpected content in %v", procFilePath("loadavg"))
+		return LoadAvgs{}, fmt.Errorf("unexpected content in %v", procFilePath("loadavg"))
 	}
+	var err error
 	for i, load := range parts[0:3] {
-		loads[i], err = strconv.ParseFloat(load, 64)
+		loadsAsArray[i], err = strconv.ParseFloat(load, 64)
 		if err != nil {
-			return nil, fmt.Errorf("could not parse load '%v': %v", load, err)
+			return LoadAvgs{}, fmt.Errorf("could not parse load '%v': %v", load, err)
 		}
+	}
+	loads := LoadAvgs{
+		oneMinAvg:     loadsAsArray[0],
+		fiveMinAvg:    loadsAsArray[1],
+		fifteenMinAvg: loadsAsArray[2],
 	}
 	return loads, nil
 }

@@ -23,15 +23,8 @@ func (sr testStatRetriever) getLoad() (LoadAvgs, error) {
 		data = "a b c d emnf,masfd"
 	}
 
-	loadsAsArray, err := parseLoad(data)
-	if err != nil {
-		return nil, err
-	}
-	var loads LoadAvgs
-	loads.oneMinAvg = loadsAsArray[0]
-	loads.fiveMinAvg = loadsAsArray[1]
-	loads.fifteenMinAvg = loadsAsArray[2]
-	return loads, nil
+	return parseLoad(data)
+
 }
 
 func TestMonitorLoad(t *testing.T) {
