@@ -9,6 +9,7 @@ import (
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/blockassets/bam_agent/controller"
+	"github.com/blockassets/bam_agent/monitor"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -19,6 +20,11 @@ var (
 )
 
 func main() {
+	monitor.StartMonitors()
+	startServer()
+}
+
+func startServer() {
 	port := flag.String("port", "1111", "The address to listen on.")
 	flag.Parse()
 
