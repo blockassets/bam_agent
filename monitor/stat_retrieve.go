@@ -11,11 +11,17 @@ import (
 )
 
 // facilitate testing of code that uses this package
-	getLoad() (loads []float64, err error)
 type statRetrieve interface {
+	getLoad() (loads LoadAvgs, err error)
 }
 
 type LinuxStatRetriever struct {
+}
+
+type LoadAvgs struct {
+	oneMinAvg     float64
+	fiveMinAvg    float64
+	fifteenMinAvg float64
 }
 
 // DefaultMountPoint is the common mount point of the proc filesystem.
@@ -26,15 +32,20 @@ func procFilePath(name string) string {
 }
 
 // Read loadavg from /proc.
-func (LinuxStatRetriever) getLoad() (loads []float64, err error) {
+func (LinuxStatRetriever) getLoad() (loads LoadAvgs, err error) {
 	data, err := ioutil.ReadFile(procFilePath("loadavg"))
 	if err != nil {
-		return nil, err
+		return loads, err
 	}
-	loads, err = parseLoad(string(data))
+
+	loadsAsArray, err := parseLoad(string(data))
 	if err != nil {
-		return nil, err
+		return loads, err
 	}
+	loads.oneMinAvg = loadsAsArray[0]
+	loads.fiveMinAvg = loadsAsArray[1]
+	loads.fifteenMinAvg = loadsAsArray[2]
+
 	return loads, nil
 }
 

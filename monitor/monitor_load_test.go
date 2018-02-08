@@ -8,7 +8,7 @@ type testStatRetriever struct {
 	dataset int
 }
 
-func (sr testStatRetriever) getLoad() (loads []float64, err error) {
+func (sr testStatRetriever) getLoad() (LoadAvgs, error) {
 	var data string
 	switch sr.dataset {
 	case 1:
@@ -23,37 +23,41 @@ func (sr testStatRetriever) getLoad() (loads []float64, err error) {
 		data = "a b c d emnf,masfd"
 	}
 
-	loads, err = parseLoad(data)
+	loadsAsArray, err := parseLoad(data)
 	if err != nil {
 		return nil, err
 	}
+	var loads LoadAvgs
+	loads.oneMinAvg = loadsAsArray[0]
+	loads.fiveMinAvg = loadsAsArray[1]
+	loads.fifteenMinAvg = loadsAsArray[2]
 	return loads, nil
 }
 
 func TestMonitorLoad(t *testing.T) {
 	sr := testStatRetriever{}
 	sr.dataset = 1
-	too_high, err := check_loadAvg(sr)
+	too_high, err := checkLoadAvg(sr)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
 	sr.dataset = 2
-	too_high, err = check_loadAvg(sr)
+	too_high, err = checkLoadAvg(sr)
 	if too_high {
 		t.Errorf("Expected low, got high!")
 	}
 	sr.dataset = 3
-	too_high, err = check_loadAvg(sr)
+	too_high, err = checkLoadAvg(sr)
 	if too_high {
 		t.Errorf("Expected low, got high!")
 	}
 	sr.dataset = 4
-	too_high, err = check_loadAvg(sr)
+	too_high, err = checkLoadAvg(sr)
 	if !too_high {
 		t.Errorf("Expected high, got low!")
 	}
 	sr.dataset = 5
-	too_high, err = check_loadAvg(sr)
+	too_high, err = checkLoadAvg(sr)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
