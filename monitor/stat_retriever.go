@@ -11,7 +11,7 @@ import (
 )
 
 // facilitate testing of code that uses this package
-type statRetrieve interface {
+type statRetriever interface {
 	getLoad() (loads LoadAvgs, err error)
 }
 

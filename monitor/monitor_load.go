@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func monitorLoad(sr statRetrieve, interval time.Duration) {
+func monitorLoad(sr statRetriever, interval time.Duration) {
 	for {
 		high, err := checkLoadAvg(sr)
 		if (err == nil) && high {
@@ -16,7 +16,7 @@ func monitorLoad(sr statRetrieve, interval time.Duration) {
 	}
 }
 
-func checkLoadAvg(sr statRetrieve) (bool, error) {
+func checkLoadAvg(sr statRetriever) (bool, error) {
 	loads, err := sr.getLoad()
 	high := false
 	if err == nil {
