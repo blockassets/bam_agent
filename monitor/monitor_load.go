@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-func monitor_load(sr stat_retrieve, interval time.Duration) {
+func monitorLoad(sr statRetrieve, interval time.Duration) {
 	for {
-		high, err := check_loadAvg(sr)
+		high, err := checkLoadAvg(sr)
 		if (err == nil) && high {
 			controller.Reboot()
 		}
@@ -16,16 +16,15 @@ func monitor_load(sr stat_retrieve, interval time.Duration) {
 	}
 }
 
-func check_loadAvg(sr stat_retrieve) (high bool, err error) {
+func checkLoadAvg(sr statRetrieve) (bool, error) {
 	loads, err := sr.getLoad()
-	high = false
+	high := false
 	if err == nil {
-		//the array loads has three values in it. the 1 min, 5 min and 15 min loadaverage
-		if loads[1] > 5.0 {
+		if loads.fiveMinAvg > 5.0 {
 			high = true
 		}
 	} else {
-		log.Println("Monitor load error: %s", err)
+		log.Println("Monitor load error: %v", err)
 	}
 	return high, err
 }

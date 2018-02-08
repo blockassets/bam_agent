@@ -10,6 +10,6 @@ func StartMonitors() {
 	sr := LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
-	go monitor_load(sr, time.Minute) // check for 5min average CPU load every minute
+	go monitorLoad(sr, time.Minute) // check for 5min average CPU load every minute
 
 }
