@@ -19,10 +19,8 @@ func monitorLoad(sr statRetriever, interval time.Duration) {
 func checkLoadAvg(sr statRetriever) (bool, error) {
 	loads, err := sr.getLoad()
 	high := false
-	if err == nil {
-		if loads.fiveMinAvg > 5.0 {
-			high = true
-		}
+	if (err == nil) && (loads.fiveMinAvg > 5.0) {
+		high = true
 	} else {
 		log.Println("Monitor load error: %v", err)
 	}
