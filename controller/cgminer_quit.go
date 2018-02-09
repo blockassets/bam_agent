@@ -27,7 +27,7 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			err := cgmQuit()
+			err := CgmQuit()
 			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
@@ -38,7 +38,7 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 		})
 }
 
-func cgmQuit() error {
+func CgmQuit() error {
 	clnt := cgminer_client.New("localhost", 4028, 5*time.Second)
 	return clnt.Quit()
 }
