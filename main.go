@@ -20,6 +20,8 @@ var (
 )
 
 func main() {
+	log.Printf("%s %s", os.Args[0], version)
+
 	monitor.StartMonitors()
 	startServer()
 }
@@ -38,7 +40,6 @@ func startServer() {
 
 	controller.Init(e)
 
-	log.Printf("%s %s", os.Args[0], version)
 
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", *port)))
