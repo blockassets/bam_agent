@@ -11,6 +11,6 @@ func StartMonitors() {
 
 	log.Println("Monitors being started")
 	go monitorLoad(sr, time.Minute) // check for 5min average CPU load every minute
-
+	go monitorCyclicMinerRestart()
 	go monitorCyclicReboot()
 }
