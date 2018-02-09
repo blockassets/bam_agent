@@ -22,7 +22,7 @@ func checkLoadAvg(sr statRetriever) (bool, error) {
 	if (err == nil) && (loads.fiveMinAvg > 5.0) {
 		high = true
 	} else {
-		log.Println("Monitor load error: %v", err)
+		log.Println("Monitor load error:", err)
 	}
 	return high, err
 }
