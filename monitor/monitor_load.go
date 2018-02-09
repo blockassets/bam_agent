@@ -1,7 +1,7 @@
 package monitor
 
 import (
-	"github.com/blockassets/bam_agent/controller"
+	"github.com/blockassets/bam_agent/service"
 	"log"
 	"time"
 )
@@ -10,7 +10,8 @@ func monitorLoad(sr statRetriever, interval time.Duration) {
 	for {
 		high, err := checkLoadAvg(sr)
 		if (err == nil) && high {
-			controller.Reboot()
+			cmds := service.Command{}
+			cmds.Reboot()
 		}
 		time.Sleep(interval)
 	}

@@ -1,11 +1,10 @@
 package monitor
 
-
 import (
-	"github.com/blockassets/bam_agent/controller"
 	"log"
 	"math/rand"
 	"time"
+
 	"github.com/blockassets/bam_agent/service"
 )
 

@@ -1,9 +1,8 @@
 package controller
 
 import (
-
-	"net/http"
 	"github.com/blockassets/bam_agent/service"
+	"net/http"
 )
 
 // Implements Controller interface
@@ -28,4 +27,3 @@ func (c RebootCtrl) makeHandler() http.HandlerFunc {
 			go cmds.Reboot()
 		})
 }
-

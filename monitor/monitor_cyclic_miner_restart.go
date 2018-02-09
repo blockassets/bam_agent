@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"time"
+
 	"github.com/blockassets/bam_agent/service"
 )
 

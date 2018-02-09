@@ -2,15 +2,14 @@ package service
 
 import (
 	"github.com/blockassets/cgminer_client"
-	"time"
-	"os/exec"
 	"log"
+	"os/exec"
+	"time"
 )
 
 type Commands interface {
 	CgmQuit() error
 	Reboot()
-
 }
 type Command struct {
 }
@@ -20,7 +19,7 @@ func (*Command) CgmQuit() error {
 	return clnt.Quit()
 }
 
-func (*Command)Reboot() {
+func (*Command) Reboot() {
 	time.Sleep(5 * time.Second)
 	log.Printf("Reboot Requested")
 	exec.Command("/sbin/reboot", "-f").Run()

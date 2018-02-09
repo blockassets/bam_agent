@@ -4,11 +4,12 @@ import (
 	"log"
 	"time"
 )
-const(
-	restartMinerHours = 23
-	rebootHours = 71
 
+const (
+	restartMinerHours = 23
+	rebootHours       = 71
 )
+
 func StartMonitors() {
 	// Startup the goroutines to do the stuff that needs to be monitored
 	sr := LinuxStatRetriever{}

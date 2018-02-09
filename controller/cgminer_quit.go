@@ -37,4 +37,3 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			w.Write(resp)
 		})
 }
-
