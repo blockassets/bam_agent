@@ -3,9 +3,8 @@ package controller
 import (
 	"log"
 	"net/http"
-	"time"
 
-	"github.com/blockassets/cgminer_client"
+	"github.com/blockassets/bam_agent/service"
 )
 
 // Implements Controller interface
@@ -27,7 +26,8 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			err := CgmQuit()
+			cmds := service.Command{}
+			err := cmds.CgmQuit()
 			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
@@ -38,7 +38,3 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 		})
 }
 
-func CgmQuit() error {
-	clnt := cgminer_client.New("localhost", 4028, 5*time.Second)
-	return clnt.Quit()
-}
