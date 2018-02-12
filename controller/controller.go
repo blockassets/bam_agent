@@ -35,7 +35,7 @@ func makeJsonHandler(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func Init(e *echo.Echo) {
-	ctrls := []*Controller{RebootCtrl{}.build(), CGQuitCtrl{}.build()}
+	ctrls := []*Controller{RebootCtrl{}.build(), CGQuitCtrl{}.build(), UpdatePoolsCtrl{}.build()}
 
 	for _, ctrl := range ctrls {
 		e.Match(ctrl.Methods, ctrl.Path, echo.WrapHandler(ctrl.Handler))
