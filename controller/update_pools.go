@@ -20,18 +20,18 @@ import (
 const defConfigPath = "usr/app/conf.default"
 
 // Implements Controller interface
-type UpdatePoolsCtrl struct {
+type PutPoolsCtrl struct {
 }
 
-func (c UpdatePoolsCtrl) build() *Controller {
+func (c PutPoolsCtrl) build() *Controller {
 	return &Controller{
-		Methods: []string{http.MethodPost},
-		Path:    "/update_pools",
+		Methods: []string{http.MethodPut},
+		Path:    "/config/pools",
 		Handler: c.makeHandler(),
 	}
 }
 
-func (c UpdatePoolsCtrl) makeHandler() http.HandlerFunc {
+func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
 
