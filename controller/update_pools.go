@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"github.com/blockassets/bam_agent/service"
 	"net/http"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
 // command to update the ip address for

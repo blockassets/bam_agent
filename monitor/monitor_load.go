@@ -1,9 +1,11 @@
 package monitor
 
 import (
-	"github.com/blockassets/bam_agent/service"
+
 	"log"
 	"time"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
 func monitorLoad(sr statRetriever, interval time.Duration) {

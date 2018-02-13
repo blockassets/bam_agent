@@ -2,13 +2,15 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/Jeffail/gabs"
-	"github.com/blockassets/cgminer_client"
 	"io"
 	"io/ioutil"
 	"log"
 	"os/exec"
 	"time"
+
+	"github.com/Jeffail/gabs"
+	"github.com/blockassets/cgminer_client"
+
 )
 
 //TODO: refactor this file to separate out the service level commands into their own files
