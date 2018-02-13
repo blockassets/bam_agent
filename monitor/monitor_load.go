@@ -12,8 +12,7 @@ func monitorLoad(sr statRetriever, interval time.Duration) {
 	for {
 		high, err := checkLoadAvg(sr)
 		if (err == nil) && high {
-			cmds := service.Command{}
-			cmds.Reboot()
+			service.Command{}.Reboot()
 		}
 		time.Sleep(interval)
 	}
