@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -8,9 +9,8 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/Jeffail/gabs"
+	"github.com/blockassets/bam_agent/util"
 	"github.com/blockassets/cgminer_client"
-
 )
 
 //TODO: refactor this file to separate out the service level commands into their own files
@@ -40,21 +40,29 @@ type PoolAddresses struct {
 }
 
 func (*Command) UpdatePools(poolsAsJson io.ReadCloser, configFilePath string) error {
-	var pools PoolAddresses
-	err := json.NewDecoder(poolsAsJson).Decode(&pools)
-	if err == nil {
-		// use the gabs json helper..
-		cont := gabs.New()
-		cont, err = gabs.ParseJSONFile(configFilePath)
-		if err == nil {
-			cont.SetP(pools.Pool1, "pool1")
-			cont.SetP(pools.Pool2, "pool2")
-			cont.SetP(pools.Pool3, "pool3")
-			err = ioutil.WriteFile(configFilePath, cont.Bytes(), 0644)
-		}
-	}
+	pools := &PoolAddresses{}
+	unknown := map[string]json.RawMessage{}
+	buf := []byte{}
+	buf, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		log.Println(err)
+		return err
 	}
+	err = util.UnmarshalJsonObjAndMap(buf, pools, unknown)
+	if err != nil {
+		return err
+	}
+	// new values
+	err = json.NewDecoder(poolsAsJson).Decode(&pools)
+	if err != nil {
+		return err
+	}
+	buf, err = util.MarshalJsonObjAndMap(pools, unknown)
+	if err != nil {
+		return err
+	}
+	out := bytes.Buffer{}
+	json.Indent(&out, buf, "", "\t")
+	err = ioutil.WriteFile(configFilePath, out.Bytes(), 0644)
 	return err
+
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/blockassets/bam_agent/service"
@@ -18,7 +19,7 @@ import (
 // eg { "pool1":"111.2.3.4", "pool2":"112.3.4.5", "pool3":"113.4.5.6"}
 // and we update the conf.default file on the miner
 
-const defConfigPath = "usr/app/conf.default"
+const defConfigPath = "/usr/app/conf.default"
 
 // Implements Controller interface
 type PutPoolsCtrl struct {
@@ -35,7 +36,7 @@ func (c PutPoolsCtrl) build() *Controller {
 func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
-
+			log.Println("In PutPools")
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
