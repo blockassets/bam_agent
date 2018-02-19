@@ -19,6 +19,7 @@ type Commands interface {
 	Reboot()
 	UpdatePools(poolsAsJson io.ReadCloser, configFilePath string) error
 }
+
 type Command struct {
 }
 
