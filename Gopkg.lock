@@ -14,7 +14,7 @@
   branch = "master"
   name = "github.com/blockassets/cgminer_client"
   packages = ["."]
-  revision = "0ec09a014e3778852ff59a687473a2df514e8bae"
+  revision = "91c153f604231118185babd62859ebfd23d6798f"
 
 [[projects]]
   branch = "master"
@@ -91,7 +91,7 @@
     "acme",
     "acme/autocert"
   ]
-  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
+  revision = "9de5f2eaf759b4c4550b3db39fed2e9e5f86f45c"
 
 [[projects]]
   branch = "master"
@@ -102,6 +102,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "16bda85e124d2ef006a35e9a9d31da9364aba8b5313d1d426684c1a847e2ae51"
+  inputs-digest = "0541308dabfe0de246eef67c41c9076fabb2c75e89926dab3b9fc51e0b28002e"
   solver-name = "gps-cdcl"
   solver-version = 1

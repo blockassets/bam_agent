@@ -1,7 +1,5 @@
 package monitor
 
-
-
 import (
 	"fmt"
 	"io/ioutil"
