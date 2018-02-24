@@ -8,10 +8,12 @@ import (
 	"os"
 
 	"github.com/GeertJohan/go.rice"
-	"github.com/blockassets/bam_agent/controller"
-	"github.com/blockassets/bam_agent/monitor"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+
+	"github.com/blockassets/bam_agent/util"
+	"github.com/blockassets/bam_agent/monitor"
+	"github.com/blockassets/bam_agent/controller"
 )
 
 var (
@@ -19,8 +21,18 @@ var (
 	version = ""
 )
 
+const (
+	theBAMConfigFile = "./etc/bam_agent.json"
+)
+
 func main() {
-	monitor.StartMonitors()
+	log.Printf("%s %s", os.Args[0], version)
+	cfg, err := util.InitialiseConfigFile(theBAMConfigFile)
+	if err != nil {
+		log.Printf("Can't initialize Configuration: %v", err)
+		return
+	}
+	monitor.StartMonitors(cfg)
 	startServer()
 }
 
@@ -37,8 +49,6 @@ func startServer() {
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
 
 	controller.Init(e)
-
-	log.Printf("%s %s", os.Args[0], version)
 
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", *port)))
