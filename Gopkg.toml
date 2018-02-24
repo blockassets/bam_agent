@@ -4,6 +4,7 @@
   version = "3.2.6"
 
 [[constraint]]
+  branch = "master"
   name = "github.com/GeertJohan/go.rice"
 
 [[constraint]]
