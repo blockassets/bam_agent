@@ -14,7 +14,7 @@
   branch = "master"
   name = "github.com/blockassets/cgminer_client"
   packages = ["."]
-  revision = "0ec09a014e3778852ff59a687473a2df514e8bae"
+  revision = "91c153f604231118185babd62859ebfd23d6798f"
 
 [[projects]]
   branch = "master"
@@ -31,8 +31,8 @@
 [[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
-  revision = "28452fcdec4e44348d2af0d91d1e9e38da3a9e0a"
-  version = "1.0.5"
+  revision = "0ac74bba4a81211b28e32ef260c0f16ae41f1377"
+  version = "1.1.1"
 
 [[projects]]
   branch = "master"
@@ -73,6 +73,15 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/v2pro/plz"
+  packages = [
+    "concurrent",
+    "reflect2"
+  ]
+  revision = "10fc95fad3224a032229e59f6e7023137d82b526"
+  version = "0.9.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/valyala/bytebufferpool"
   packages = ["."]
@@ -91,17 +100,17 @@
     "acme",
     "acme/autocert"
   ]
-  revision = "1875d0a70c90e57f11972aefd42276df65e895b9"
+  revision = "49796115aa4b964c318aad4f3084fdb41e9aa067"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "37707fdb30a5b38865cfb95e5aab41707daec7fd"
+  revision = "88d2dcc510266da9f7f8c7f34e1940716cab5f5c"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "16bda85e124d2ef006a35e9a9d31da9364aba8b5313d1d426684c1a847e2ae51"
+  inputs-digest = "707457e4d73c37e9ca50660b210280ebd6563e8d0bba942176f3b8f66ff71d78"
   solver-name = "gps-cdcl"
   solver-version = 1
