@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	
+
 	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
