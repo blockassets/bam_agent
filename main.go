@@ -6,12 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	
 	"github.com/GeertJohan/go.rice"
-	"github.com/blockassets/bam_agent/controller"
-	"github.com/blockassets/bam_agent/monitor"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+
+	"github.com/blockassets/bam_agent/util"
+	"github.com/blockassets/bam_agent/monitor"
+	"github.com/blockassets/bam_agent/controller"
 )
 
 var (
@@ -19,10 +21,18 @@ var (
 	version = ""
 )
 
+const (
+	theBAMConfigFile = "./etc/bam_agent.json"
+)
+
 func main() {
 	log.Printf("%s %s", os.Args[0], version)
-
-	monitor.StartMonitors()
+	cfg, err := util.InitialiseConfigFile(theBAMConfigFile)
+	if err != nil {
+		log.Printf("Can't initialize Configuration: %v", err)
+		return
+	}
+	monitor.StartMonitors(cfg)
 	startServer()
 }
 

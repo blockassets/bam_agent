@@ -23,7 +23,7 @@ func (*Command) UpdatePools(poolsAsJson io.ReadCloser, configFilePath string) er
 	if err != nil {
 		return err
 	}
-	err = util.UnmarshalJsonObjAndMap(buf, pools, unknown)
+	err = util.UnmarshalJson(buf, pools, unknown)
 	if err != nil {
 		return err
 	}
@@ -32,7 +32,7 @@ func (*Command) UpdatePools(poolsAsJson io.ReadCloser, configFilePath string) er
 	if err != nil {
 		return err
 	}
-	buf, err = util.MarshalJsonObjAndMap(pools, unknown)
+	buf, err = util.MarshalJson(pools, unknown)
 	if err != nil {
 		return err
 	}

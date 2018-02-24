@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"time"
 
 	"github.com/blockassets/cgminer_client"
@@ -13,6 +14,7 @@ const (
 )
 
 func (*Command) CgmQuit() error {
+	log.Printf("cgminer quit requested")
 	clnt := cgminer_client.New(MINER_HOSTNAME, MINER_PORT, MINER_TIMEOUT)
 	return clnt.Quit()
 }
