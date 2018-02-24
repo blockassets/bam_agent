@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/blockassets/bam_agent/service"
@@ -36,7 +35,6 @@ func (c PutPoolsCtrl) build() *Controller {
 func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
-			log.Println("In PutPools")
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
@@ -49,6 +47,5 @@ func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
 			w.WriteHeader(httpStat)
 			resp, _ := json.Marshal(bamStat)
 			w.Write(resp)
-
 		})
 }
