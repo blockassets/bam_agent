@@ -6,7 +6,12 @@ import (
 	"strings"
 )
 
-func UnmarshalJsonObjAndMap(jsonStr []byte, obj interface{}, otherFields map[string]json.RawMessage) (err error) {
+// These functions marshal and unmarshal typed structs and also return/take fields not parsed into a json.RawMessage map
+// This allows for the benefits of typed structs on elements of the json a particular peice of code is interested in
+// but keeps the json robust to change
+//
+
+func UnmarshalJson(jsonStr []byte, obj interface{}, otherFields map[string]json.RawMessage) (err error) {
 	objValue := reflect.ValueOf(obj).Elem()
 	knownFields := map[string]reflect.Value{}
 	for i := 0; i != objValue.NumField(); i++ {
@@ -30,7 +35,7 @@ func UnmarshalJsonObjAndMap(jsonStr []byte, obj interface{}, otherFields map[str
 	return err
 }
 
-func MarshalJsonObjAndMap(obj interface{}, otherFields map[string]json.RawMessage) ([]byte, error) {
+func MarshalJson(obj interface{}, otherFields map[string]json.RawMessage) ([]byte, error) {
 	a, err := json.Marshal(otherFields)
 	if err != nil {
 		return nil, err

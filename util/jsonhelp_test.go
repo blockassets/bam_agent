@@ -52,7 +52,7 @@ func TestUnmarshalJsonObjAndMap(t *testing.T) {
 
 	for index, tt := range unmarshallTests {
 		unknown := map[string]json.RawMessage{}
-		err := UnmarshalJsonObjAndMap([]byte(tt.in), tt.testStruct, unknown)
+		err := UnmarshalJson([]byte(tt.in), tt.testStruct, unknown)
 		if (err == nil) && tt.shouldErr {
 			t.Errorf("Test Index: %v: Unmarshal should of errored. returned nil", index)
 		}
@@ -93,11 +93,11 @@ func TestMarshalJsonObjAndMap(t *testing.T) {
 
 	for index, tt := range marshallTests {
 		unknown := map[string]json.RawMessage{}
-		err := UnmarshalJsonObjAndMap([]byte(tt.in), tt.testStruct, unknown)
+		err := UnmarshalJson([]byte(tt.in), tt.testStruct, unknown)
 		if err != nil {
 			t.Errorf("Test Index: %v: Umarshal Errored %v", index, err)
 		}
-		actualOutput, err := MarshalJsonObjAndMap(tt.testStruct, unknown)
+		actualOutput, err := MarshalJson(tt.testStruct, unknown)
 		if (err == nil) && tt.shouldErr {
 			t.Errorf("Test Index: %v: marshal should of errored. returned nil", index)
 		}
