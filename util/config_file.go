@@ -4,18 +4,19 @@ import (
 	"io/ioutil"
 	"os"
 )
-
+// day == 86400 seconds, hour == 3600 seconds
+// 3 day == 259200
 var defaultConfig = []byte(`{ 
 	"monitor": {
 		"miner_quit":{	
-			"enabled":true,
-			"period_secs":15,
-			"initial_range_secs":5
+			"enabled":false,
+			"period_secs":86400,
+			"initial_range_secs":3600
 		}, 
 		"system_reboot":{	
-			"enabled":true,
-			"period_secs":15,
-			"initial_range_secs":5
+			"enabled":false,
+			"period_secs":259200,
+			"initial_range_secs":3600
 		},
 		"system_load":{
 			"enabled":true,
