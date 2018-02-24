@@ -17,7 +17,7 @@ arm-compile:
 arm: | arm-compile rice
 
 test:
-	@go test .
+	@go test ./...
 
 dep:
 	@dep ensure
