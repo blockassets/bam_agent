@@ -19,7 +19,7 @@ jobs:
     before_deploy:
       - git config --local user.name "lookfirst"
       - git config --local user.email "latchkey@gmail.com"
-      - git tag "$(date '+%Y%m%d-%H%M%S')-$(git log --format=%h -1)-arm"
+      - git tag "$(date '+%Y%m%d-%H%M%S')-$(git log --format=%h -1)-linux-arm"
     deploy:
       provider: releases
       api_key:
