@@ -27,4 +27,4 @@ jobs:
       file: bam_agent.gz
       skip_cleanup: true
       on:
-        repo: lookfirst/bam_agent
+        repo: blockassets/bam_agent
