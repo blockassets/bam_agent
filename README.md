@@ -26,9 +26,10 @@ Install [dep](https://github.com/golang/dep) and the dependencies...
 
 The [releases tab](https://github.com/blockassets/bam_agent/releases) has `master` binaries cross compiled for ARM suitable for running on the miner. These are built automatically on [Travis](https://travis-ci.org/blockassets/bam_agent).
 
-Download the latest release and copy the `bam_agent` binary to `/usr/bin`
+Download the [latest release](https://github.com/blockassets/bam_agent/releases) and copy the gunzipped `bam_agent` binary to `/usr/bin`
 
 ```
+gunzip bam_agent.gz
 chmod ugo+x bam_agent
 scp bam_agent root@MINER_IP:/usr/bin
 ```
