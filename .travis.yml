@@ -24,7 +24,7 @@ jobs:
       provider: releases
       api_key:
         secure: QFwVnEFnogEy/sRMBhZenUfSDGnLALQhg/15rzj0tgd/ypDq+U66JwNJMCbRnEOIChrMBy5Ssiq5Tl4sUxQLghMzfvzQ/+sqKsL3ZKIN0eAvyGItB58MQFX5gmlJQbWmqEBa7c2zuhM9w4auWSYnznr6vdBtmY5iFQqAnLjzu8vFLOsbXs0H0t+SzR6aH7nlTQuQ9q/Cc6SKpmKceJ5bRvdYDflPQL20qOQ7m8UD79kFWtqcq2dTrvNB33JT1MN7xp2TSdiO6D28+L1rXeBC5Rkmo1QAnOs21dRLSPz/X0eV65X1MBFFGc5BGnciFE+UAsFG1xmgRq3Zhsz5b3aaACWoplis+szwdo+iZInvWiX7/bYilHQXrv4N24PdDbimpHv1xNMA2QFJmupB9Tp1ILaNlTWaJqiMJuy4mjLEdheG/vTepxEdUQUhMPFx23Hgefz6KMO0qu2QvlHa+xew3Nf8jbNv2RgHU4gj9cGZK2XFlj+e46IgSyEfvsXuPrNsw3NOflb5rW0+hJN1yMhQOlgNOhyGc1qGlJEZirwYgMYsdKY0Giuh78C2oqSeZj26vUOwhdPrdop2+BgIJlP1QtGnF1DASh74nIv9+xVjhEd8V6wYDu1ZkZsLyG0cQ/+esNOEaUKGSMwdcMlZKVyD32Eo84BdAtLcF4c0hMAy690=
-      file: bam_agent.gz
+      file: bam_agent-linux-arm.gz
       skip_cleanup: true
       on:
         repo: blockassets/bam_agent

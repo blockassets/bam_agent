@@ -10,3 +10,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/blockassets/cgminer_client"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jpillora/overseer"

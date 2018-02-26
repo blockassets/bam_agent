@@ -1,6 +1,7 @@
 .idea
 *.iml
 bam_agent
-bam_agent.gz
+bam_agent-linux-arm
+bam_agent-linux-arm.gz
 vendor
 workers.txt
