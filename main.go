@@ -4,12 +4,17 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"runtime"
+	"time"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/blockassets/bam_agent/controller"
+	"github.com/blockassets/bam_agent/fetcher"
 	"github.com/blockassets/bam_agent/monitor"
+	"github.com/jpillora/overseer"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -19,16 +24,55 @@ var (
 	version = ""
 )
 
-func main() {
-	log.Printf("%s %s", os.Args[0], version)
-	monitor.StartMonitors()
-	startServer()
-}
+const (
+	max24HourInt = 23
+	ghUser       = "blockassets"
+	ghRepo       = "bam_agent"
+)
 
-func startServer() {
-	port := flag.String("port", "1111", "The address to listen on.")
+func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	port := flag.String("port", "1111", "The address to listen on")
+	noUpdate := flag.Bool("no-update", false, "Never do any updates. Example: -no-update=true")
 	flag.Parse()
 
+	portStr := fmt.Sprintf(":%s", *port)
+
+	if *noUpdate {
+		prog(overseer.State{Address: portStr})
+	} else {
+		overseerRun(portStr)
+	}
+}
+
+func overseerRun(port string) {
+	// Sometime in the next 24 hours check for update to prevent all machines updating
+	// at the same exact time, which could DDOS the network. +1 since rand.Intn is zero based.
+	interval := time.Duration(rand.Intn(max24HourInt)+1) * time.Hour
+
+	overseer.Run(overseer.Config{
+		Program: prog,
+		Address: port,
+		// The default is to check on startup, but we really just want to check in the next interval
+		// in order to prevent DDOS'ing the whole network if we restart all machines. I copied the overseer
+		// version of the github fetcher into this project and modified the logic there.
+		Fetcher: &fetcher.Github{
+			User:     ghUser,
+			Repo:     ghRepo,
+			Interval: interval,
+		},
+	})
+}
+
+func prog(state overseer.State) {
+	log.Printf("%s %s %s %s on port %s", os.Args[0], version, runtime.GOOS, runtime.GOARCH, state.Address)
+
+	monitor.StartMonitors()
+	startServer(state)
+}
+
+func startServer(state overseer.State) {
 	e := echo.New()
 	e.HideBanner = true
 
@@ -40,5 +84,8 @@ func startServer() {
 	controller.Init(e)
 
 	// Start server
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", *port)))
+	if state.Listener != nil {
+		e.Listener = state.Listener
+	}
+	e.Logger.Fatal(e.Start(state.Address))
 }
