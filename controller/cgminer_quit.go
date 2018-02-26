@@ -1,11 +1,9 @@
 package controller
 
 import (
-	"log"
 	"net/http"
-	"time"
 
-	"github.com/blockassets/cgminer_client"
+	"github.com/blockassets/bam_agent/service"
 )
 
 // Implements Controller interface
@@ -22,12 +20,10 @@ func (c CGQuitCtrl) build() *Controller {
 func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
-			log.Printf("CGMiner Quit Requested")
-
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			err := cgmQuit()
+			err := service.CgmQuit()
 			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
@@ -36,9 +32,4 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			resp, _ := json.Marshal(bamStat)
 			w.Write(resp)
 		})
-}
-
-func cgmQuit() error {
-	clnt := cgminer_client.New("localhost", 4028, 5*time.Second)
-	return clnt.Quit()
 }
