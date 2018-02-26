@@ -22,6 +22,8 @@ import (
 var (
 	// Makefile build
 	version = ""
+
+	interval time.Duration
 )
 
 const (
@@ -33,6 +35,10 @@ const (
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
+	// Sometime in the next 24 hours check for update to prevent all machines updating
+	// at the same exact time, which could DDOS the network. +1 since rand.Intn is zero based.
+	interval = time.Duration(rand.Intn(max24HourInt)+1) * time.Hour
+
 	port := flag.String("port", "1111", "The address to listen on")
 	noUpdate := flag.Bool("no-update", false, "Never do any updates. Example: -no-update=true")
 	flag.Parse()
@@ -42,15 +48,11 @@ func main() {
 	if *noUpdate {
 		prog(overseer.State{Address: portStr})
 	} else {
-		overseerRun(portStr)
+		overseerRun(portStr, interval)
 	}
 }
 
-func overseerRun(port string) {
-	// Sometime in the next 24 hours check for update to prevent all machines updating
-	// at the same exact time, which could DDOS the network. +1 since rand.Intn is zero based.
-	interval := time.Duration(rand.Intn(max24HourInt)+1) * time.Hour
-
+func overseerRun(port string, interval time.Duration) {
 	overseer.Run(overseer.Config{
 		Program: prog,
 		Address: port,
@@ -67,6 +69,9 @@ func overseerRun(port string) {
 
 func prog(state overseer.State) {
 	log.Printf("%s %s %s %s on port %s", os.Args[0], version, runtime.GOOS, runtime.GOARCH, state.Address)
+	if state.Listener != nil {
+		log.Printf("Self-update interval: %s", interval)
+	}
 
 	monitor.StartMonitors()
 	startServer(state)
