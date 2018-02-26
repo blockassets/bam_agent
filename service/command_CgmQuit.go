@@ -13,7 +13,7 @@ const (
 	MINER_TIMEOUT  = 5 * time.Second
 )
 
-func (*Command) CgmQuit() error {
+func CgmQuit() error {
 	log.Printf("Cgminer quit requested")
 	clnt := cgminer_client.New(MINER_HOSTNAME, MINER_PORT, MINER_TIMEOUT)
 	return clnt.Quit()

@@ -24,7 +24,7 @@ func (c RebootCtrl) makeHandler() http.HandlerFunc {
 
 			resp, _ := json.Marshal(BAMStatus{"OK", nil})
 			w.Write(resp)
-			cmds := service.Command{}
-			go cmds.Reboot()
+
+			go service.Reboot()
 		})
 }
