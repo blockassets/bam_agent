@@ -23,7 +23,6 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-
 			err := service.CgmQuit()
 			if err != nil {
 				httpStat = http.StatusBadGateway
