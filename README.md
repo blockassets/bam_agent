@@ -9,8 +9,10 @@ Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project
 ### Usage (defaults):
 
 ``
-./bam_agent -port 1111
+./bam_agent -port 1111 -no-update=false
 ``
+
+By default, the BAM Agent will automatically attempt to self update from the Github [latest release](https://github.com/blockassets/bam_agent/releases) tab. It chooses a random hour of the day to update. This way, if you have a number of machines, they will not all DDOS Github and your network. You can override the update behavior to not perform any updates.
 
 ### Setup
 
