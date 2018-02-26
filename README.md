@@ -9,7 +9,7 @@ Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project
 ### Usage (defaults):
 
 ``
-./bam_agent -port 1111 -no-update=false
+./bam_agent-linux-arm -port 1111 -no-update=false
 ``
 
 By default, the BAM Agent will automatically attempt to self update from the Github [latest release](https://github.com/blockassets/bam_agent/releases) tab. It chooses a random hour of the day to update. This way, if you have a number of machines, they will not all DDOS Github and your network. You can override the update behavior to not perform any updates.
@@ -28,12 +28,12 @@ Install [dep](https://github.com/golang/dep) and the dependencies...
 
 The [releases tab](https://github.com/blockassets/bam_agent/releases) has `master` binaries cross compiled for ARM suitable for running on the miner. These are built automatically on [Travis](https://travis-ci.org/blockassets/bam_agent).
 
-Download the [latest release](https://github.com/blockassets/bam_agent/releases) and copy the gunzipped `bam_agent` binary to `/usr/bin`
+Download the [latest release](https://github.com/blockassets/bam_agent/releases) and copy the gunzipped `bam_agent-linux-arm` binary to `/usr/bin`
 
 ```
-gunzip bam_agent.gz
-chmod ugo+x bam_agent
-scp bam_agent root@MINER_IP:/usr/bin
+gunzip bam_agent-linux-arm.gz
+chmod ugo+x bam_agent-linux-arm
+scp bam_agent-linux-arm root@MINER_IP:/usr/bin
 ```
 
 Create `/etc/systemd/system/bam_agent.service`
@@ -46,7 +46,7 @@ After=init.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/bam_agent
+ExecStart=/usr/bin/bam_agent-linux-arm
 Restart=always
 RestartSec=4s
 StandardOutput=journal+console
