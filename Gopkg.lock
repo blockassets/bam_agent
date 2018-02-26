@@ -11,6 +11,12 @@
   revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
 
 [[projects]]
+  name = "github.com/Jeffail/gabs"
+  packages = ["."]
+  revision = "2a3aa15961d5fee6047b8151b67ac2f08ba2c48c"
+  version = "1.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/blockassets/cgminer_client"
   packages = ["."]
@@ -111,6 +117,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "707457e4d73c37e9ca50660b210280ebd6563e8d0bba942176f3b8f66ff71d78"
+  inputs-digest = "8c172a0d50f1552cc2259a6fed69d58538387268b20426633fad194f29f31d41"
   solver-name = "gps-cdcl"
   solver-version = 1
