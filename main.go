@@ -39,7 +39,6 @@ func startServer() {
 
 	controller.Init(e)
 
-
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", *port)))
 }
