@@ -1,10 +1,9 @@
 package controller
 
 import (
-	"log"
 	"net/http"
-	"os/exec"
-	"time"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
 // Implements Controller interface
@@ -26,12 +25,6 @@ func (c RebootCtrl) makeHandler() http.HandlerFunc {
 			resp, _ := json.Marshal(BAMStatus{"OK", nil})
 			w.Write(resp)
 
-			go Reboot()
+			go service.Reboot()
 		})
-}
-
-func Reboot() {
-	time.Sleep(5 * time.Second)
-	log.Printf("Reboot Requested")
-	exec.Command("/sbin/reboot", "-f").Run()
 }
