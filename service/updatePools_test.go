@@ -2,7 +2,6 @@ package service
 
 import (
 	"io/ioutil"
-	"os"
 	"strings"
 	"testing"
 )
@@ -122,31 +121,15 @@ var updatePoolsTests []struct {
 func TestCommand_UpdatePools(t *testing.T) {
 
 	for index, tt := range updatePoolsTests {
-		// create a test file
-		tmpfile, err := ioutil.TempFile("", "pools")
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer os.Remove(tmpfile.Name()) // clean up
-		if _, err := tmpfile.Write([]byte(tt.configFile)); err != nil {
-			t.Fatal(err)
-		}
-		if err := tmpfile.Close(); err != nil {
-			t.Fatal(err)
-		}
-		err = UpdatePools(ioutil.NopCloser(strings.NewReader(tt.poolsIn)), tmpfile.Name())
+
+		buf, err := updateCfgJson(ioutil.NopCloser(strings.NewReader(tt.poolsIn)), []byte(tt.configFile))
 		if (err == nil) && tt.shouldErr {
 			t.Errorf("Test Index: %v: UpdatePools should of errored. returned nil", index)
 		}
 		if err == nil {
-			buf, err := ioutil.ReadFile(tmpfile.Name())
-			if err != nil {
-				t.Fatal(err)
-			}
 			if tt.expectedOut != string(buf) {
 				t.Errorf("Test Index: %v: Expected:\n%s\nGot:\n%s\n ", index, tt.expectedOut, string(buf))
 			}
-
 		}
 	}
 
