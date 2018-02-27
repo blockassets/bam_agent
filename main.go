@@ -23,7 +23,8 @@ var (
 	// Makefile build
 	version = ""
 
-	interval time.Duration
+	interval       time.Duration
+	configFileName *string
 )
 
 const (
@@ -31,6 +32,10 @@ const (
 	ghUser       = "blockassets"
 	ghRepo       = "bam_agent"
 )
+
+type BamConfig struct {
+	Monitor monitor.Monitor `json:"monitor"`
+}
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -41,6 +46,7 @@ func main() {
 
 	port := flag.String("port", "1111", "The address to listen on")
 	noUpdate := flag.Bool("no-update", false, "Never do any updates. Example: -no-update=true")
+	configFileName = flag.String("config", "/etc/bam_agent.json", "configuration file, created if it doesnt exist")
 	flag.Parse()
 
 	portStr := fmt.Sprintf(":%s", *port)
@@ -73,7 +79,13 @@ func prog(state overseer.State) {
 		log.Printf("Self-update interval: %s", interval)
 	}
 
-	monitor.StartMonitors()
+	cfg, err := InitialiseConfigFile(*configFileName)
+	if err != nil {
+		log.Printf("Failed to open configuration: %s\nError:%v\n", *configFileName, err)
+		return
+	}
+
+	monitor.StartMonitors(&cfg.Monitor)
 	startServer(state)
 }
 

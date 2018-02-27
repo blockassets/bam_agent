@@ -1,0 +1,9 @@
+{
+	"monitor": {
+		"load":{
+			"enabled":true,
+			"period_secs":60,
+			"high_load_Mark":5.0
+		}
+	}
+}
