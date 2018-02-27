@@ -46,7 +46,7 @@ func main() {
 
 	port := flag.String("port", "1111", "The address to listen on")
 	noUpdate := flag.Bool("no-update", false, "Never do any updates. Example: -no-update=true")
-	configFileName = flag.String("config", "/etc/bam_agent.json", "configuration file, created if it doesnt exist")
+	configFileName = flag.String("config", "/etc/bam_agent.json", "configuration file, created if it doesn't exist")
 	flag.Parse()
 
 	portStr := fmt.Sprintf(":%s", *port)
