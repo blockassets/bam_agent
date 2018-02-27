@@ -46,8 +46,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "f7f1ee9550cc76ceea731d99c8dbe00a0c39f66d"
-  version = "v1.13.4"
+  revision = "f3a52638aeadcd5d6ba1d747b8c552c8e0066312"
+  version = "v1.13.5"
 
 [[projects]]
   branch = "master"
@@ -159,7 +159,7 @@
     "acme",
     "acme/autocert"
   ]
-  revision = "49796115aa4b964c318aad4f3084fdb41e9aa067"
+  revision = "beaf6a35706e5032ae4c3fcf342c663c069f44d2"
 
 [[projects]]
   branch = "master"

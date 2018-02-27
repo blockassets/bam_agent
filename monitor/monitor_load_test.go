@@ -30,27 +30,27 @@ func (sr testStatRetriever) getLoad() (LoadAvgs, error) {
 func TestMonitorLoad(t *testing.T) {
 	sr := testStatRetriever{}
 	sr.dataset = 1
-	tooHigh, err := checkLoadAvg(sr)
+	tooHigh, err := checkLoadAvg(sr, 5.0)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
 	sr.dataset = 2
-	tooHigh, err = checkLoadAvg(sr)
+	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if tooHigh {
 		t.Errorf("Expected low, got high!")
 	}
 	sr.dataset = 3
-	tooHigh, err = checkLoadAvg(sr)
+	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if tooHigh {
 		t.Errorf("Expected low, got high!")
 	}
 	sr.dataset = 4
-	tooHigh, err = checkLoadAvg(sr)
+	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if !tooHigh {
 		t.Errorf("Expected high, got low!")
 	}
 	sr.dataset = 5
-	tooHigh, err = checkLoadAvg(sr)
+	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
