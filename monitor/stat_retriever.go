@@ -32,7 +32,7 @@ func procFilePath(name string) string {
 }
 
 // Read loadavg from /proc.
-func (LinuxStatRetriever) getLoad() (LoadAvgs, error) {
+func (*LinuxStatRetriever) getLoad() (LoadAvgs, error) {
 	data, err := ioutil.ReadFile(procFilePath("loadavg"))
 	if err != nil {
 		return LoadAvgs{}, err

@@ -2,24 +2,33 @@ package monitor
 
 import (
 	"testing"
+	"time"
 )
 
 type testStatRetriever struct {
 	dataset int
 }
 
-func (sr testStatRetriever) getLoad() (LoadAvgs, error) {
+const (
+	LevelNotEnough = iota
+	LevelBelowFive
+	LevelExactlyFive
+	LevelAboveFive
+	LevelMalformed
+)
+
+func (sr *testStatRetriever) getLoad() (LoadAvgs, error) {
 	var data string
 	switch sr.dataset {
-	case 1:
-		data = "0.0 0.0" // not enough
-	case 2:
+	case LevelNotEnough:
+		data = "0.0 0.0"
+	case LevelBelowFive:
 		data = "0.0 4.999 0.0 1234 1234"
-	case 3:
+	case LevelExactlyFive:
 		data = "0.0 5.0 0.0 1234 1234"
-	case 4:
+	case LevelAboveFive:
 		data = "0.0 5.1 0.0 1234 1234"
-	case 5:
+	case LevelMalformed:
 		data = "a b c d emnf,masfd"
 	}
 
@@ -27,31 +36,73 @@ func (sr testStatRetriever) getLoad() (LoadAvgs, error) {
 
 }
 
-func TestMonitorLoad(t *testing.T) {
-	sr := testStatRetriever{}
-	sr.dataset = 1
+func TestCheckLoadAvg(t *testing.T) {
+	sr := &testStatRetriever{}
+	sr.dataset = LevelNotEnough
 	tooHigh, err := checkLoadAvg(sr, 5.0)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
-	sr.dataset = 2
+	sr.dataset = LevelBelowFive
 	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if tooHigh {
 		t.Errorf("Expected low, got high!")
 	}
-	sr.dataset = 3
+	sr.dataset = LevelExactlyFive
 	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if tooHigh {
 		t.Errorf("Expected low, got high!")
 	}
-	sr.dataset = 4
+	sr.dataset = LevelAboveFive
 	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if !tooHigh {
 		t.Errorf("Expected high, got low!")
 	}
-	sr.dataset = 5
+	sr.dataset = LevelMalformed
 	tooHigh, err = checkLoadAvg(sr, 5.0)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
+}
+
+var testOnHighLoadCounter int
+
+func TestLoadMonitors(t *testing.T) {
+	sr := &testStatRetriever{}
+	sr.dataset = LevelBelowFive
+	cfg := MonitorConfig{}
+	cfg.Load = LoadConfig{Enabled: true, PeriodSecs: 1, HighLoadMark: 5.0}
+	lm := newLoadMonitor(sr, func() { testOnHighLoadCounter += 1 })
+	err := lm.start(&cfg)
+	if err != nil {
+		t.Errorf("Expected start to suceed. Returned %+v", err)
+	}
+	if lm.isRunning != true {
+		t.Errorf("Expected lm.isRunning to be true")
+	}
+	time.Sleep(time.Duration(4500) * time.Millisecond)
+	if testOnHighLoadCounter != 0 {
+		t.Errorf("Expected 0 onHighMarks, got %d", testOnHighLoadCounter)
+	}
+	sr.dataset = LevelAboveFive
+	time.Sleep(time.Duration(4500) * time.Millisecond)
+	lm.stop()
+	mark := testOnHighLoadCounter
+	time.Sleep(time.Duration(2000) * time.Millisecond)
+	if mark != testOnHighLoadCounter {
+		t.Errorf("Expected OnHighLoad to stop: mark == %d, counter == %d", mark, testOnHighLoadCounter)
+	}
+
+	if (testOnHighLoadCounter != 4) && (testOnHighLoadCounter != 5) {
+		t.Errorf("Expected 4 or 5 onHighMarks, got %d", testOnHighLoadCounter)
+	}
+	err = lm.start(&cfg)
+	if err != nil {
+		t.Errorf("Expected 2nd start to suceed. Returned %+v", err)
+	}
+	err = lm.start(&cfg)
+	if err == nil {
+		t.Errorf("Expected 3rd start to fail")
+	}
+
 }

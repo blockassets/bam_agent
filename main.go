@@ -34,7 +34,7 @@ const (
 )
 
 type BamConfig struct {
-	Monitor monitor.Monitor `json:"monitor"`
+	Monitor monitor.MonitorConfig `json:"monitor"`
 }
 
 func main() {
