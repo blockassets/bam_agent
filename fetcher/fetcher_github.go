@@ -26,7 +26,7 @@ type Github struct {
 	//both GOOS and GOARCH.
 	Asset func(filename string) bool
 	//internal state
-	firstTime	  bool
+	firstTime     bool
 	releaseURL    string
 	lastETag      string
 	latestRelease struct {
