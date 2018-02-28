@@ -2,13 +2,13 @@
 	"monitor": {
 		"load": {
 			"enabled": true,
-			"period_secs": 60,
-			"high_load_Mark": 5.0
+			"periodInSeconds": 60,
+			"highLoadMark": 5.0
 		},
 		"reboot":{
 			"enabled":false,
-			"period_secs":259200,
-			"initial_period_range_secs":3600
+			"periodInSeconds":259200,
+			"initialPeriodRangeInSeconds":3600
 		}
 	}
 }

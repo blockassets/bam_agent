@@ -9,9 +9,9 @@ import (
 )
 
 type RebootConfig struct {
-	Enabled            bool `json:"enabled"`
-	PeriodSecs         int  `json:"period_secs"`
-	InitialPeriodRange int  `json:"initial_period_range_secs"`
+	Enabled                     bool `json:"enabled"`
+	PeriodInSeconds             int  `json:"periodInSeconds"`
+	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
 }
 
 func (cfg *RebootConfig) InitialPeriod() time.Duration {
@@ -19,7 +19,7 @@ func (cfg *RebootConfig) InitialPeriod() time.Duration {
 	// denial of service attack on the pool
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
-	return time.Duration(cfg.PeriodSecs)*time.Second + time.Duration(r1.Intn(cfg.InitialPeriodRange))*time.Second
+	return time.Duration(cfg.PeriodInSeconds)*time.Second + time.Duration(r1.Intn(cfg.InitialPeriodRangeInSeconds))*time.Second
 }
 
 type periodicReboot struct {

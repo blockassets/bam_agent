@@ -11,7 +11,7 @@ func TestPeriodicReboot(t *testing.T) {
 
 	fmt.Printf("Starting Periodic Reboot logic test")
 	cfg := MonitorConfig{}
-	cfg.Reboot = RebootConfig{Enabled: true, PeriodSecs: 1, InitialPeriodRange: 1}
+	cfg.Reboot = RebootConfig{Enabled: true, PeriodInSeconds: 1, InitialPeriodRangeInSeconds: 1}
 
 	pr := newPeriodicReboot(func() { count++ })
 
