@@ -20,11 +20,11 @@ import (
 
 const defConfigPath = "/usr/app/conf.default"
 
-// Implements Controller interface
+// Implements Builder interface
 type PutPoolsCtrl struct {
 }
 
-func (c PutPoolsCtrl) build() *Controller {
+func (c PutPoolsCtrl) build(cfg *Config) *Controller {
 	return &Controller{
 		Methods: []string{http.MethodPut},
 		Path:    "/config/pools",
