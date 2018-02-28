@@ -11,10 +11,10 @@ const (
 	DELAY_BEFORE_REBOOT = time.Duration(5) * time.Second
 )
 
-// Implements Controller interface
+// Implements Builder interface
 type RebootCtrl struct{}
 
-func (c RebootCtrl) build() *Controller {
+func (c RebootCtrl) build(cfg *Config) *Controller {
 	return &Controller{
 		Methods: []string{http.MethodGet},
 		Path:    "/reboot",
