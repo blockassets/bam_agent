@@ -143,6 +143,4 @@ func TestLoadMonitors(t *testing.T) {
 		t.Errorf("t2.10 Expected to be not running")
 	}
 
-
-
 }
