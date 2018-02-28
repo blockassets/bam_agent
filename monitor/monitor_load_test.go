@@ -36,34 +36,57 @@ func (sr *testStatRetriever) getLoad() (LoadAvgs, error) {
 
 }
 
-func doNothing() {}
+var countSomething int
 
-func TestcheckLoad(t *testing.T) {
+func doSomething() { countSomething++ }
+
+func TestCheckLoad(t *testing.T) {
+
 	sr := &testStatRetriever{}
 	sr.dataset = LevelNotEnough
-	tooHigh, err := checkLoad(sr, 5.0, doNothing)
+	countSomething = 0
+	tooHigh, err := checkLoad(sr, 5.0, doSomething)
 	if err == nil {
-		t.Errorf("Expected error!")
+		t.Errorf("t1: Expected error!")
+	}
+	if countSomething != 0 {
+		t.Errorf("t1: Expected 0 in countSomething")
 	}
 	sr.dataset = LevelBelowFive
-	tooHigh, err = checkLoad(sr, 5.0, doNothing)
+	countSomething = 0
+	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if tooHigh {
-		t.Errorf("Expected low, got high!")
+		t.Errorf("t2: Expected low, got high!")
+	}
+	if countSomething != 0 {
+		t.Errorf("t2: Expected 0 in countSomething")
 	}
 	sr.dataset = LevelExactlyFive
-	tooHigh, err = checkLoad(sr, 5.0, doNothing)
+	countSomething = 0
+	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if tooHigh {
-		t.Errorf("Expected low, got high!")
+		t.Errorf("t3: Expected low, got high!")
+	}
+	if countSomething != 0 {
+		t.Errorf("t3: Expected 0 in countSomething")
 	}
 	sr.dataset = LevelAboveFive
-	tooHigh, err = checkLoad(sr, 5.0, doNothing)
+	countSomething = 0
+	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if !tooHigh {
-		t.Errorf("Expected high, got low!")
+		t.Errorf("t4: Expected high, got low!")
+	}
+	if countSomething != 1 {
+		t.Errorf("t4: Expected 1 in countSomething")
 	}
 	sr.dataset = LevelMalformed
-	tooHigh, err = checkLoad(sr, 5.0, doNothing)
+	countSomething = 0
+	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if err == nil {
-		t.Errorf("Expected error!")
+		t.Errorf("t5: Expected error!")
+	}
+	if countSomething != 0 {
+		t.Errorf("t5: Expected 0 in countSomething")
 	}
 }
 
