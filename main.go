@@ -14,6 +14,7 @@ import (
 	"github.com/blockassets/bam_agent/controller"
 	"github.com/blockassets/bam_agent/fetcher"
 	"github.com/blockassets/bam_agent/monitor"
+	"github.com/blockassets/bam_agent/service"
 	"github.com/blockassets/cgminer_client"
 	"github.com/jpillora/overseer"
 	"github.com/labstack/echo"
@@ -34,17 +35,8 @@ const (
 
 	// TODO: refactor into config
 	minerHostname = "localhost"
-	minerPort     = 4028
 	minerTimeout  = 5 * time.Second
 )
-
-type BamConfig struct {
-	Monitor monitor.MonitorConfig `json:"monitor"`
-}
-
-type AgentVersion struct {
-	Version string
-}
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -90,24 +82,29 @@ func prog(state overseer.State) {
 
 	cfg, err := InitialiseConfigFile(*configFileName)
 	if err != nil {
-		log.Printf("Failed to open configuration: %s\nError:%v\n", *configFileName, err)
+		log.Fatalf("Failed to open configuration: %s\nError: %v\n", *configFileName, err)
 		return
 	}
 
+	client, err := minerClient()
+	if err != nil {
+		log.Fatalf("Failed to get a miner client Error: %v", err)
+	}
+
 	monitor.StartMonitors(&cfg.Monitor)
-	startServer(state)
+	startServer(state, client)
 }
 
-func startServer(state overseer.State) {
+func startServer(state overseer.State, client *cgminer_client.Client) {
 	e := echo.New()
+
 	e.HideBanner = true
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	// Must exist here and not as a controller due to issues with rice
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
-
-	client := cgminer_client.New(minerHostname, minerPort, minerTimeout)
 
 	controller.Init(e, &controller.Config{Version: version, Client: client})
 
@@ -116,4 +113,13 @@ func startServer(state overseer.State) {
 		e.Listener = state.Listener
 	}
 	e.Logger.Fatal(e.Start(state.Address))
+}
+
+func minerClient() (*cgminer_client.Client, error) {
+	config, err := service.LoadMinerConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return cgminer_client.New(minerHostname, config.Path("api-port").Data().(int64), minerTimeout), nil
 }

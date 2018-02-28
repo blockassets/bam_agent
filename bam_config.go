@@ -5,12 +5,17 @@ import (
 	"os"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/blockassets/bam_agent/monitor"
 	"github.com/json-iterator/go"
 )
 
 var (
 	json = jsoniter.ConfigDefault
 )
+
+type BamConfig struct {
+	Monitor monitor.MonitorConfig `json:"monitor"`
+}
 
 func InitialiseConfigFile(configFile string) (*BamConfig, error) {
 
@@ -27,7 +32,7 @@ func InitialiseConfigFile(configFile string) (*BamConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.OpenFile(configFile, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+	file, err := os.OpenFile(configFile, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0664)
 	if err == nil {
 		// write out default content if just created
 		file.Write(defaultJson)
