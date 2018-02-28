@@ -33,22 +33,23 @@ func (lm *loadMonitor) Start(cfg *MonitorConfig) error {
 	}
 	lm.setRunning()
 	lm.quiter = make(chan struct{})
-	if cfg.Load.Enabled {
-		go func() {
-			log.Printf("Starting Load Moniter: Checking load < %v every: %v seconds\n", cfg.Load.HighLoadMark, cfg.Load.PeriodSecs)
-			ticker := time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
-			defer ticker.Stop()
-			defer lm.stoppedRunning()
-			for {
-				select {
-				case <-ticker.C:
+	go func() {
+		log.Printf("Starting Load Moniter: Enabled:%v Checking load < %v every: %v seconds\n", cfg.Load.Enabled, cfg.Load.HighLoadMark, cfg.Load.PeriodSecs)
+		ticker := time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
+		defer ticker.Stop()
+		defer lm.stoppedRunning()
+		for {
+			select {
+			case <-ticker.C:
+				if cfg.Load.Enabled {
 					checkLoad(lm.sr, cfg.Load.HighLoadMark, lm.onHighLoad)
-				case <-lm.quiter:
-					return
 				}
+			case <-lm.quiter:
+				return
 			}
-		}()
-	}
+		}
+	}()
+
 	return nil
 }
 
