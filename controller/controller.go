@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/blockassets/cgminer_client"
 	"github.com/json-iterator/go"
 	"github.com/labstack/echo"
 )
@@ -22,8 +23,13 @@ type Controller struct {
 	Handler http.HandlerFunc
 }
 
+type Config struct {
+	Version string
+	Client  *cgminer_client.Client
+}
+
 type Builder interface {
-	build() *Controller
+	build(cfg *Config) *Controller
 	makeHandler() http.HandlerFunc
 }
 
@@ -34,8 +40,13 @@ func makeJsonHandler(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func Init(e *echo.Echo) {
-	ctrls := []*Controller{RebootCtrl{}.build(), CGQuitCtrl{}.build(), PutPoolsCtrl{}.build()}
+func Init(e *echo.Echo, cfg *Config) {
+	ctrls := []*Controller{
+		RebootCtrl{}.build(cfg),
+		CGQuitCtrl{}.build(cfg),
+		PutPoolsCtrl{}.build(cfg),
+		StatusCtrl{}.build(cfg),
+	}
 
 	for _, ctrl := range ctrls {
 		e.Match(ctrl.Methods, ctrl.Path, echo.WrapHandler(ctrl.Handler))

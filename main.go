@@ -14,6 +14,7 @@ import (
 	"github.com/blockassets/bam_agent/controller"
 	"github.com/blockassets/bam_agent/fetcher"
 	"github.com/blockassets/bam_agent/monitor"
+	"github.com/blockassets/cgminer_client"
 	"github.com/jpillora/overseer"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -21,8 +22,7 @@ import (
 
 var (
 	// Makefile build
-	version = ""
-
+	version        = ""
 	interval       time.Duration
 	configFileName *string
 )
@@ -31,10 +31,19 @@ const (
 	max24HourInt = 23
 	ghUser       = "blockassets"
 	ghRepo       = "bam_agent"
+
+	// TODO: refactor into config
+	minerHostname = "localhost"
+	minerPort     = 4028
+	minerTimeout  = 5 * time.Second
 )
 
 type BamConfig struct {
 	Monitor monitor.MonitorConfig `json:"monitor"`
+}
+
+type AgentVersion struct {
+	Version string
 }
 
 func main() {
@@ -98,7 +107,9 @@ func startServer(state overseer.State) {
 
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
 
-	controller.Init(e)
+	client := cgminer_client.New(minerHostname, minerPort, minerTimeout)
+
+	controller.Init(e, &controller.Config{Version: version, Client: client})
 
 	// Start server
 	if state.Listener != nil {

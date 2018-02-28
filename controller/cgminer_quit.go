@@ -5,12 +5,16 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/cgminer_client"
 )
 
-// Implements Controller interface
-type CGQuitCtrl struct{}
+// Implements Builder interface
+type CGQuitCtrl struct {
+	client *cgminer_client.Client
+}
 
-func (c CGQuitCtrl) build() *Controller {
+func (c CGQuitCtrl) build(cfg *Config) *Controller {
+	c.client = cfg.Client
 	return &Controller{
 		Methods: []string{http.MethodGet},
 		Path:    "/cgminer/quit",
@@ -26,7 +30,7 @@ func (c CGQuitCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			err := service.CgmQuit()
+			err := service.CgmQuit(c.client)
 			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
