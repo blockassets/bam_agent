@@ -14,14 +14,13 @@ type LoadConfig struct {
 
 type loadMonitor struct {
 	sr         statRetriever
-	ticker     *time.Ticker
 	quiter     chan struct{}
 	isRunning  bool
 	onHighLoad func()
 }
 
 func newLoadMonitor(sr statRetriever, onHighLoad func()) *loadMonitor {
-	return &loadMonitor{sr, nil, nil, false, onHighLoad}
+	return &loadMonitor{sr, nil, false, onHighLoad}
 }
 
 func (lm *loadMonitor) start(cfg *MonitorConfig) error {
@@ -33,12 +32,12 @@ func (lm *loadMonitor) start(cfg *MonitorConfig) error {
 	if cfg.Load.Enabled {
 		go func() {
 			log.Printf("Starting Load Moniter: Checking load < %v every: %v seconds\n", cfg.Load.HighLoadMark, cfg.Load.PeriodSecs)
-			lm.ticker = time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
-			defer lm.ticker.Stop()
+			ticker := time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
+			defer ticker.Stop()
 			defer func() { lm.isRunning = false }()
 			for {
 				select {
-				case <-lm.ticker.C:
+				case <-ticker.C:
 					high, err := checkLoadAvg(lm.sr, cfg.Load.HighLoadMark)
 					if err != nil {
 						log.Printf("Error checking LoadAvg: %v", err)
