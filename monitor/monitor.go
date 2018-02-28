@@ -2,16 +2,26 @@ package monitor
 
 import (
 	"log"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
-type Monitor struct {
+type MonitorConfig struct {
 	Load LoadConfig `json:"load"`
 }
 
-func StartMonitors(cfg *Monitor) {
+type Monitor interface {
+	Start(cfg *MonitorConfig) error
+	Stop()
+}
+
+func StartMonitors(cfg *MonitorConfig) {
 	// Startup the goroutines to do the stuff that needs to be monitored
 	sr := LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
-	go monitorLoad(&cfg.Load, sr)
+
+	lm := newLoadMonitor(&sr, service.Reboot)
+	lm.start(cfg)
+
 }
