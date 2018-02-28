@@ -17,10 +17,10 @@ type RebootConfig struct {
 func (cfg *RebootConfig) InitialPeriod() time.Duration {
 	// If all miners are reset, they come back on line in a random distribution so that we dont get seen as a
 	// denial of service attack on the pool
-	s1 := rand.NewSource(time.Now().UnixNano())                                                                   // provide synchronization around starting and stopping of the monitor
-	r1 := rand.New(s1)                                                                                            // there are some tricky edge cases and this ensures only one monitor is running
-	return time.Duration(cfg.PeriodSecs)*time.Second + time.Duration(r1.Intn(cfg.InitialPeriodRange))*time.Second // for each instance of the periodicReboot and that monitor.Stop() blocks until the monitor
-} // actually ends
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	return time.Duration(cfg.PeriodSecs)*time.Second + time.Duration(r1.Intn(cfg.InitialPeriodRange))*time.Second
+}
 
 type periodicReboot struct {
 	monitorControl
@@ -34,7 +34,7 @@ func newPeriodicReboot(rebootFunc func()) *periodicReboot {
 func (pr *periodicReboot) Start(cfg *MonitorConfig) error {
 
 	if pr.getRunning() {
-		return errors.New("Periodic Reboot: Already started")
+		return errors.New("periodic Reboot: Already started")
 	}
 	pr.setRunning()
 	pr.quiter = make(chan struct{})

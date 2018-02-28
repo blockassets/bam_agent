@@ -24,8 +24,8 @@ func TestPeriodicReboot(t *testing.T) {
 	if pr.getRunning() != true {
 		t.Errorf("t2.2 Expected pr.isRunning to be true")
 	}
-	// give it time for one call max tim eis 2 seconds
-	time.Sleep(time.Duration(1500) * time.Millisecond)
+	// give it time for one call max time is 2 seconds
+	time.Sleep(time.Duration(2200) * time.Millisecond)
 	fmt.Printf("Stopping Monitor")
 	pr.Stop()
 	if count != 1 {
@@ -35,7 +35,7 @@ func TestPeriodicReboot(t *testing.T) {
 
 	err = pr.Start(&cfg)
 	if err != nil {
-		t.Errorf("t2.5 Expected 2nd start to suceed. Returned %+v", err)
+		t.Errorf("t2.5 Expected 2nd start to suceced. Returned %+v", err)
 	}
 	fmt.Printf("Starting Monitor")
 
