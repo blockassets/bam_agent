@@ -2,9 +2,8 @@ package monitor
 
 import (
 	"errors"
+	"log"
 	"time"
-
-	"github.com/labstack/gommon/log"
 )
 
 type LoadConfig struct {
@@ -43,7 +42,7 @@ func (lm *loadMonitor) start(cfg *MonitorConfig) error {
 					high, err := checkLoadAvg(lm.sr, cfg.Load.HighLoadMark)
 					if err != nil {
 						log.Printf("Error checking LoadAvg: %v", err)
-						return 
+						return
 					}
 					if high {
 						lm.onHighLoad()
