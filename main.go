@@ -101,6 +101,7 @@ func startServer(state overseer.State) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	// Must exist here and not as a controller due to issues with rice
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
 
 	client := cgminer_client.New(minerHostname, minerPort, minerTimeout)
