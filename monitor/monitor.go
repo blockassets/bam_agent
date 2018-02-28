@@ -22,6 +22,5 @@ func StartMonitors(cfg *MonitorConfig) {
 	log.Println("Monitors being started")
 
 	lm := newLoadMonitor(&sr, service.Reboot)
-	lm.start(cfg)
-
+	lm.Start(cfg)
 }

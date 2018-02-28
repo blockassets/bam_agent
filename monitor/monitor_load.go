@@ -3,6 +3,7 @@ package monitor
 import (
 	"errors"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -17,56 +18,93 @@ type loadMonitor struct {
 	quiter     chan struct{}
 	isRunning  bool
 	onHighLoad func()
+	mutex      *sync.Mutex
+	wg         *sync.WaitGroup
 }
 
 func newLoadMonitor(sr statRetriever, onHighLoad func()) *loadMonitor {
-	return &loadMonitor{sr, nil, false, onHighLoad}
+	return &loadMonitor{sr, nil, false, onHighLoad, &sync.Mutex{}, &sync.WaitGroup{}}
 }
 
-func (lm *loadMonitor) start(cfg *MonitorConfig) error {
-	if lm.isRunning {
+func (lm *loadMonitor) Start(cfg *MonitorConfig) error {
+
+	if lm.getRunning() {
 		return errors.New("loadMonitor:Already started")
 	}
-	lm.isRunning = true
+	lm.setRunning()
 	lm.quiter = make(chan struct{})
-	if cfg.Load.Enabled {
-		go func() {
-			log.Printf("Starting Load Moniter: Checking load < %v every: %v seconds\n", cfg.Load.HighLoadMark, cfg.Load.PeriodSecs)
-			ticker := time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
-			defer ticker.Stop()
-			defer func() { lm.isRunning = false }()
-			for {
-				select {
-				case <-ticker.C:
-					high, err := checkLoadAvg(lm.sr, cfg.Load.HighLoadMark)
-					if err != nil {
-						log.Printf("Error checking LoadAvg: %v", err)
-						return
-					}
-					if high {
-						lm.onHighLoad()
-					}
-				case <-lm.quiter:
-					return
+	go func() {
+		log.Printf("Starting Load Moniter: Enabled:%v Checking load < %v every: %v seconds\n", cfg.Load.Enabled, cfg.Load.HighLoadMark, cfg.Load.PeriodSecs)
+		ticker := time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
+		defer ticker.Stop()
+		defer lm.stoppedRunning()
+		for {
+			select {
+			case <-ticker.C:
+				if cfg.Load.Enabled {
+					checkLoad(lm.sr, cfg.Load.HighLoadMark, lm.onHighLoad)
 				}
+			case <-lm.quiter:
+				return
 			}
-		}()
-	}
+		}
+	}()
+
 	return nil
 }
 
-func (lm *loadMonitor) stop() {
-	close(lm.quiter)
+// getRunning, setRunning, waitOnRunning and stoppedRunning
+// provide synchronization around starting and stopping of the monitor
+// there are some tricky edge cases and this ensures only one monitor is running
+// for each instance of the loadMonitor and that monitor.Stop() blocks until the monitor
+// actually ends
+func (lm *loadMonitor) getRunning() bool {
+	lm.mutex.Lock()
+	defer lm.mutex.Unlock()
+	return lm.isRunning
 }
 
-func checkLoadAvg(sr statRetriever, highLoadMark float64) (bool, error) {
-	loads, err := sr.getLoad()
-	if err != nil {
-		return false, err
+func (lm *loadMonitor) waitOnRunning() {
+	lm.wg.Wait()
+}
+
+func (lm *loadMonitor) setRunning() {
+	lm.mutex.Lock()
+	defer lm.mutex.Unlock()
+	if lm.isRunning {
+		return
 	}
+	lm.isRunning = true
+	lm.wg.Add(1)
+	return
+}
+
+func (lm *loadMonitor) stoppedRunning() {
+	lm.mutex.Lock()
+	defer lm.mutex.Unlock()
+	if !lm.isRunning {
+		return
+	}
+	lm.isRunning = false
+	lm.wg.Done()
+	return
+}
+
+func (lm *loadMonitor) Stop() {
+	close(lm.quiter)
+	lm.waitOnRunning()
+}
+
+func checkLoad(sr statRetriever, highLoadMark float64, onHighLoad func()) (bool, error) {
+	loads, err := sr.getLoad()
 	high := false
+	if err != nil {
+		log.Printf("Error checking LoadAvg: %v", err)
+		return high, err
+	}
 	if loads.fiveMinAvg > highLoadMark {
 		high = true
+		onHighLoad()
 	}
-	return high, err
+	return high, nil
 }
