@@ -38,10 +38,6 @@ const (
 	minerTimeout  = 5 * time.Second
 )
 
-type BamConfig struct {
-	Monitor monitor.MonitorConfig `json:"monitor"`
-}
-
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 

@@ -5,12 +5,17 @@ import (
 	"os"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/blockassets/bam_agent/monitor"
 	"github.com/json-iterator/go"
 )
 
 var (
 	json = jsoniter.ConfigDefault
 )
+
+type BamConfig struct {
+	Monitor monitor.MonitorConfig `json:"monitor"`
+}
 
 func InitialiseConfigFile(configFile string) (*BamConfig, error) {
 
