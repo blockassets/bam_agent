@@ -100,7 +100,7 @@ var updatePoolsTests = []struct {
 }`},
 }
 
-func TestMutateConfig(t *testing.T) {
+func TestMutatePools(t *testing.T) {
 	for index, tt := range updatePoolsTests {
 		jsonConfig, err := gabs.ParseJSON([]byte(tt.configFile))
 		if err != nil {
@@ -113,7 +113,7 @@ func TestMutateConfig(t *testing.T) {
 			t.Error(err)
 		}
 
-		mutated := mutateConfig(pools, jsonConfig)
+		mutated := mutatePools(pools, jsonConfig)
 		buf := string(mutated)
 		if tt.expectedOut != buf {
 			t.Errorf("Test Index: %v: Expected:\n%s\nGot:\n%s\n ", index, tt.expectedOut, buf)

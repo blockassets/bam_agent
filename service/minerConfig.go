@@ -15,6 +15,32 @@ type PoolAddresses struct {
 	Pool3 string `json:"pool3"`
 }
 
+// Local private cache. Always reference this through the LoadMinerConfig() function
+var config *gabs.Container
+
+func LoadMinerConfig() (*gabs.Container, error) {
+	// Local cache of config to prevent a lot of reads
+	if config != nil {
+		return config, nil
+	}
+
+	config, err := gabs.ParseJSONFile(configFilePath)
+	if err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
+func SaveMinerConfig(bytes []byte) error {
+	result := ioutil.WriteFile(configFilePath, bytes,0644)
+	// Clear the cache so that the next LoadMinerConfig() will read from disk
+	if result == nil {
+		config = nil
+	}
+	return result
+}
+
 func UpdatePools(poolData []byte) error {
 	pools := &PoolAddresses{}
 	err := json.Unmarshal(poolData, pools)
@@ -22,22 +48,16 @@ func UpdatePools(poolData []byte) error {
 		return err
 	}
 
-	jsonParsed, err := gabs.ParseJSONFile(configFilePath)
+	config, err := LoadMinerConfig()
 	if err != nil {
 		return err
 	}
 
-	bytes := mutateConfig(pools, jsonParsed)
-
-	err = ioutil.WriteFile(configFilePath, bytes,0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	bytes := mutatePools(pools, config)
+	return SaveMinerConfig(bytes)
 }
 
-func mutateConfig(pools *PoolAddresses, config *gabs.Container) []byte {
+func mutatePools(pools *PoolAddresses, config *gabs.Container) []byte {
 	config.Set(pools.Pool1, "pool1")
 	config.Set(pools.Pool2, "pool2")
 	config.Set(pools.Pool3, "pool3")
