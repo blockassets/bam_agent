@@ -5,10 +5,10 @@
 			"periodInSeconds": 60,
 			"highLoadMark": 5.0
 		},
-		"reboot":{
-			"enabled":false,
-			"periodInSeconds":259200,
-			"initialPeriodRangeInSeconds":3600
+		"reboot": {
+			"enabled": false,
+			"periodInSeconds": 259200,
+			"initialPeriodRangeInSeconds": 3600
 		}
 	}
 }
