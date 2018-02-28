@@ -8,7 +8,8 @@ import (
 )
 
 type MonitorConfig struct {
-	Load LoadConfig `json:"load"`
+	Load   LoadConfig   `json:"load"`
+	Reboot RebootConfig `json:"reboot"`
 }
 
 type Monitor interface {

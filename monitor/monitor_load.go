@@ -10,9 +10,9 @@ import (
 )
 
 type LoadConfig struct {
-	Enabled      bool    `json:"enabled"`
-	PeriodSecs   int     `json:"period_secs"`
-	HighLoadMark float64 `json:"high_load_mark"`
+	Enabled         bool    `json:"enabled"`
+	PeriodInSeconds int     `json:"periodInSeconds"`
+	HighLoadMark    float64 `json:"highLoadMark"`
 }
 
 type loadMonitor struct {
@@ -33,8 +33,8 @@ func (lm *loadMonitor) Start(cfg *MonitorConfig) error {
 	lm.setRunning()
 	lm.quiter = make(chan struct{})
 	go func() {
-		log.Printf("Starting Load Moniter: Enabled:%v Checking load < %v every: %v seconds\n", cfg.Load.Enabled, cfg.Load.HighLoadMark, cfg.Load.PeriodSecs)
-		ticker := time.NewTicker(time.Duration(cfg.Load.PeriodSecs) * time.Second)
+		log.Printf("Starting Load Monitor: Enabled:%v Checking load > %v every: %v seconds\n", cfg.Load.Enabled, cfg.Load.HighLoadMark, cfg.Load.PeriodInSeconds)
+		ticker := time.NewTicker(time.Duration(cfg.Load.PeriodInSeconds) * time.Second)
 		defer ticker.Stop()
 		defer lm.stoppedRunning()
 		for {

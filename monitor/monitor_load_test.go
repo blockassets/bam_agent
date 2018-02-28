@@ -97,7 +97,7 @@ func TestLoadMonitors(t *testing.T) {
 	sr := &testStatRetriever{}
 	sr.dataset = LevelAboveFive
 	cfg := MonitorConfig{}
-	cfg.Load = LoadConfig{Enabled: true, PeriodSecs: 1, HighLoadMark: 5.0}
+	cfg.Load = LoadConfig{Enabled: true, PeriodInSeconds: 1, HighLoadMark: 5.0}
 
 	lm := newLoadMonitor(sr, func() { testOnHighLoadCounter += 1 })
 
