@@ -16,16 +16,13 @@ type LoadConfig struct {
 }
 
 type loadMonitor struct {
-	sr         service.StatRetriever
-	quiter     chan struct{}
-	isRunning  bool
-	onHighLoad func()
-	mutex      *sync.Mutex
-	wg         *sync.WaitGroup
+	monitorControl // delegate the synchronization and implementation for start, stop etc
+	sr             service.StatRetriever
+	onHighLoad     func()
 }
 
 func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) *loadMonitor {
-	return &loadMonitor{sr, nil, false, onHighLoad, &sync.Mutex{}, &sync.WaitGroup{}}
+	return &loadMonitor{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
 }
 
 func (lm *loadMonitor) Start(cfg *MonitorConfig) error {
@@ -53,48 +50,6 @@ func (lm *loadMonitor) Start(cfg *MonitorConfig) error {
 	}()
 
 	return nil
-}
-
-// getRunning, setRunning, waitOnRunning and stoppedRunning
-// provide synchronization around starting and stopping of the monitor
-// there are some tricky edge cases and this ensures only one monitor is running
-// for each instance of the loadMonitor and that monitor.Stop() blocks until the monitor
-// actually ends
-func (lm *loadMonitor) getRunning() bool {
-	lm.mutex.Lock()
-	defer lm.mutex.Unlock()
-	return lm.isRunning
-}
-
-func (lm *loadMonitor) waitOnRunning() {
-	lm.wg.Wait()
-}
-
-func (lm *loadMonitor) setRunning() {
-	lm.mutex.Lock()
-	defer lm.mutex.Unlock()
-	if lm.isRunning {
-		return
-	}
-	lm.isRunning = true
-	lm.wg.Add(1)
-	return
-}
-
-func (lm *loadMonitor) stoppedRunning() {
-	lm.mutex.Lock()
-	defer lm.mutex.Unlock()
-	if !lm.isRunning {
-		return
-	}
-	lm.isRunning = false
-	lm.wg.Done()
-	return
-}
-
-func (lm *loadMonitor) Stop() {
-	close(lm.quiter)
-	lm.waitOnRunning()
 }
 
 func checkLoad(sr service.StatRetriever, highLoadMark float64, onHighLoad func()) (bool, error) {
