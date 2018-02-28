@@ -82,7 +82,7 @@ func prog(state overseer.State) {
 
 	cfg, err := InitialiseConfigFile(*configFileName)
 	if err != nil {
-		log.Printf("Failed to open configuration: %s\nError:%v\n", *configFileName, err)
+		log.Fatalf("Failed to open configuration: %s\nError: %v\n", *configFileName, err)
 		return
 	}
 
