@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	"github.com/blockassets/bam_agent/service"
@@ -18,7 +19,6 @@ import (
 // eg { "pool1":"111.2.3.4", "pool2":"112.3.4.5", "pool3":"113.4.5.6"}
 // and we update the conf.default file on the miner
 
-const defConfigPath = "/usr/app/conf.default"
 
 // Implements Builder interface
 type PutPoolsCtrl struct {
@@ -38,11 +38,18 @@ func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			err := service.UpdatePools(r.Body, defConfigPath)
+			data, err := ioutil.ReadAll(r.Body)
 			if err != nil {
-				httpStat = http.StatusBadGateway
+				httpStat = http.StatusInternalServerError
 				bamStat = BAMStatus{"Error", err}
+			} else {
+				err = service.UpdatePools(data)
+				if err != nil {
+					httpStat = http.StatusBadGateway
+					bamStat = BAMStatus{"Error", err}
+				}
 			}
+
 			w.WriteHeader(httpStat)
 			resp, _ := json.Marshal(bamStat)
 			w.Write(resp)

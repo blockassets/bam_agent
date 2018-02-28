@@ -1,24 +1,21 @@
 package service
 
 import (
-	"io/ioutil"
-	"strings"
+	"encoding/json"
 	"testing"
+
+	"github.com/Jeffail/gabs"
 )
 
-var updatePoolsTests []struct {
-	configFile  string
-	poolsIn     string
-	shouldErr   bool
-	expectedOut string
-} = []struct {
+var updatePoolsTests = []struct {
 	configFile  string
 	poolsIn     string
 	shouldErr   bool
 	expectedOut string
 }{
 	// happy path
-	{`{
+	{
+		configFile:`{
 	"api-allow": "W:0/0",
 	"api-listen": true,
 	"api-port": "4028",
@@ -58,10 +55,10 @@ var updatePoolsTests []struct {
 	"temp_threshold": "80",
 	"username": "admin",
 	"volt": "2"
-}`, `{"pool1": "333.2.3.4",
-	"pool2": "333.3.4.5",
-	"pool3": "333.4.5.6",
-	}`, false, `"api-allow": "W:0/0",
+}`,
+	poolsIn: `{"pool1": "333.2.3.4", "pool2": "333.3.4.5", "pool3": "333.4.5.6"}`,
+	expectedOut: `{
+	"api-allow": "W:0/0",
 	"api-listen": true,
 	"api-port": "4028",
 	"autoFrequency": true,
@@ -100,37 +97,38 @@ var updatePoolsTests []struct {
 	"temp_threshold": "80",
 	"username": "admin",
 	"volt": "2"
-`},
-	// Emptyin
-	{``, `{"pool1": "333.2.3.4",
-	"pool2": "333.3.4.5",
-	"pool3": "333.4.5.6",
-	}`, false, `{"pool1": "333.2.3.4",
-	"pool2": "333.3.4.5",
-	"pool3": "333.4.5.6",
-	}`},
-	// Incomplete json in
-	{`{"pool1": "333.2.3.4",
-	"pool2": "333.3.4.5",
-	"pool3": "333.4.5.6",
-	}`, `{"pool1": "333.2.3.4",
-	"pool2": "333.3.4.5",
-	"pool3": "33`, true, ``},
+}`},
 }
 
-func TestCommand_UpdatePools(t *testing.T) {
-
+func TestMutateConfig(t *testing.T) {
 	for index, tt := range updatePoolsTests {
-
-		buf, err := updateCfgJson(ioutil.NopCloser(strings.NewReader(tt.poolsIn)), []byte(tt.configFile))
-		if (err == nil) && tt.shouldErr {
-			t.Errorf("Test Index: %v: UpdatePools should of errored. returned nil", index)
+		jsonConfig, err := gabs.ParseJSON([]byte(tt.configFile))
+		if err != nil {
+			t.Error(err)
 		}
-		if err == nil {
-			if tt.expectedOut != string(buf) {
-				t.Errorf("Test Index: %v: Expected:\n%s\nGot:\n%s\n ", index, tt.expectedOut, string(buf))
-			}
+
+		pools := &PoolAddresses{}
+		err = json.Unmarshal([]byte(tt.poolsIn), pools)
+		if err != nil {
+			t.Error(err)
+		}
+
+		mutated := mutateConfig(pools, jsonConfig)
+		buf := string(mutated)
+		if tt.expectedOut != buf {
+			t.Errorf("Test Index: %v: Expected:\n%s\nGot:\n%s\n ", index, tt.expectedOut, buf)
 		}
 	}
+}
 
+func TestUpdatePools(t *testing.T) {
+	err := UpdatePools(nil)
+	if err == nil {
+		t.Error("Should have had an error on nil input")
+	}
+
+	err = UpdatePools([]byte("{ this is bad json }"))
+	if err == nil {
+		t.Error("Should have had an error on bad input")
+	}
 }
