@@ -42,10 +42,6 @@ type BamConfig struct {
 	Monitor monitor.MonitorConfig `json:"monitor"`
 }
 
-type AgentVersion struct {
-	Version string
-}
-
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
