@@ -8,8 +8,12 @@ import (
 	"time"
 )
 
+const (
+	uptimePath = "/proc/uptime"
+)
+
 func GetUptime() (time.Duration, error) {
-	data, err := ioutil.ReadFile("/proc/uptime")
+	data, err := ioutil.ReadFile(uptimePath)
 	if err != nil {
 		return time.Duration(0), err
 	}
@@ -19,7 +23,7 @@ func GetUptime() (time.Duration, error) {
 func parseUptime(data string) (time.Duration, error) {
 	parts := strings.Fields(data)
 	if len(parts) < 2 {
-		return time.Duration(0), fmt.Errorf("unexpected content in /proc/uptime: %s", data)
+		return time.Duration(0), fmt.Errorf("unexpected content in %s: %s", uptimePath, data)
 	}
 
 	uptimeInSeconds := strings.Split(parts[0], ".")
