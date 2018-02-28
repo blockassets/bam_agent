@@ -2,8 +2,13 @@ package controller
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/blockassets/bam_agent/service"
+)
+
+const (
+	DELAY_BEFORE_REBOOT = time.Duration(5) * time.Second
 )
 
 // Implements Controller interface
@@ -24,7 +29,7 @@ func (c RebootCtrl) makeHandler() http.HandlerFunc {
 
 			resp, _ := json.Marshal(BAMStatus{"OK", nil})
 			w.Write(resp)
-
-			go service.Reboot()
+			// leave enough time for http server to respond to caller
+			time.AfterFunc(DELAY_BEFORE_REBOOT, service.Reboot)
 		})
 }
