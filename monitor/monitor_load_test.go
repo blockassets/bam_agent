@@ -36,48 +36,52 @@ func (sr *testStatRetriever) getLoad() (LoadAvgs, error) {
 
 }
 
-func TestCheckLoadAvg(t *testing.T) {
+func doNothing() {}
+
+func TestcheckLoad(t *testing.T) {
 	sr := &testStatRetriever{}
 	sr.dataset = LevelNotEnough
-	tooHigh, err := checkLoadAvg(sr, 5.0)
+	tooHigh, err := checkLoad(sr, 5.0, doNothing)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
 	sr.dataset = LevelBelowFive
-	tooHigh, err = checkLoadAvg(sr, 5.0)
+	tooHigh, err = checkLoad(sr, 5.0, doNothing)
 	if tooHigh {
 		t.Errorf("Expected low, got high!")
 	}
 	sr.dataset = LevelExactlyFive
-	tooHigh, err = checkLoadAvg(sr, 5.0)
+	tooHigh, err = checkLoad(sr, 5.0, doNothing)
 	if tooHigh {
 		t.Errorf("Expected low, got high!")
 	}
 	sr.dataset = LevelAboveFive
-	tooHigh, err = checkLoadAvg(sr, 5.0)
+	tooHigh, err = checkLoad(sr, 5.0, doNothing)
 	if !tooHigh {
 		t.Errorf("Expected high, got low!")
 	}
 	sr.dataset = LevelMalformed
-	tooHigh, err = checkLoadAvg(sr, 5.0)
+	tooHigh, err = checkLoad(sr, 5.0, doNothing)
 	if err == nil {
 		t.Errorf("Expected error!")
 	}
 }
 
-var testOnHighLoadCounter int
-
 func TestLoadMonitors(t *testing.T) {
+	testOnHighLoadCounter := 0
+
 	sr := &testStatRetriever{}
 	sr.dataset = LevelBelowFive
 	cfg := MonitorConfig{}
 	cfg.Load = LoadConfig{Enabled: true, PeriodSecs: 1, HighLoadMark: 5.0}
+
 	lm := newLoadMonitor(sr, func() { testOnHighLoadCounter += 1 })
-	err := lm.start(&cfg)
+
+	err := lm.Start(&cfg)
 	if err != nil {
 		t.Errorf("Expected start to suceed. Returned %+v", err)
 	}
-	if lm.isRunning != true {
+	if lm.getRunning() != true {
 		t.Errorf("Expected lm.isRunning to be true")
 	}
 	time.Sleep(time.Duration(4500) * time.Millisecond)
@@ -86,21 +90,18 @@ func TestLoadMonitors(t *testing.T) {
 	}
 	sr.dataset = LevelAboveFive
 	time.Sleep(time.Duration(4500) * time.Millisecond)
-	lm.stop()
+	lm.Stop()
 	mark := testOnHighLoadCounter
 	time.Sleep(time.Duration(2000) * time.Millisecond)
 	if mark != testOnHighLoadCounter {
 		t.Errorf("Expected OnHighLoad to stop: mark == %d, counter == %d", mark, testOnHighLoadCounter)
 	}
 
-	if (testOnHighLoadCounter != 4) && (testOnHighLoadCounter != 5) {
-		t.Errorf("Expected 4 or 5 onHighMarks, got %d", testOnHighLoadCounter)
-	}
-	err = lm.start(&cfg)
+	err = lm.Start(&cfg)
 	if err != nil {
 		t.Errorf("Expected 2nd start to suceed. Returned %+v", err)
 	}
-	err = lm.start(&cfg)
+	err = lm.Start(&cfg)
 	if err == nil {
 		t.Errorf("Expected 3rd start to fail")
 	}
