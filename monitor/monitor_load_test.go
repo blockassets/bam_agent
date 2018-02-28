@@ -3,6 +3,8 @@ package monitor
 import (
 	"testing"
 	"time"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
 type testStatRetriever struct {
@@ -17,7 +19,7 @@ const (
 	LevelMalformed
 )
 
-func (sr *testStatRetriever) getLoad() (LoadAvgs, error) {
+func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
 	var data string
 	switch sr.dataset {
 	case LevelNotEnough:
@@ -32,8 +34,7 @@ func (sr *testStatRetriever) getLoad() (LoadAvgs, error) {
 		data = "a b c d emnf,masfd"
 	}
 
-	return parseLoad(data)
-
+	return service.ParseLoad(data)
 }
 
 var countSomething int

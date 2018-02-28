@@ -1,4 +1,4 @@
-package monitor
+package service
 
 // this code cut and pasted from the promethious repo
 
@@ -11,17 +11,17 @@ import (
 )
 
 // facilitate testing of code that uses this package
-type statRetriever interface {
-	getLoad() (loads LoadAvgs, err error)
+type StatRetriever interface {
+	GetLoad() (loads LoadAvgs, err error)
 }
 
 type LinuxStatRetriever struct {
 }
 
 type LoadAvgs struct {
-	oneMinAvg     float64
-	fiveMinAvg    float64
-	fifteenMinAvg float64
+	OneMinAvg     float64
+	FiveMinAvg    float64
+	FifteenMinAvg float64
 }
 
 // DefaultMountPoint is the common mount point of the proc filesystem.
@@ -32,16 +32,16 @@ func procFilePath(name string) string {
 }
 
 // Read loadavg from /proc.
-func (*LinuxStatRetriever) getLoad() (LoadAvgs, error) {
+func (*LinuxStatRetriever) GetLoad() (LoadAvgs, error) {
 	data, err := ioutil.ReadFile(procFilePath("loadavg"))
 	if err != nil {
 		return LoadAvgs{}, err
 	}
-	return parseLoad(string(data))
+	return ParseLoad(string(data))
 }
 
 // Parse /proc loadavg and return 1m, 5m and 15m.
-func parseLoad(data string) (LoadAvgs, error) {
+func ParseLoad(data string) (LoadAvgs, error) {
 	loadsAsArray := make([]float64, 3)
 	parts := strings.Fields(data)
 	if len(parts) < 3 {
@@ -55,9 +55,9 @@ func parseLoad(data string) (LoadAvgs, error) {
 		}
 	}
 	loads := LoadAvgs{
-		oneMinAvg:     loadsAsArray[0],
-		fiveMinAvg:    loadsAsArray[1],
-		fifteenMinAvg: loadsAsArray[2],
+		OneMinAvg:     loadsAsArray[0],
+		FiveMinAvg:    loadsAsArray[1],
+		FifteenMinAvg: loadsAsArray[2],
 	}
 	return loads, nil
 }

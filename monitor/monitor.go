@@ -17,7 +17,7 @@ type Monitor interface {
 
 func StartMonitors(cfg *MonitorConfig) {
 	// Startup the goroutines to do the stuff that needs to be monitored
-	sr := LinuxStatRetriever{}
+	sr := service.LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
 

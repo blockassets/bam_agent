@@ -5,6 +5,8 @@ import (
 	"log"
 	"sync"
 	"time"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
 type LoadConfig struct {
@@ -14,7 +16,7 @@ type LoadConfig struct {
 }
 
 type loadMonitor struct {
-	sr         statRetriever
+	sr         service.StatRetriever
 	quiter     chan struct{}
 	isRunning  bool
 	onHighLoad func()
@@ -22,7 +24,7 @@ type loadMonitor struct {
 	wg         *sync.WaitGroup
 }
 
-func newLoadMonitor(sr statRetriever, onHighLoad func()) *loadMonitor {
+func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) *loadMonitor {
 	return &loadMonitor{sr, nil, false, onHighLoad, &sync.Mutex{}, &sync.WaitGroup{}}
 }
 
@@ -95,14 +97,14 @@ func (lm *loadMonitor) Stop() {
 	lm.waitOnRunning()
 }
 
-func checkLoad(sr statRetriever, highLoadMark float64, onHighLoad func()) (bool, error) {
-	loads, err := sr.getLoad()
+func checkLoad(sr service.StatRetriever, highLoadMark float64, onHighLoad func()) (bool, error) {
+	loads, err := sr.GetLoad()
 	high := false
 	if err != nil {
 		log.Printf("Error checking LoadAvg: %v", err)
 		return high, err
 	}
-	if loads.fiveMinAvg > highLoadMark {
+	if loads.FiveMinAvg > highLoadMark {
 		high = true
 		onHighLoad()
 	}
