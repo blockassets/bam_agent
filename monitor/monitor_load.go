@@ -15,7 +15,7 @@ type HighLoadConfig struct {
 	HighLoadMark    float64 `json:"highLoadMark"`
 }
 
-// Implements the Instance interface
+// Implements the Monitor interface
 type LoadMonitor struct {
 	*Context
 	sr             service.StatRetriever
