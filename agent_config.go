@@ -13,22 +13,26 @@ var (
 	json = jsoniter.ConfigDefault
 )
 
-type BamConfig struct {
+const (
+	defaultConfigFile = "bam_agent.json"
+)
+
+type AgentConfig struct {
 	Monitor monitor.MonitorConfig `json:"monitor"`
 }
 
-func InitialiseConfigFile(configFile string) (*BamConfig, error) {
+func LoadAgentConfig(configFile string) (*AgentConfig, error) {
 
 	confBox, err := rice.FindBox("conf")
 	if err != nil {
 		return nil, err
 	}
-	defaultJson, err := confBox.Bytes("config.json")
+	defaultJson, err := confBox.Bytes(defaultConfigFile)
 	// create a config structure from the default json
 	// so any struct additions in this version of app will get correct
 	// defaults
-	bamConfig := &BamConfig{}
-	err = json.Unmarshal(defaultJson, bamConfig)
+	agentConfig := &AgentConfig{}
+	err = json.Unmarshal(defaultJson, agentConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +52,11 @@ func InitialiseConfigFile(configFile string) (*BamConfig, error) {
 			if err != nil {
 				return nil, err
 			}
-			err = json.Unmarshal(buf, bamConfig)
+			err = json.Unmarshal(buf, agentConfig)
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
-	return bamConfig, nil
+	return agentConfig, nil
 }
