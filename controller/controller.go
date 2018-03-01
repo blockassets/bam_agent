@@ -35,7 +35,13 @@ type Builder interface {
 
 func makeJsonHandler(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8") // normal header
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		// Prevent caching of any of the requests so that we can use GET for things like /reboot
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+
 		handler.ServeHTTP(w, r)
 	}
 }
