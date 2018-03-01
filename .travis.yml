@@ -13,7 +13,7 @@ stages:
 jobs:
   include:
   - stage: test
-    script: make test
+    script: make test-all
   - stage: deploy
     script: make arm
     before_deploy:
