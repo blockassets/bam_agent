@@ -37,6 +37,7 @@ const (
 	// TODO: refactor into config
 	minerHostname = "localhost"
 	minerTimeout  = 5 * time.Second
+	minerPort = 4028
 )
 
 func main() {
@@ -81,7 +82,7 @@ func prog(state overseer.State) {
 		log.Printf("Self-update interval: %s", interval)
 	}
 
-	cfg, err := InitialiseConfigFile(*configFileName)
+	cfg, err := LoadAgentConfig(*configFileName)
 	if err != nil {
 		log.Fatalf("Failed to open configuration: %s\nError: %v\n", *configFileName, err)
 		return
@@ -122,6 +123,9 @@ func minerClient() (*cgminer_client.Client, error) {
 		return nil, err
 	}
 
-	port, err := strconv.ParseInt(config.Path("api-port").Data().(string), 10, 32)
+	port, err := strconv.ParseInt(config.Path("api-port").Data().(string), 10, 64)
+	if err != nil {
+		port = minerPort
+	}
 	return cgminer_client.New(minerHostname, port, minerTimeout), err
 }
