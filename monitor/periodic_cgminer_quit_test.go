@@ -19,7 +19,7 @@ func TestPeriodicCGMQuit(t *testing.T) {
 
 	err := pr.Start(&cfg)
 	if err != nil {
-		t.Errorf("t2.1 Expected start to suceed. Returned %+v", err)
+		t.Errorf("t2.1 Expected start to succeed. Returned %+v", err)
 	}
 	if pr.getRunning() != true {
 		t.Errorf("t2.2 Expected pr.isRunning to be true")
@@ -27,6 +27,7 @@ func TestPeriodicCGMQuit(t *testing.T) {
 
 	// give it time for an inital call(between 1 and 2 seconds) and then one more..
 	time.Sleep(time.Duration(3200) * time.Millisecond)
+
 	fmt.Printf("Stopping Monitor")
 	pr.Stop()
 	mark := count
@@ -40,23 +41,23 @@ func TestPeriodicCGMQuit(t *testing.T) {
 	fmt.Printf("Starting Monitor\n")
 	err = pr.Start(&cfg)
 	if err != nil {
-		t.Errorf("t2.5 Expected 2nd start to suceced. Returned %+v", err)
+		t.Errorf("t2.5 Expected 2nd start to succeed. Returned %+v", err)
 	}
-	fmt.Printf("Starting Monitor\n")
 
+	fmt.Printf("Starting Monitor\n")
 	err = pr.Start(&cfg)
 	if err == nil {
 		t.Errorf("t2.6 Expected 3rd start to fail")
 	}
-	fmt.Printf("Stopping Monitor\n")
 
+	fmt.Printf("Stopping Monitor\n")
 	pr.Stop()
 	if pr.getRunning() {
 		t.Errorf("t2.7 Expected to be not running")
 	}
-	cfg.CGMQuit.Enabled = false
-	fmt.Printf("Starting Monitor\n")
 
+	fmt.Printf("Starting Monitor\n")
+	cfg.CGMQuit.Enabled = false
 	err = pr.Start(&cfg)
 	if err != nil {
 		t.Errorf("t2.8 Expected 4th start to succeed")
@@ -77,7 +78,6 @@ func TestPeriodicCGMQuit(t *testing.T) {
 	time.Sleep(time.Duration(2500) * time.Millisecond)
 	if count < 1 {
 		t.Errorf("t2.10 Expected count to be non-zero, got %d", count)
-
 	}
 
 }
