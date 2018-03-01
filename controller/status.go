@@ -32,22 +32,16 @@ func (c StatusCtrl) build(cfg *Config) *Controller {
 func (c StatusCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
-			var status interface{}
-			httpStatus := http.StatusOK
 
-			uptime, err := service.GetUptime()
-			if err != nil {
-				httpStatus = http.StatusInternalServerError
-				status = BAMStatus{Status: "Error", Error: err}
-			} else {
-				status = Status{
-					Agent:  strings.TrimSpace(c.version),
-					Miner:  strings.TrimSpace(service.ReadVersionFile()),
-					Uptime: uptime,
-				}
+			uptime, _ := service.GetUptime()
+
+			status := Status{
+				Agent:  strings.TrimSpace(c.version),
+				Miner:  strings.TrimSpace(service.ReadVersionFile()),
+				Uptime: uptime,
 			}
 
-			w.WriteHeader(httpStatus)
+			w.WriteHeader(http.StatusOK)
 			resp, _ := json.Marshal(status)
 			w.Write(resp)
 		})

@@ -37,7 +37,7 @@ const (
 	// TODO: refactor into config
 	minerHostname = "localhost"
 	minerTimeout  = 5 * time.Second
-	minerPort = 4028
+	minerPort = int64(4028)
 )
 
 func main() {
@@ -88,10 +88,7 @@ func prog(state overseer.State) {
 		return
 	}
 
-	client, err := minerClient()
-	if err != nil {
-		log.Fatalf("Failed to get a miner client Error: %v", err)
-	}
+	client := minerClient()
 
 	monitor.StartMonitors(&cfg.Monitor, client)
 	startServer(state, client)
@@ -117,15 +114,16 @@ func startServer(state overseer.State, client *cgminer_client.Client) {
 	e.Logger.Fatal(e.Start(state.Address))
 }
 
-func minerClient() (*cgminer_client.Client, error) {
+func minerClient() (*cgminer_client.Client) {
+	port := minerPort
+
 	config, err := service.LoadMinerConfig()
-	if err != nil {
-		return nil, err
+	if err == nil {
+		port, err = strconv.ParseInt(config.Path("api-port").Data().(string), 10, 64)
+		if err != nil {
+			port = minerPort
+		}
 	}
 
-	port, err := strconv.ParseInt(config.Path("api-port").Data().(string), 10, 64)
-	if err != nil {
-		port = minerPort
-	}
-	return cgminer_client.New(minerHostname, port, minerTimeout), err
+	return cgminer_client.New(minerHostname, port, minerTimeout)
 }
