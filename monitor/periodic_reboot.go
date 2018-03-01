@@ -18,34 +18,35 @@ type periodicReboot struct {
 	reboot func()
 }
 
-func newPeriodicReboot(rebootFunc func()) *periodicReboot {
+func newPeriodicReboot(rebootFunc func()) Monitor {
 	return &periodicReboot{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, rebootFunc}
 }
 
-func (pr *periodicReboot) Start(cfgMon *MonitorConfig) error {
+func (monitor *periodicReboot) Start(cfgMon *Config) error {
 	cfg := cfgMon.Reboot
-	if pr.getRunning() {
+	if monitor.IsRunning() {
 		return errors.New("periodic Reboot: Already started")
 	}
-	pr.setRunning()
-	pr.quiter = make(chan struct{})
+
+	monitor.setRunning()
+	monitor.quitter = make(chan struct{})
+
 	go func() {
 		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
-		log.Printf("Starting Periodic Reboot: Enabled:%v reboot in:%v", cfg.Enabled, initialPeriod)
+		log.Printf("Starting Periodic Reboot: Enabled: %v reboot in: %v", cfg.Enabled, initialPeriod)
 		timer := time.NewTimer(initialPeriod)
-		defer pr.stoppedRunning()
+		defer monitor.stoppedRunning()
 		for {
 			select {
 			case <-timer.C:
-				log.Printf("timer_tick\n")
 				if cfg.Enabled {
-					log.Printf("timer_tick2\n")
-					pr.reboot()
+					monitor.reboot()
 				}
-			case <-pr.quiter:
+			case <-monitor.quitter:
 				return
 			}
 		}
 	}()
+
 	return nil
 }

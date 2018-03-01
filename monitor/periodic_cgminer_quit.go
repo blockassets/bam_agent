@@ -18,33 +18,36 @@ type periodicCGMQuit struct {
 	CGMinerQuit func()
 }
 
-func newPeriodicCGMQuit(CGMQuitFunc func()) *periodicCGMQuit {
+func newPeriodicCGMQuit(CGMQuitFunc func()) Monitor {
 	return &periodicCGMQuit{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, CGMQuitFunc}
 }
 
-func (pmq *periodicCGMQuit) Start(cfgMon *MonitorConfig) error {
+func (monitor *periodicCGMQuit) Start(cfgMon *Config) error {
 	cfg := cfgMon.CGMQuit
-	if pmq.getRunning() {
+	if monitor.IsRunning() {
 		return errors.New("periodic CGMQuit: Already started")
 	}
-	pmq.setRunning()
-	pmq.quiter = make(chan struct{})
+
+	monitor.setRunning()
+	monitor.quitter = make(chan struct{})
+
 	go func() {
 		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
-		log.Printf("Starting Periodic CGMQuit: Enabled:%v Initial CGMQuit in:%v seconds, then every %v seconds", cfg.Enabled, initialPeriod, cfg.PeriodInSeconds)
+		log.Printf("Starting Periodic CGMQuit: Enabled: %v Initial CGMQuit in: %v, then every %v seconds", cfg.Enabled, initialPeriod, cfg.PeriodInSeconds)
 		timer := time.NewTimer(initialPeriod)
-		defer pmq.stoppedRunning()
+		defer monitor.stoppedRunning()
 		for {
 			select {
 			case <-timer.C:
 				timer.Reset(time.Duration(cfg.PeriodInSeconds) * time.Second)
 				if cfg.Enabled {
-					pmq.CGMinerQuit()
+					monitor.CGMinerQuit()
 				}
-			case <-pmq.quiter:
+			case <-monitor.quitter:
 				return
 			}
 		}
 	}()
+
 	return nil
 }

@@ -10,7 +10,7 @@ func TestPeriodicCGMQuit(t *testing.T) {
 	count := 0
 
 	fmt.Printf("Starting Periodic CGMQuit logic test\n")
-	cfg := MonitorConfig{}
+	cfg := Config{}
 	cfg.CGMQuit = CGMQuitConfig{Enabled: true, PeriodInSeconds: 1, InitialPeriodRangeInSeconds: 1}
 
 	pr := newPeriodicCGMQuit(func() { count++ })
@@ -21,7 +21,7 @@ func TestPeriodicCGMQuit(t *testing.T) {
 	if err != nil {
 		t.Errorf("t2.1 Expected start to succeed. Returned %+v", err)
 	}
-	if pr.getRunning() != true {
+	if !pr.IsRunning() {
 		t.Errorf("t2.2 Expected pr.isRunning to be true")
 	}
 
@@ -52,7 +52,7 @@ func TestPeriodicCGMQuit(t *testing.T) {
 
 	fmt.Printf("Stopping Monitor\n")
 	pr.Stop()
-	if pr.getRunning() {
+	if pr.IsRunning() {
 		t.Errorf("t2.7 Expected to be not running")
 	}
 
@@ -62,13 +62,13 @@ func TestPeriodicCGMQuit(t *testing.T) {
 	if err != nil {
 		t.Errorf("t2.8 Expected 4th start to succeed")
 	}
-	if !pr.getRunning() {
+	if !pr.IsRunning() {
 		t.Errorf("t2.9 Expected to be running")
 	}
 
 	fmt.Printf("Stopping Monitor\n")
 	pr.Stop()
-	if pr.getRunning() {
+	if pr.IsRunning() {
 		t.Errorf("t2.10 Expected to be not running")
 	}
 

@@ -18,7 +18,7 @@ const (
 )
 
 type AgentConfig struct {
-	Monitor monitor.MonitorConfig `json:"monitor"`
+	Monitor monitor.Config `json:"monitor"`
 }
 
 func LoadAgentConfig(configFile string) (*AgentConfig, error) {
