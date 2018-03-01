@@ -37,7 +37,7 @@ const (
 	// TODO: refactor into config
 	minerHostname = "localhost"
 	minerTimeout  = 5 * time.Second
-	minerPort = int64(4028)
+	minerPort     = int64(4028)
 )
 
 func main() {
@@ -114,7 +114,7 @@ func startServer(state overseer.State, client *cgminer_client.Client) {
 	e.Logger.Fatal(e.Start(state.Address))
 }
 
-func minerClient() (*cgminer_client.Client) {
+func minerClient() *cgminer_client.Client {
 	port := minerPort
 
 	config, err := service.LoadMinerConfig()
