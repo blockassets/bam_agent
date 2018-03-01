@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
@@ -122,4 +123,6 @@ func minerClient() (*cgminer_client.Client, error) {
 	}
 
 	return cgminer_client.New(minerHostname, config.Path("api-port").Data().(int64), minerTimeout), nil
+	port, err :=strconv.ParseInt(config.Path("api-port").Data().(string),10,32)
+	return cgminer_client.New(minerHostname, port, minerTimeout), err
 }
