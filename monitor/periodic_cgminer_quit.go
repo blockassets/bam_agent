@@ -13,6 +13,7 @@ type CGMQuitConfig struct {
 	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
 }
 
+// Implements the Monitor interface
 type PeriodicCGMQuitMonitor struct {
 	*Context
 	CGMinerQuit func()

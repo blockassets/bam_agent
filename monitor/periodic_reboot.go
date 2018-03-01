@@ -13,6 +13,7 @@ type RebootConfig struct {
 	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
 }
 
+// Implements the Monitor interface
 type PeriodicRebootMonitor struct {
 	*Context
 	reboot func()

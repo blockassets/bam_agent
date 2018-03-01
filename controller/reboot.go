@@ -14,15 +14,15 @@ const (
 // Implements Builder interface
 type RebootCtrl struct{}
 
-func (c RebootCtrl) build(cfg *Config) *Controller {
+func (ctrl RebootCtrl) build(cfg *Config) *Controller {
 	return &Controller{
 		Methods: []string{http.MethodGet},
 		Path:    "/reboot",
-		Handler: c.makeHandler(),
+		Handler: ctrl.makeHandler(),
 	}
 }
 
-func (c RebootCtrl) makeHandler() http.HandlerFunc {
+func (ctrl RebootCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)

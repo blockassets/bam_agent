@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/cgminer_client"
 	"github.com/json-iterator/go"
 	"github.com/labstack/echo"
@@ -26,6 +27,7 @@ type Controller struct {
 type Config struct {
 	Version string
 	Client  *cgminer_client.Client
+	MonitorManager *monitor.Manager
 }
 
 type Builder interface {
