@@ -3,7 +3,7 @@
 make build
 
 # Start bam_agent
-./bam_agent & PID=$!
+./bam_agent -no-update & PID=$!
 
 sleep 3
 
