@@ -19,7 +19,6 @@ import (
 // eg { "pool1":"111.2.3.4", "pool2":"112.3.4.5", "pool3":"113.4.5.6"}
 // and we update the conf.default file on the miner
 
-
 // Implements Builder interface
 type PutPoolsCtrl struct {
 }
