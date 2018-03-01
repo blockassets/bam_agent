@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/GeertJohan/go.rice"
@@ -91,7 +92,7 @@ func prog(state overseer.State) {
 		log.Fatalf("Failed to get a miner client Error: %v", err)
 	}
 
-	monitor.StartMonitors(&cfg.Monitor)
+	monitor.StartMonitors(&cfg.Monitor, client)
 	startServer(state, client)
 }
 
@@ -121,5 +122,6 @@ func minerClient() (*cgminer_client.Client, error) {
 		return nil, err
 	}
 
-	return cgminer_client.New(minerHostname, config.Path("api-port").Data().(int64), minerTimeout), nil
+	port, err := strconv.ParseInt(config.Path("api-port").Data().(string), 10, 32)
+	return cgminer_client.New(minerHostname, port, minerTimeout), err
 }

@@ -25,23 +25,23 @@ func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) *loadMonitor {
 	return &loadMonitor{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
 }
 
-func (lm *loadMonitor) Start(cfg *MonitorConfig) error {
-
+func (lm *loadMonitor) Start(cfgMon *MonitorConfig) error {
+	cfg := cfgMon.Load
 	if lm.getRunning() {
 		return errors.New("loadMonitor:Already started")
 	}
 	lm.setRunning()
 	lm.quiter = make(chan struct{})
 	go func() {
-		log.Printf("Starting Load Monitor: Enabled:%v Checking load > %v every: %v seconds\n", cfg.Load.Enabled, cfg.Load.HighLoadMark, cfg.Load.PeriodInSeconds)
-		ticker := time.NewTicker(time.Duration(cfg.Load.PeriodInSeconds) * time.Second)
+		log.Printf("Starting Load Monitor: Enabled:%v Checking load > %v every: %v seconds\n", cfg.Enabled, cfg.HighLoadMark, cfg.PeriodInSeconds)
+		ticker := time.NewTicker(time.Duration(cfg.PeriodInSeconds) * time.Second)
 		defer ticker.Stop()
 		defer lm.stoppedRunning()
 		for {
 			select {
 			case <-ticker.C:
-				if cfg.Load.Enabled {
-					checkLoad(lm.sr, cfg.Load.HighLoadMark, lm.onHighLoad)
+				if cfg.Enabled {
+					checkLoad(lm.sr, cfg.HighLoadMark, lm.onHighLoad)
 				}
 			case <-lm.quiter:
 				return

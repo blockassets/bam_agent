@@ -15,7 +15,7 @@ var updatePoolsTests = []struct {
 }{
 	// happy path
 	{
-		configFile:`{
+		configFile: `{
 	"api-allow": "W:0/0",
 	"api-listen": true,
 	"api-port": "4028",
@@ -56,8 +56,8 @@ var updatePoolsTests = []struct {
 	"username": "admin",
 	"volt": "2"
 }`,
-	poolsIn: `{"pool1": "333.2.3.4", "pool2": "333.3.4.5", "pool3": "333.4.5.6"}`,
-	expectedOut: `{
+		poolsIn: `{"pool1": "333.2.3.4", "pool2": "333.3.4.5", "pool3": "333.4.5.6"}`,
+		expectedOut: `{
 	"api-allow": "W:0/0",
 	"api-listen": true,
 	"api-port": "4028",

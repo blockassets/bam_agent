@@ -33,7 +33,7 @@ func LoadMinerConfig() (*gabs.Container, error) {
 }
 
 func SaveMinerConfig(bytes []byte) error {
-	result := ioutil.WriteFile(configFilePath, bytes,0644)
+	result := ioutil.WriteFile(configFilePath, bytes, 0644)
 	// Clear the cache so that the next LoadMinerConfig() will read from disk
 	if result == nil {
 		config = nil

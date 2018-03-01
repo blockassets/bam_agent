@@ -2,19 +2,32 @@ package monitor
 
 import (
 	"log"
+	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/cgminer_client"
 )
 
 type MonitorConfig struct {
-	Load   LoadConfig   `json:"load"`
-	Reboot RebootConfig `json:"reboot"`
+	Load    LoadConfig    `json:"load"`
+	Reboot  RebootConfig  `json:"reboot"`
+	CGMQuit CGMQuitConfig `json:"cgMinerQuit"`
 }
 
 type Monitor interface {
 	Start(cfg *MonitorConfig) error
 	Stop()
+}
+
+// If all miners are reset, they come back on line in a random distribution so that we dont get seen as a
+// denial of service attack on the pool. Helper to create randomized initial period
+func getRandomizedInitialPeriod(periodInSeconds int, rangeInSeconds int) time.Duration {
+
+	s1 := rand.NewSource(time.Now().UnixNano())
+	r1 := rand.New(s1)
+	return time.Duration(periodInSeconds)*time.Second + time.Duration(r1.Intn(rangeInSeconds))*time.Second
 }
 
 // Shared functionality to manage starting and stopping and synchronization
@@ -71,12 +84,18 @@ func (mc *monitorControl) Stop() {
 	mc.waitOnRunning()
 }
 
-func StartMonitors(cfg *MonitorConfig) {
-	// Startup the goroutines to do the stuff that needs to be monitored
+func StartMonitors(cfg *MonitorConfig, client *cgminer_client.Client) {
 	sr := service.LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
 
 	mc := newLoadMonitor(&sr, service.Reboot)
 	mc.Start(cfg)
+
+	mr := newPeriodicReboot(service.Reboot)
+	mr.Start(cfg)
+
+	// TODO add in how to get access to the cgm_quit functionality
+	mcgmQ := newPeriodicCGMQuit(func() { client.Quit() })
+	mcgmQ.Start(cfg)
 }

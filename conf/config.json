@@ -9,6 +9,11 @@
 			"enabled": false,
 			"periodInSeconds": 259200,
 			"initialPeriodRangeInSeconds": 3600
+		},
+		"cgMinerQuit": {
+			"enabled": false,
+			"periodInSeconds": 86400,
+			"initialPeriodRangeInSeconds": 3600
 		}
 	}
 }
