@@ -85,7 +85,6 @@ func (mc *monitorControl) Stop() {
 }
 
 func StartMonitors(cfg *MonitorConfig, client *cgminer_client.Client) {
-	// Startup the goroutines to do the stuff that needs to be monitored
 	sr := service.LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
