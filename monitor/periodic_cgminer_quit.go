@@ -13,29 +13,29 @@ type CGMQuitConfig struct {
 	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
 }
 
-type periodicCGMQuit struct {
-	monitorControl
+type PeriodicCGMQuitMonitor struct {
+	*Context
 	CGMinerQuit func()
 }
 
 func newPeriodicCGMQuit(CGMQuitFunc func()) Monitor {
-	return &periodicCGMQuit{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, CGMQuitFunc}
+	return &PeriodicCGMQuitMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, CGMQuitFunc}
 }
 
-func (monitor *periodicCGMQuit) Start(cfgMon *Config) error {
-	cfg := cfgMon.CGMQuit
+func (monitor *PeriodicCGMQuitMonitor) Start(config *Config) error {
+	cfg := config.CGMQuit
 	if monitor.IsRunning() {
 		return errors.New("periodic CGMQuit: Already started")
 	}
 
-	monitor.setRunning()
+	monitor.StartRunning()
 	monitor.quitter = make(chan struct{})
 
 	go func() {
 		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
 		log.Printf("Starting Periodic CGMQuit: Enabled: %v Initial CGMQuit in: %v, then every %v seconds", cfg.Enabled, initialPeriod, cfg.PeriodInSeconds)
 		timer := time.NewTimer(initialPeriod)
-		defer monitor.stoppedRunning()
+		defer monitor.StopRunning()
 		for {
 			select {
 			case <-timer.C:

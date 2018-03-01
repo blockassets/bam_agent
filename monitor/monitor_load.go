@@ -15,30 +15,31 @@ type HighLoadConfig struct {
 	HighLoadMark    float64 `json:"highLoadMark"`
 }
 
-type loadMonitor struct {
-	monitorControl // delegate the synchronization and implementation for start, stop etc
+// Implements the Instance interface
+type LoadMonitor struct {
+	*Context
 	sr             service.StatRetriever
 	onHighLoad     func()
 }
 
 func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) Monitor {
-	return &loadMonitor{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
+	return &LoadMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
 }
 
-func (monitor *loadMonitor) Start(cfgMon *Config) error {
-	cfg := cfgMon.Load
+func (monitor *LoadMonitor) Start(config *Config) error {
+	cfg := config.Load
 	if monitor.IsRunning() {
 		return errors.New("loadMonitor:Already started")
 	}
 
-	monitor.setRunning()
+	monitor.StartRunning()
 	monitor.quitter = make(chan struct{})
 
 	go func() {
 		log.Printf("Starting Load Monitor: Enabled:%v Checking load > %v every: %v seconds\n", cfg.Enabled, cfg.HighLoadMark, cfg.PeriodInSeconds)
 		ticker := time.NewTicker(time.Duration(cfg.PeriodInSeconds) * time.Second)
 		defer ticker.Stop()
-		defer monitor.stoppedRunning()
+		defer monitor.StopRunning()
 		for {
 			select {
 			case <-ticker.C:

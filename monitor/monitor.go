@@ -20,6 +20,17 @@ type Monitor interface {
 	Start(cfg *Config) error
 	Stop()
 	IsRunning() bool
+	StartRunning()
+	StopRunning()
+}
+
+// Shared functionality to manage starting and stopping and synchronization
+// across all the monitors
+type Context struct {
+	quitter chan struct{}
+	running bool
+	mutex   *sync.Mutex
+	wg      *sync.WaitGroup
 }
 
 // If all miners are reset, they come back on line in a random distribution so that we dont get seen as a
@@ -30,70 +41,61 @@ func getRandomizedInitialPeriod(periodInSeconds int, rangeInSeconds int) time.Du
 	return time.Duration(periodInSeconds)*time.Second + time.Duration(r1.Intn(rangeInSeconds))*time.Second
 }
 
-// Shared functionality to manage starting and stopping and synchronization
-// across all the monitors
-type monitorControl struct {
-	quitter chan struct{}
-	running bool
-	mutex   *sync.Mutex
-	wg      *sync.WaitGroup
-}
 
 //
-// iIRunning, setRunning, waitOnRunning and stoppedRunning
 // provide synchronization around starting and stopping of the monitor
 // there are some tricky edge cases and this ensures only one monitor is running
 // for each instance of the specific monitor and that monitor.Stop() blocks until the monitor
 // actually ends
 // See monitor_load for usage patterns
 //
-func (mc *monitorControl) IsRunning() bool {
-	mc.mutex.Lock()
-	defer mc.mutex.Unlock()
-	return mc.running
+func (ctx *Context) IsRunning() bool {
+	ctx.mutex.Lock()
+	defer ctx.mutex.Unlock()
+	return ctx.running
 }
 
-func (mc *monitorControl) waitOnRunning() {
-	mc.wg.Wait()
+func (ctx *Context) waitOnRunning() {
+	ctx.wg.Wait()
 }
 
-func (mc *monitorControl) setRunning() {
-	mc.mutex.Lock()
-	defer mc.mutex.Unlock()
-	if mc.running {
+func (ctx *Context) StartRunning() {
+	ctx.mutex.Lock()
+	defer ctx.mutex.Unlock()
+	if ctx.running {
 		return
 	}
-	mc.running = true
-	mc.wg.Add(1)
+	ctx.running = true
+	ctx.wg.Add(1)
 }
 
-func (mc *monitorControl) stoppedRunning() {
-	mc.mutex.Lock()
-	defer mc.mutex.Unlock()
-	if !mc.running {
+func (ctx *Context) StopRunning() {
+	ctx.mutex.Lock()
+	defer ctx.mutex.Unlock()
+	if !ctx.running {
 		return
 	}
-	mc.running = false
-	mc.wg.Done()
+	ctx.running = false
+	ctx.wg.Done()
 }
 
-func (mc *monitorControl) Stop() {
-	close(mc.quitter)
-	mc.waitOnRunning()
+func (ctx *Context) Stop() {
+	close(ctx.quitter)
+	ctx.waitOnRunning()
 }
 
-func StartMonitors(cfg *Config, client *cgminer_client.Client) {
-	sr := service.LinuxStatRetriever{}
+func StartMonitors(config *Config, client *cgminer_client.Client) {
+	statRetriever := service.LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
 
 	monitors := []Monitor{
-		newLoadMonitor(&sr, service.Reboot),
+		newLoadMonitor(&statRetriever, service.Reboot),
 		newPeriodicReboot(service.Reboot),
 		newPeriodicCGMQuit(func() { client.Quit() }),
 	}
 
 	for _, monitor := range monitors {
-		monitor.Start(cfg)
+		monitor.Start(config)
 	}
 }

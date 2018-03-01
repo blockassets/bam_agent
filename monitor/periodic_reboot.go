@@ -13,29 +13,29 @@ type RebootConfig struct {
 	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
 }
 
-type periodicReboot struct {
-	monitorControl
+type PeriodicRebootMonitor struct {
+	*Context
 	reboot func()
 }
 
 func newPeriodicReboot(rebootFunc func()) Monitor {
-	return &periodicReboot{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, rebootFunc}
+	return &PeriodicRebootMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, rebootFunc}
 }
 
-func (monitor *periodicReboot) Start(cfgMon *Config) error {
-	cfg := cfgMon.Reboot
+func (monitor *PeriodicRebootMonitor) Start(config *Config) error {
+	cfg := config.Reboot
 	if monitor.IsRunning() {
 		return errors.New("periodic Reboot: Already started")
 	}
 
-	monitor.setRunning()
+	monitor.StartRunning()
 	monitor.quitter = make(chan struct{})
 
 	go func() {
 		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
 		log.Printf("Starting Periodic Reboot: Enabled: %v reboot in: %v", cfg.Enabled, initialPeriod)
 		timer := time.NewTimer(initialPeriod)
-		defer monitor.stoppedRunning()
+		defer monitor.StopRunning()
 		for {
 			select {
 			case <-timer.C:
