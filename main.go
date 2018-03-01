@@ -34,7 +34,6 @@ const (
 	ghUser       = "blockassets"
 	ghRepo       = "bam_agent"
 
-	// TODO: refactor into config
 	minerHostname = "localhost"
 	minerTimeout  = 5 * time.Second
 	minerPort     = int64(4028)
@@ -102,7 +101,8 @@ func startServer(state overseer.State, client *cgminer_client.Client) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Must exist here and not as a controller due to issues with rice
+	// Must exist here and not as a controller due to issues with rice not supporting nested boxes
+	// https://github.com/GeertJohan/go.rice#todo--development  "find boxes in imported packages"
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
 
 	controller.Init(e, &controller.Config{Version: version, Client: client})
