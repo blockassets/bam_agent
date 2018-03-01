@@ -9,41 +9,44 @@ import (
 	"github.com/blockassets/bam_agent/service"
 )
 
-type LoadConfig struct {
+type HighLoadConfig struct {
 	Enabled         bool    `json:"enabled"`
 	PeriodInSeconds int     `json:"periodInSeconds"`
 	HighLoadMark    float64 `json:"highLoadMark"`
 }
 
-type loadMonitor struct {
-	monitorControl // delegate the synchronization and implementation for start, stop etc
+// Implements the Instance interface
+type LoadMonitor struct {
+	*Context
 	sr             service.StatRetriever
 	onHighLoad     func()
 }
 
-func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) *loadMonitor {
-	return &loadMonitor{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
+func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) Monitor {
+	return &LoadMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
 }
 
-func (lm *loadMonitor) Start(cfgMon *MonitorConfig) error {
-	cfg := cfgMon.Load
-	if lm.getRunning() {
+func (monitor *LoadMonitor) Start(config *Config) error {
+	cfg := config.Load
+	if monitor.IsRunning() {
 		return errors.New("loadMonitor:Already started")
 	}
-	lm.setRunning()
-	lm.quiter = make(chan struct{})
+
+	monitor.StartRunning()
+	monitor.quitter = make(chan struct{})
+
 	go func() {
 		log.Printf("Starting Load Monitor: Enabled:%v Checking load > %v every: %v seconds\n", cfg.Enabled, cfg.HighLoadMark, cfg.PeriodInSeconds)
 		ticker := time.NewTicker(time.Duration(cfg.PeriodInSeconds) * time.Second)
 		defer ticker.Stop()
-		defer lm.stoppedRunning()
+		defer monitor.StopRunning()
 		for {
 			select {
 			case <-ticker.C:
 				if cfg.Enabled {
-					checkLoad(lm.sr, cfg.HighLoadMark, lm.onHighLoad)
+					checkLoad(monitor.sr, cfg.HighLoadMark, monitor.onHighLoad)
 				}
-			case <-lm.quiter:
+			case <-monitor.quitter:
 				return
 			}
 		}

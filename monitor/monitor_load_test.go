@@ -8,7 +8,7 @@ import (
 )
 
 type testStatRetriever struct {
-	dataset int
+	dataSet int
 }
 
 const (
@@ -21,7 +21,7 @@ const (
 
 func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
 	var data string
-	switch sr.dataset {
+	switch sr.dataSet {
 	case LevelNotEnough:
 		data = "0.0 0.0"
 	case LevelBelowFive:
@@ -44,7 +44,7 @@ func doSomething() { countSomething++ }
 func TestCheckLoad(t *testing.T) {
 
 	sr := &testStatRetriever{}
-	sr.dataset = LevelNotEnough
+	sr.dataSet = LevelNotEnough
 	countSomething = 0
 	tooHigh, err := checkLoad(sr, 5.0, doSomething)
 	if err == nil {
@@ -53,7 +53,7 @@ func TestCheckLoad(t *testing.T) {
 	if countSomething != 0 {
 		t.Errorf("t1.1: Expected 0 in countSomething")
 	}
-	sr.dataset = LevelBelowFive
+	sr.dataSet = LevelBelowFive
 	countSomething = 0
 	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if tooHigh {
@@ -62,7 +62,7 @@ func TestCheckLoad(t *testing.T) {
 	if countSomething != 0 {
 		t.Errorf("t1.2: Expected 0 in countSomething")
 	}
-	sr.dataset = LevelExactlyFive
+	sr.dataSet = LevelExactlyFive
 	countSomething = 0
 	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if tooHigh {
@@ -71,7 +71,7 @@ func TestCheckLoad(t *testing.T) {
 	if countSomething != 0 {
 		t.Errorf("t1.3: Expected 0 in countSomething")
 	}
-	sr.dataset = LevelAboveFive
+	sr.dataSet = LevelAboveFive
 	countSomething = 0
 	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if !tooHigh {
@@ -80,7 +80,7 @@ func TestCheckLoad(t *testing.T) {
 	if countSomething != 1 {
 		t.Errorf("t1.4: Expected 1 in countSomething")
 	}
-	sr.dataset = LevelMalformed
+	sr.dataSet = LevelMalformed
 	countSomething = 0
 	tooHigh, err = checkLoad(sr, 5.0, doSomething)
 	if err == nil {
@@ -95,9 +95,9 @@ func TestLoadMonitors(t *testing.T) {
 	testOnHighLoadCounter := 0
 
 	sr := &testStatRetriever{}
-	sr.dataset = LevelAboveFive
-	cfg := MonitorConfig{}
-	cfg.Load = LoadConfig{Enabled: true, PeriodInSeconds: 1, HighLoadMark: 5.0}
+	sr.dataSet = LevelAboveFive
+	cfg := Config{}
+	cfg.Load = HighLoadConfig{Enabled: true, PeriodInSeconds: 1, HighLoadMark: 5.0}
 
 	lm := newLoadMonitor(sr, func() { testOnHighLoadCounter += 1 })
 
@@ -105,7 +105,7 @@ func TestLoadMonitors(t *testing.T) {
 	if err != nil {
 		t.Errorf("t2.1 Expected start to suceed. Returned %+v", err)
 	}
-	if lm.getRunning() != true {
+	if !lm.IsRunning() {
 		t.Errorf("t2.2 Expected lm.isRunning to be true")
 	}
 	// give it time for one call
@@ -128,7 +128,7 @@ func TestLoadMonitors(t *testing.T) {
 		t.Errorf("t2.6 Expected 3rd start to fail")
 	}
 	lm.Stop()
-	if lm.getRunning() {
+	if lm.IsRunning() {
 		t.Errorf("t2.7 Expected to be not running")
 	}
 	cfg.Load.Enabled = false
@@ -136,11 +136,11 @@ func TestLoadMonitors(t *testing.T) {
 	if err != nil {
 		t.Errorf("t2.8 Expected 4th start to succeed")
 	}
-	if !lm.getRunning() {
+	if !lm.IsRunning() {
 		t.Errorf("t2.9 Expected to be running")
 	}
 	lm.Stop()
-	if lm.getRunning() {
+	if lm.IsRunning() {
 		t.Errorf("t2.10 Expected to be not running")
 	}
 

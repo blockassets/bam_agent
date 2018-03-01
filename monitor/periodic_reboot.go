@@ -13,39 +13,40 @@ type RebootConfig struct {
 	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
 }
 
-type periodicReboot struct {
-	monitorControl
+type PeriodicRebootMonitor struct {
+	*Context
 	reboot func()
 }
 
-func newPeriodicReboot(rebootFunc func()) *periodicReboot {
-	return &periodicReboot{monitorControl{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, rebootFunc}
+func newPeriodicReboot(rebootFunc func()) Monitor {
+	return &PeriodicRebootMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, rebootFunc}
 }
 
-func (pr *periodicReboot) Start(cfgMon *MonitorConfig) error {
-	cfg := cfgMon.Reboot
-	if pr.getRunning() {
+func (monitor *PeriodicRebootMonitor) Start(config *Config) error {
+	cfg := config.Reboot
+	if monitor.IsRunning() {
 		return errors.New("periodic Reboot: Already started")
 	}
-	pr.setRunning()
-	pr.quiter = make(chan struct{})
+
+	monitor.StartRunning()
+	monitor.quitter = make(chan struct{})
+
 	go func() {
 		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
-		log.Printf("Starting Periodic Reboot: Enabled:%v reboot in:%v", cfg.Enabled, initialPeriod)
+		log.Printf("Starting Periodic Reboot: Enabled: %v reboot in: %v", cfg.Enabled, initialPeriod)
 		timer := time.NewTimer(initialPeriod)
-		defer pr.stoppedRunning()
+		defer monitor.StopRunning()
 		for {
 			select {
 			case <-timer.C:
-				log.Printf("timer_tick\n")
 				if cfg.Enabled {
-					log.Printf("timer_tick2\n")
-					pr.reboot()
+					monitor.reboot()
 				}
-			case <-pr.quiter:
+			case <-monitor.quitter:
 				return
 			}
 		}
 	}()
+
 	return nil
 }
