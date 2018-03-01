@@ -28,6 +28,10 @@ gzip:
 test:
 	@go test ./...
 
+test-all:
+	@go test ./...
+	./test.sh
+
 dep:
 	@dep ensure
 	@go get github.com/GeertJohan/go.rice/rice
