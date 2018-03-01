@@ -84,18 +84,39 @@ func (ctx *Context) Stop() {
 	ctx.waitOnRunning()
 }
 
-func StartMonitors(config *Config, client *cgminer_client.Client) {
+type Lifecycle interface {
+	StartMonitors()
+	StopMonitors()
+}
+
+// Implements the Lifecycle interface
+type Manager struct {
+	Config *Config
+	Client *cgminer_client.Client
+	Monitors *[]Monitor
+}
+
+func (mgr *Manager) StartMonitors() {
 	statRetriever := service.LinuxStatRetriever{}
 
 	log.Println("Monitors being started")
 
-	monitors := []Monitor{
+	mgr.Monitors = &[]Monitor{
 		newLoadMonitor(&statRetriever, service.Reboot),
 		newPeriodicReboot(service.Reboot),
-		newPeriodicCGMQuit(func() { client.Quit() }),
+		newPeriodicCGMQuit(func() { mgr.Client.Quit() }),
 	}
 
-	for _, monitor := range monitors {
-		monitor.Start(config)
+	for _, monitor := range *mgr.Monitors {
+		monitor.Start(mgr.Config)
+	}
+}
+
+func (mgr *Manager) StopMonitors() {
+
+	log.Println("Monitors being stopped")
+
+	for _, monitor := range *mgr.Monitors {
+		monitor.Stop()
 	}
 }

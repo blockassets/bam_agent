@@ -89,11 +89,13 @@ func prog(state overseer.State) {
 
 	client := minerClient()
 
-	monitor.StartMonitors(&cfg.Monitor, client)
-	startServer(state, client)
+	monitorManager := &monitor.Manager{Config: &cfg.Monitor, Client: client}
+	monitorManager.StartMonitors()
+
+	startServer(state, client, monitorManager)
 }
 
-func startServer(state overseer.State, client *cgminer_client.Client) {
+func startServer(state overseer.State, client *cgminer_client.Client, monitorManager *monitor.Manager) {
 	e := echo.New()
 
 	e.HideBanner = true
@@ -105,7 +107,7 @@ func startServer(state overseer.State, client *cgminer_client.Client) {
 	// https://github.com/GeertJohan/go.rice#todo--development  "find boxes in imported packages"
 	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
 
-	controller.Init(e, &controller.Config{Version: version, Client: client})
+	controller.Init(e, &controller.Config{Version: version, Client: client, MonitorManager: monitorManager})
 
 	// Start server
 	if state.Listener != nil {

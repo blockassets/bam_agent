@@ -19,24 +19,24 @@ type Status struct {
 	Uptime time.Duration `json:"uptimeInSeconds"`
 }
 
-func (c StatusCtrl) build(cfg *Config) *Controller {
-	c.version = cfg.Version
+func (ctrl StatusCtrl) build(cfg *Config) *Controller {
+	ctrl.version = cfg.Version
 
 	return &Controller{
 		Methods: []string{http.MethodGet},
 		Path:    "/status",
-		Handler: c.makeHandler(),
+		Handler: ctrl.makeHandler(),
 	}
 }
 
-func (c StatusCtrl) makeHandler() http.HandlerFunc {
+func (ctrl StatusCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
 
 			uptime, _ := service.GetUptime()
 
 			status := Status{
-				Agent:  strings.TrimSpace(c.version),
+				Agent:  strings.TrimSpace(ctrl.version),
 				Miner:  strings.TrimSpace(service.ReadVersionFile()),
 				Uptime: uptime,
 			}

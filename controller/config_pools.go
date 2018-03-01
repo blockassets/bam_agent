@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service"
 )
 
@@ -21,17 +22,20 @@ import (
 
 // Implements Builder interface
 type PutPoolsCtrl struct {
+	monitorManager *monitor.Manager
 }
 
-func (c PutPoolsCtrl) build(cfg *Config) *Controller {
+func (ctrl PutPoolsCtrl) build(cfg *Config) *Controller {
+	ctrl.monitorManager = cfg.MonitorManager
+
 	return &Controller{
 		Methods: []string{http.MethodPut},
 		Path:    "/config/pools",
-		Handler: c.makeHandler(),
+		Handler: ctrl.makeHandler(),
 	}
 }
 
-func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
+func (ctrl PutPoolsCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
 			bamStat := BAMStatus{"OK", nil}
@@ -42,11 +46,15 @@ func (c PutPoolsCtrl) makeHandler() http.HandlerFunc {
 				httpStat = http.StatusInternalServerError
 				bamStat = BAMStatus{"Error", err}
 			} else {
+				ctrl.monitorManager.StopMonitors()
+
 				err = service.UpdatePools(data)
 				if err != nil {
 					httpStat = http.StatusBadGateway
 					bamStat = BAMStatus{"Error", err}
 				}
+
+				ctrl.monitorManager.StartMonitors()
 			}
 
 			w.WriteHeader(httpStat)
