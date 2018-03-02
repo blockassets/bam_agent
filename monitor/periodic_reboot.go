@@ -1,53 +1,53 @@
 package monitor
 
 import (
-	"errors"
 	"log"
-	"sync"
 	"time"
 )
 
 type RebootConfig struct {
-	Enabled                     bool `json:"enabled"`
-	PeriodInSeconds             int  `json:"periodInSeconds"`
-	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
+	Enabled         bool `json:"enabled"`
+	PeriodInSeconds int  `json:"periodInSeconds"`
 }
 
 // Implements the Monitor interface
 type PeriodicRebootMonitor struct {
 	*Context
-	reboot func()
+	config        *RebootConfig
+	initialPeriod *time.Duration
+	reboot        func()
 }
 
-func newPeriodicReboot(rebootFunc func()) Monitor {
-	return &PeriodicRebootMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, rebootFunc}
-}
-
-func (monitor *PeriodicRebootMonitor) Start(config *Config) error {
-	cfg := config.Reboot
-	if monitor.IsRunning() {
-		return errors.New("periodic Reboot: Already started")
+func newPeriodicReboot(context *Context, config *RebootConfig, initialPeriod *time.Duration, rebootFunc func()) Monitor {
+	return &PeriodicRebootMonitor{
+		Context:       context,
+		config:        config,
+		initialPeriod: initialPeriod,
+		reboot:        rebootFunc,
 	}
+}
 
-	monitor.StartRunning()
-	monitor.quitter = make(chan struct{})
+func (monitor *PeriodicRebootMonitor) Start() error {
+	if monitor.config.Enabled {
+		log.Printf("PeriodicRebootMonitor: reboot in %v", monitor.initialPeriod)
 
-	go func() {
-		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
-		log.Printf("Starting Periodic Reboot: Enabled: %v reboot in: %v", cfg.Enabled, initialPeriod)
-		timer := time.NewTimer(initialPeriod)
-		defer monitor.StopRunning()
-		for {
-			select {
-			case <-timer.C:
-				if cfg.Enabled {
+		go func() {
+			monitor.waitGroup.Add(1)
+			timer := time.NewTimer(*monitor.initialPeriod)
+			for {
+				select {
+				case <-timer.C:
 					monitor.reboot()
+				case <-monitor.quit:
+					timer.Stop()
+					monitor.waitGroup.Done()
+					return
 				}
-			case <-monitor.quitter:
-				return
 			}
-		}
-	}()
+		}()
+	} else {
+		log.Println("PeriodicRebootMonitor: Not enabled")
+	}
 
 	return nil
 }

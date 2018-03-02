@@ -1,11 +1,10 @@
 package service
 
-// this code cut and pasted from the promethious repo
+// this code cut and pasted from the prometheus repo
 
 import (
 	"fmt"
 	"io/ioutil"
-	"path"
 	"strconv"
 	"strings"
 )
@@ -18,6 +17,10 @@ type StatRetriever interface {
 type LinuxStatRetriever struct {
 }
 
+func NewStatRetriever() StatRetriever {
+	return &LinuxStatRetriever{}
+}
+
 type LoadAvgs struct {
 	OneMinAvg     float64
 	FiveMinAvg    float64
@@ -25,15 +28,11 @@ type LoadAvgs struct {
 }
 
 // DefaultMountPoint is the common mount point of the proc filesystem.
-const DefaultMountPoint = "/proc"
-
-func procFilePath(name string) string {
-	return path.Join(DefaultMountPoint, name)
-}
+const loadAvgProc = "/proc/loadavg"
 
 // Read loadavg from /proc.
 func (*LinuxStatRetriever) GetLoad() (LoadAvgs, error) {
-	data, err := ioutil.ReadFile(procFilePath("loadavg"))
+	data, err := ioutil.ReadFile(loadAvgProc)
 	if err != nil {
 		return LoadAvgs{}, err
 	}
@@ -45,7 +44,7 @@ func ParseLoad(data string) (LoadAvgs, error) {
 	loadsAsArray := make([]float64, 3)
 	parts := strings.Fields(data)
 	if len(parts) < 3 {
-		return LoadAvgs{}, fmt.Errorf("unexpected content in %v", procFilePath("loadavg"))
+		return LoadAvgs{}, fmt.Errorf("unexpected content %s", data)
 	}
 	var err error
 	for i, load := range parts[0:3] {

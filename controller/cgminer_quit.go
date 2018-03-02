@@ -11,7 +11,7 @@ import (
 
 // Implements Builder interface
 type CGQuitCtrl struct {
-	client *cgminer_client.Client
+	client         *cgminer_client.Client
 	monitorManager *monitor.Manager
 }
 
