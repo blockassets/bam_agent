@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestPeriodicCGMQuit(t *testing.T) {
+func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	count := 0
 
 	config := &CGMQuitConfig{Enabled: true, PeriodInSeconds: 1}
