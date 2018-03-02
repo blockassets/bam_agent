@@ -25,8 +25,8 @@ type Controller struct {
 }
 
 type Config struct {
-	Version string
-	Client  *cgminer_client.Client
+	Version        string
+	Client         *cgminer_client.Client
 	MonitorManager *monitor.Manager
 }
 

@@ -1,54 +1,53 @@
 package monitor
 
 import (
-	"errors"
 	"log"
-	"sync"
 	"time"
 )
 
 type CGMQuitConfig struct {
-	Enabled                     bool `json:"enabled"`
-	PeriodInSeconds             int  `json:"periodInSeconds"`
-	InitialPeriodRangeInSeconds int  `json:"initialPeriodRangeInSeconds"`
+	Enabled         bool `json:"enabled"`
+	PeriodInSeconds int  `json:"periodInSeconds"`
 }
 
 // Implements the Monitor interface
 type PeriodicCGMQuitMonitor struct {
 	*Context
-	CGMinerQuit func()
+	config        *CGMQuitConfig
+	initialPeriod *time.Duration
+	CGMinerQuit   func()
 }
 
-func newPeriodicCGMQuit(CGMQuitFunc func()) Monitor {
-	return &PeriodicCGMQuitMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, CGMQuitFunc}
-}
-
-func (monitor *PeriodicCGMQuitMonitor) Start(config *Config) error {
-	cfg := config.CGMQuit
-	if monitor.IsRunning() {
-		return errors.New("periodic CGMQuit: Already started")
+func newPeriodicCGMQuit(context *Context, config *CGMQuitConfig, initialPeriod *time.Duration, CGMQuitFunc func()) Monitor {
+	return &PeriodicCGMQuitMonitor{
+		Context:       context,
+		config:        config,
+		initialPeriod: initialPeriod,
+		CGMinerQuit:   CGMQuitFunc,
 	}
+}
 
-	monitor.StartRunning()
-	monitor.quitter = make(chan struct{})
+func (monitor *PeriodicCGMQuitMonitor) Start() error {
+	if monitor.config.Enabled {
+		log.Printf("PeriodicCGMQuitMonitor: cgminer quit in: %v", monitor.initialPeriod)
 
-	go func() {
-		initialPeriod := getRandomizedInitialPeriod(cfg.PeriodInSeconds, cfg.InitialPeriodRangeInSeconds)
-		log.Printf("Starting Periodic CGMQuit: Enabled: %v Initial CGMQuit in: %v, then every %v seconds", cfg.Enabled, initialPeriod, cfg.PeriodInSeconds)
-		timer := time.NewTimer(initialPeriod)
-		defer monitor.StopRunning()
-		for {
-			select {
-			case <-timer.C:
-				timer.Reset(time.Duration(cfg.PeriodInSeconds) * time.Second)
-				if cfg.Enabled {
+		go func() {
+			monitor.waitGroup.Add(1)
+			timer := time.NewTimer(*monitor.initialPeriod)
+			for {
+				select {
+				case <-timer.C:
 					monitor.CGMinerQuit()
+				case <-monitor.quit:
+					timer.Stop()
+					monitor.waitGroup.Done()
+					return
 				}
-			case <-monitor.quitter:
-				return
 			}
-		}
-	}()
+		}()
+	} else {
+		log.Println("PeriodicCGMQuitMonitor: Not enabled")
+	}
 
 	return nil
 }

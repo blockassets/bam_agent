@@ -1,83 +1,34 @@
 package monitor
 
 import (
-	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
 
-func TestPeriodicCGMQuit(t *testing.T) {
+func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	count := 0
 
-	fmt.Printf("Starting Periodic CGMQuit logic test\n")
-	cfg := Config{}
-	cfg.CGMQuit = CGMQuitConfig{Enabled: true, PeriodInSeconds: 1, InitialPeriodRangeInSeconds: 1}
+	config := &CGMQuitConfig{Enabled: true, PeriodInSeconds: 1}
+	context := &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
+	initialPeriod := time.Duration(50) * time.Millisecond
+	quit := func() { count++ }
 
-	pr := newPeriodicCGMQuit(func() { count++ })
+	monitor := newPeriodicCGMQuit(context, config, &initialPeriod, quit)
 
-	fmt.Printf("Starting Monitor\n")
-
-	err := pr.Start(&cfg)
+	err := monitor.Start()
 	if err != nil {
-		t.Errorf("t2.1 Expected start to succeed. Returned %+v", err)
-	}
-	if !pr.IsRunning() {
-		t.Errorf("t2.2 Expected pr.isRunning to be true")
+		t.Error(err)
 	}
 
-	// give it time for an inital call(between 1 and 2 seconds) and then one more..
-	time.Sleep(time.Duration(3200) * time.Millisecond)
+	// Sleep to ensure the timer runs once
+	time.Sleep(initialPeriod * 2)
 
-	fmt.Printf("Stopping Monitor")
-	pr.Stop()
-	mark := count
-	if (count < 2) || (count > 3) {
-		t.Errorf("t2.3 Expected 2 or 3 on count, got %d", count)
-	}
-	time.Sleep(time.Duration(3) * time.Second)
-	if count != mark {
-		t.Errorf("t2.4 Expected count to be the same as mark, %d != %d", count, mark)
-	}
-	fmt.Printf("Starting Monitor\n")
-	err = pr.Start(&cfg)
-	if err != nil {
-		t.Errorf("t2.5 Expected 2nd start to succeed. Returned %+v", err)
-	}
+	// Test that stop cleans up the WaitGroup
+	monitor.Stop()
+	context.waitGroup.Wait()
 
-	fmt.Printf("Starting Monitor\n")
-	err = pr.Start(&cfg)
-	if err == nil {
-		t.Errorf("t2.6 Expected 3rd start to fail")
+	if count == 0 {
+		t.Errorf("Expected >=1 count, got %d", count)
 	}
-
-	fmt.Printf("Stopping Monitor\n")
-	pr.Stop()
-	if pr.IsRunning() {
-		t.Errorf("t2.7 Expected to be not running")
-	}
-
-	fmt.Printf("Starting Monitor\n")
-	cfg.CGMQuit.Enabled = false
-	err = pr.Start(&cfg)
-	if err != nil {
-		t.Errorf("t2.8 Expected 4th start to succeed")
-	}
-	if !pr.IsRunning() {
-		t.Errorf("t2.9 Expected to be running")
-	}
-
-	fmt.Printf("Stopping Monitor\n")
-	pr.Stop()
-	if pr.IsRunning() {
-		t.Errorf("t2.10 Expected to be not running")
-	}
-
-	count = 0
-	cfg.CGMQuit.Enabled = true
-	err = pr.Start(&cfg)
-	time.Sleep(time.Duration(2500) * time.Millisecond)
-	if count < 1 {
-		t.Errorf("t2.10 Expected count to be non-zero, got %d", count)
-	}
-
 }

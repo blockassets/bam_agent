@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -37,111 +38,90 @@ func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
 	return service.ParseLoad(data)
 }
 
+func NewTestStatRetriever(dataSet int) service.StatRetriever {
+	return &testStatRetriever{
+		dataSet: dataSet,
+	}
+}
+
 var countSomething int
 
 func doSomething() { countSomething++ }
 
 func TestCheckLoad(t *testing.T) {
+	expectErrors := []service.StatRetriever{
+		NewTestStatRetriever(LevelNotEnough),
+		NewTestStatRetriever(LevelMalformed),
+	}
 
-	sr := &testStatRetriever{}
-	sr.dataSet = LevelNotEnough
-	countSomething = 0
-	tooHigh, err := checkLoad(sr, 5.0, doSomething)
-	if err == nil {
-		t.Errorf("t1.1: Expected error!")
+	for _, sr := range expectErrors {
+		countSomething = 0
+		_, err := checkLoad(sr, 5.0, doSomething)
+		if err == nil {
+			t.Errorf("Expected error, got nil!")
+		}
+		if countSomething != 0 {
+			t.Errorf("Expected 0 in countSomething, got %d", countSomething)
+		}
 	}
-	if countSomething != 0 {
-		t.Errorf("t1.1: Expected 0 in countSomething")
+
+	expectLow := []service.StatRetriever{
+		NewTestStatRetriever(LevelBelowFive),
+		NewTestStatRetriever(LevelExactlyFive),
 	}
-	sr.dataSet = LevelBelowFive
-	countSomething = 0
-	tooHigh, err = checkLoad(sr, 5.0, doSomething)
-	if tooHigh {
-		t.Errorf("t1.2: Expected low, got high!")
+
+	for _, sr := range expectLow {
+		countSomething = 0
+		tooHigh, _ := checkLoad(sr, 5.0, doSomething)
+		if tooHigh {
+			t.Errorf("Expected low, got high!")
+		}
+		if countSomething != 0 {
+			t.Errorf("Expected 0 in countSomething, got %d", countSomething)
+		}
 	}
-	if countSomething != 0 {
-		t.Errorf("t1.2: Expected 0 in countSomething")
+
+	expectHigh := []service.StatRetriever{
+		NewTestStatRetriever(LevelAboveFive),
 	}
-	sr.dataSet = LevelExactlyFive
-	countSomething = 0
-	tooHigh, err = checkLoad(sr, 5.0, doSomething)
-	if tooHigh {
-		t.Errorf("t1.3: Expected low, got high!")
-	}
-	if countSomething != 0 {
-		t.Errorf("t1.3: Expected 0 in countSomething")
-	}
-	sr.dataSet = LevelAboveFive
-	countSomething = 0
-	tooHigh, err = checkLoad(sr, 5.0, doSomething)
-	if !tooHigh {
-		t.Errorf("t1.4: Expected high, got low!")
-	}
-	if countSomething != 1 {
-		t.Errorf("t1.4: Expected 1 in countSomething")
-	}
-	sr.dataSet = LevelMalformed
-	countSomething = 0
-	tooHigh, err = checkLoad(sr, 5.0, doSomething)
-	if err == nil {
-		t.Errorf("t1.5: Expected error!")
-	}
-	if countSomething != 0 {
-		t.Errorf("t1.5: Expected 0 in countSomething")
+
+	for _, sr := range expectHigh {
+		countSomething = 0
+		tooHigh, _ := checkLoad(sr, 5.0, doSomething)
+		if !tooHigh {
+			t.Errorf("Expected high, got low!")
+		}
+		if countSomething != 1 {
+			t.Errorf("Expected 1 in countSomething, got %d", countSomething)
+		}
 	}
 }
 
-func TestLoadMonitors(t *testing.T) {
-	testOnHighLoadCounter := 0
+func TestLoadMonitor_Start(t *testing.T) {
+	count := 0
 
-	sr := &testStatRetriever{}
-	sr.dataSet = LevelAboveFive
-	cfg := Config{}
-	cfg.Load = HighLoadConfig{Enabled: true, PeriodInSeconds: 1, HighLoadMark: 5.0}
+	config := &HighLoadConfig{Enabled: true, PeriodInSeconds: 1, HighLoadMark: 5.0}
+	sr := NewTestStatRetriever(LevelAboveFive)
+	tickerPeriod := time.Duration(50) * time.Millisecond
 
-	lm := newLoadMonitor(sr, func() { testOnHighLoadCounter += 1 })
+	onHighLoad := func() { count += 1 }
 
-	err := lm.Start(&cfg)
+	context := &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
+
+	monitor := newLoadMonitor(context, config, &tickerPeriod, sr, onHighLoad)
+	err := monitor.Start()
 	if err != nil {
-		t.Errorf("t2.1 Expected start to suceed. Returned %+v", err)
-	}
-	if !lm.IsRunning() {
-		t.Errorf("t2.2 Expected lm.isRunning to be true")
-	}
-	// give it time for one call
-	time.Sleep(time.Duration(1500) * time.Millisecond)
-	lm.Stop()
-	if testOnHighLoadCounter != 1 {
-		t.Errorf("t2.3 Expected 1 onHighMarks, got %d", testOnHighLoadCounter)
-	}
-	mark := testOnHighLoadCounter
-	time.Sleep(time.Duration(1500) * time.Millisecond)
-	if mark != testOnHighLoadCounter {
-		t.Errorf("t2.4 Expected OnHighLoad to stop: mark == %d, counter == %d", mark, testOnHighLoadCounter)
-	}
-	err = lm.Start(&cfg)
-	if err != nil {
-		t.Errorf("t2.5 Expected 2nd start to suceed. Returned %+v", err)
-	}
-	err = lm.Start(&cfg)
-	if err == nil {
-		t.Errorf("t2.6 Expected 3rd start to fail")
-	}
-	lm.Stop()
-	if lm.IsRunning() {
-		t.Errorf("t2.7 Expected to be not running")
-	}
-	cfg.Load.Enabled = false
-	err = lm.Start(&cfg)
-	if err != nil {
-		t.Errorf("t2.8 Expected 4th start to succeed")
-	}
-	if !lm.IsRunning() {
-		t.Errorf("t2.9 Expected to be running")
-	}
-	lm.Stop()
-	if lm.IsRunning() {
-		t.Errorf("t2.10 Expected to be not running")
+		t.Error(err)
 	}
 
+	// Sleep to ensure the timer runs once
+	time.Sleep(tickerPeriod * 2)
+
+	// Test that stop cleans up the WaitGroup
+	monitor.Stop()
+	context.waitGroup.Wait()
+
+	if count == 0 {
+		t.Errorf("Expected >=1 count, got %d", count)
+	}
 }

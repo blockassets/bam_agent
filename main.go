@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -87,17 +88,33 @@ func prog(state overseer.State) {
 		return
 	}
 
+	e := echo.New()
 	client := minerClient()
-
 	monitorManager := &monitor.Manager{Config: &cfg.Monitor, Client: client}
-	monitorManager.StartMonitors()
 
-	startServer(state, client, monitorManager)
+	// Start the server and monitors in the background
+	go func() {
+		monitorManager.StartMonitors()
+		startServer(e, state, client, monitorManager)
+	}()
+
+	// Blocks until we receive a shutdown notice
+	<-state.GracefulShutdown
+
+	// Stop monitors from executing
+	monitorManager.StopMonitors()
+
+	// After 10 seconds we gracefully shutdown the server
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	} else {
+		log.Println("Shutdown")
+	}
 }
 
-func startServer(state overseer.State, client *cgminer_client.Client, monitorManager *monitor.Manager) {
-	e := echo.New()
-
+func startServer(e *echo.Echo, state overseer.State, client *cgminer_client.Client, monitorManager *monitor.Manager) {
 	e.HideBanner = true
 
 	e.Use(middleware.Logger())

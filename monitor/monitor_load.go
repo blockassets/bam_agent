@@ -1,9 +1,7 @@
 package monitor
 
 import (
-	"errors"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/blockassets/bam_agent/service"
@@ -18,39 +16,43 @@ type HighLoadConfig struct {
 // Implements the Monitor interface
 type LoadMonitor struct {
 	*Context
-	sr             service.StatRetriever
-	onHighLoad     func()
+	config        *HighLoadConfig
+	statRetriever *service.StatRetriever
+	tickerPeriod  *time.Duration
+	onHighLoad    func()
 }
 
-func newLoadMonitor(sr service.StatRetriever, onHighLoad func()) Monitor {
-	return &LoadMonitor{&Context{nil, false, &sync.Mutex{}, &sync.WaitGroup{}}, sr, onHighLoad}
-}
-
-func (monitor *LoadMonitor) Start(config *Config) error {
-	cfg := config.Load
-	if monitor.IsRunning() {
-		return errors.New("loadMonitor:Already started")
+func newLoadMonitor(context *Context, config *HighLoadConfig, tickerPeriod *time.Duration, statRetriever service.StatRetriever, onHighLoad func()) Monitor {
+	return &LoadMonitor{
+		Context:       context,
+		config:        config,
+		tickerPeriod:  tickerPeriod,
+		statRetriever: &statRetriever,
+		onHighLoad:    onHighLoad,
 	}
+}
 
-	monitor.StartRunning()
-	monitor.quitter = make(chan struct{})
+func (monitor *LoadMonitor) Start() error {
+	if monitor.config.Enabled {
+		log.Printf("LoadMonitor: Checking load > %v every %v seconds\n", monitor.config.HighLoadMark, monitor.config.PeriodInSeconds)
 
-	go func() {
-		log.Printf("Starting Load Monitor: Enabled: %v Checking load > %v every: %v seconds\n", cfg.Enabled, cfg.HighLoadMark, cfg.PeriodInSeconds)
-		ticker := time.NewTicker(time.Duration(cfg.PeriodInSeconds) * time.Second)
-		defer ticker.Stop()
-		defer monitor.StopRunning()
-		for {
-			select {
-			case <-ticker.C:
-				if cfg.Enabled {
-					checkLoad(monitor.sr, cfg.HighLoadMark, monitor.onHighLoad)
+		go func() {
+			monitor.waitGroup.Add(1)
+			ticker := time.NewTicker(*monitor.tickerPeriod)
+			for {
+				select {
+				case <-ticker.C:
+					checkLoad(*monitor.statRetriever, monitor.config.HighLoadMark, monitor.onHighLoad)
+				case <-monitor.quit:
+					ticker.Stop()
+					monitor.waitGroup.Done()
+					return
 				}
-			case <-monitor.quitter:
-				return
 			}
-		}
-	}()
+		}()
+	} else {
+		log.Println("LoadMonitor: Not enabled")
+	}
 
 	return nil
 }
