@@ -7,7 +7,8 @@ import (
 	"github.com/Jeffail/gabs"
 )
 
-const configFilePath = "/usr/app/conf.default"
+//const configFilePath = "/usr/app/conf.default"
+const configFilePath = "/tmp/conf.default"
 
 type PoolAddresses struct {
 	Pool1 string `json:"pool1"`
@@ -62,4 +63,21 @@ func mutatePools(pools *PoolAddresses, config *gabs.Container) []byte {
 	config.Set(pools.Pool2, "pool2")
 	config.Set(pools.Pool3, "pool3")
 	return config.BytesIndent("", "\t")
+}
+
+func GetPools() (*PoolAddresses, error) {
+	config, err := LoadMinerConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	pool1, _ := config.Path("pool1").Data().(string)
+	pool2, _ := config.Path("pool2").Data().(string)
+	pool3, _ := config.Path("pool3").Data().(string)
+
+	return &PoolAddresses{
+		Pool1: pool1,
+		Pool2: pool2,
+		Pool3: pool3,
+	}, nil
 }
