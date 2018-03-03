@@ -8,9 +8,9 @@ import (
 )
 
 type HighLoadConfig struct {
-	Enabled         bool    `json:"enabled"`
-	PeriodInSeconds int     `json:"periodInSeconds"`
-	HighLoadMark    float64 `json:"highLoadMark"`
+	Enabled      bool          `json:"enabled"`
+	Period       time.Duration `json:"period"`
+	HighLoadMark float64       `json:"highLoadMark"`
 }
 
 // Implements the Monitor interface
@@ -34,7 +34,7 @@ func newLoadMonitor(context *Context, config *HighLoadConfig, tickerPeriod *time
 
 func (monitor *LoadMonitor) Start() error {
 	if monitor.config.Enabled {
-		log.Printf("LoadMonitor: Checking load > %v every %v seconds\n", monitor.config.HighLoadMark, monitor.config.PeriodInSeconds)
+		log.Printf("LoadMonitor: Checking load > %v every %v\n", monitor.config.HighLoadMark, monitor.config.Period)
 
 		go func() {
 			monitor.waitGroup.Add(1)

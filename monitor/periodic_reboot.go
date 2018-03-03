@@ -6,8 +6,8 @@ import (
 )
 
 type RebootConfig struct {
-	Enabled         bool `json:"enabled"`
-	PeriodInSeconds int  `json:"periodInSeconds"`
+	Enabled bool          `json:"enabled"`
+	Period  time.Duration `json:"period"`
 }
 
 // Implements the Monitor interface

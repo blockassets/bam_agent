@@ -100,7 +100,7 @@ func TestCheckLoad(t *testing.T) {
 func TestLoadMonitor_Start(t *testing.T) {
 	count := 0
 
-	config := &HighLoadConfig{Enabled: true, PeriodInSeconds: 1, HighLoadMark: 5.0}
+	config := &HighLoadConfig{Enabled: true, Period: 1, HighLoadMark: 5.0}
 	sr := NewTestStatRetriever(LevelAboveFive)
 	tickerPeriod := time.Duration(50) * time.Millisecond
 

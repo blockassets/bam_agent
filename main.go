@@ -17,6 +17,7 @@ import (
 	"github.com/blockassets/bam_agent/fetcher"
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/blockassets/cgminer_client"
 	"github.com/jpillora/overseer"
 	"github.com/labstack/echo"
@@ -42,6 +43,9 @@ const (
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
+
+	// Enables jsoniter to parse time.Duration fields in json
+	tool.RegisterTimeDuration()
 
 	// Sometime in the next 24 hours check for update to prevent all machines updating
 	// at the same exact time, which could DDOS the network. +1 since rand.Intn is zero based.
