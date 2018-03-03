@@ -22,7 +22,6 @@ type AgentConfig struct {
 }
 
 func LoadAgentConfig(configFile string) (*AgentConfig, error) {
-
 	confBox, err := rice.FindBox("conf")
 	if err != nil {
 		return nil, err

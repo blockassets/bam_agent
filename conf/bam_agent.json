@@ -2,16 +2,16 @@
 	"monitor": {
 		"highLoad": {
 			"enabled": true,
-			"periodInSeconds": 60,
+			"period": "60s",
 			"highLoadMark": 5.0
 		},
 		"reboot": {
 			"enabled": false,
-			"periodInSeconds": 259200
+			"period": "72h"
 		},
 		"cgMinerQuit": {
 			"enabled": false,
-			"periodInSeconds": 86400
+			"period": "24h"
 		}
 	}
 }

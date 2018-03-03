@@ -9,7 +9,7 @@ import (
 func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	count := 0
 
-	config := &RebootConfig{Enabled: true, PeriodInSeconds: 1}
+	config := &RebootConfig{Enabled: true, Period: 1}
 	context := &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
 	initialPeriod := time.Duration(50) * time.Millisecond
 	reboot := func() { count++ }
