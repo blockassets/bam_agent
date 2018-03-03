@@ -53,9 +53,9 @@ func (mgr *Manager) StartMonitors() {
 
 	log.Println("Monitors being started")
 
-	loadMonitorPeriod := time.Duration(mgr.Config.HighLoad.PeriodInSeconds) * time.Second
-	periodicRebootInitial := getRandomizedInitialPeriod(mgr.Config.Reboot.PeriodInSeconds)
-	periodicCGMQuitInitial := getRandomizedInitialPeriod(mgr.Config.CGMQuit.PeriodInSeconds)
+	loadMonitorPeriod := mgr.Config.HighLoad.Period
+	periodicRebootInitial := getRandomizedInitialPeriod(mgr.Config.Reboot.Period)
+	periodicCGMQuitInitial := getRandomizedInitialPeriod(mgr.Config.CGMQuit.Period)
 
 	statRetriever := service.NewStatRetriever()
 	cgQuitFunc := func() { mgr.Client.Quit() }
@@ -85,8 +85,8 @@ func (mgr *Manager) StopMonitors() {
 
 // If all miners are reset, they come back on line in a random distribution so that we dont get seen as a
 // denial of service attack on the pool. Helper to create randomized initial period
-func getRandomizedInitialPeriod(periodInSeconds int) time.Duration {
+func getRandomizedInitialPeriod(period time.Duration) time.Duration {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
-	return time.Duration(periodInSeconds)*time.Second + time.Duration(r1.Intn(3600))*time.Second
+	return period + time.Duration(r1.Intn(3600))*time.Second
 }
