@@ -31,20 +31,7 @@ func (monitor *PeriodicRebootMonitor) Start() error {
 	if monitor.config.Enabled {
 		log.Printf("PeriodicRebootMonitor: reboot in %v", monitor.initialPeriod)
 
-		go func() {
-			monitor.waitGroup.Add(1)
-			timer := time.NewTimer(*monitor.initialPeriod)
-			for {
-				select {
-				case <-timer.C:
-					monitor.reboot()
-				case <-monitor.quit:
-					timer.Stop()
-					monitor.waitGroup.Done()
-					return
-				}
-			}
-		}()
+		go monitor.makeTimerFunc(monitor.reboot, monitor.initialPeriod)()
 	} else {
 		log.Println("PeriodicRebootMonitor: Not enabled")
 	}

@@ -31,20 +31,7 @@ func (monitor *PeriodicCGMQuitMonitor) Start() error {
 	if monitor.config.Enabled {
 		log.Printf("PeriodicCGMQuitMonitor: cgminer quit in: %v", monitor.initialPeriod)
 
-		go func() {
-			monitor.waitGroup.Add(1)
-			timer := time.NewTimer(*monitor.initialPeriod)
-			for {
-				select {
-				case <-timer.C:
-					monitor.CGMinerQuit()
-				case <-monitor.quit:
-					timer.Stop()
-					monitor.waitGroup.Done()
-					return
-				}
-			}
-		}()
+		go monitor.makeTimerFunc(monitor.CGMinerQuit, monitor.initialPeriod)()
 	} else {
 		log.Println("PeriodicCGMQuitMonitor: Not enabled")
 	}

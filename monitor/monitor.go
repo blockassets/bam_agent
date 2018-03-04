@@ -96,16 +96,37 @@ func getRandomizedInitialPeriod(period time.Duration) time.Duration {
 	We use a helper function to build the goroutine so that we can encapsulate
 	the functionality of having to stop the ticker and inc/dec the waitGroup.
 */
-func (ctx *Context) makeTickerFunc(tick func(), period *time.Duration) func() {
+func (ctx *Context) makeTickerFunc(doIt func(), period *time.Duration) func() {
 	return func() {
 		ctx.waitGroup.Add(1)
 		ticker := time.NewTicker(*period)
 		for {
 			select {
 			case <-ticker.C:
-				tick()
+				doIt()
 			case <-ctx.quit:
 				ticker.Stop()
+				ctx.waitGroup.Done()
+				return
+			}
+		}
+	}
+}
+
+/*
+	We use a helper function to build the goroutine so that we can encapsulate
+	the functionality of having to stop the timer and inc/dec the waitGroup.
+*/
+func (ctx *Context) makeTimerFunc(doIt func(), period *time.Duration) func() {
+	return func() {
+		ctx.waitGroup.Add(1)
+		timer := time.NewTimer(*period)
+		for {
+			select {
+			case <-timer.C:
+				doIt()
+			case <-ctx.quit:
+				timer.Stop()
 				ctx.waitGroup.Done()
 				return
 			}
