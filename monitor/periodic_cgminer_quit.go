@@ -14,11 +14,11 @@ type CGMQuitConfig struct {
 type PeriodicCGMQuitMonitor struct {
 	*Context
 	config        *CGMQuitConfig
-	initialPeriod *time.Duration
+	initialPeriod time.Duration
 	CGMinerQuit   func()
 }
 
-func newPeriodicCGMQuit(context *Context, config *CGMQuitConfig, initialPeriod *time.Duration, CGMQuitFunc func()) Monitor {
+func newPeriodicCGMQuit(context *Context, config *CGMQuitConfig, initialPeriod time.Duration, CGMQuitFunc func()) Monitor {
 	return &PeriodicCGMQuitMonitor{
 		Context:       context,
 		config:        config,

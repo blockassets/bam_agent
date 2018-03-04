@@ -14,11 +14,11 @@ type RebootConfig struct {
 type PeriodicRebootMonitor struct {
 	*Context
 	config        *RebootConfig
-	initialPeriod *time.Duration
+	initialPeriod time.Duration
 	reboot        func()
 }
 
-func newPeriodicReboot(context *Context, config *RebootConfig, initialPeriod *time.Duration, rebootFunc func()) Monitor {
+func newPeriodicReboot(context *Context, config *RebootConfig, initialPeriod time.Duration, rebootFunc func()) Monitor {
 	return &PeriodicRebootMonitor{
 		Context:       context,
 		config:        config,

@@ -36,7 +36,7 @@ func (monitor *LoadMonitor) Start() error {
 
 		go monitor.makeTickerFunc(func() {
 			checkLoad(*monitor.statRetriever, monitor.config.HighLoadMark, monitor.onHighLoad)
-		}, &monitor.config.Period)()
+		}, monitor.config.Period)()
 	} else {
 		log.Println("LoadMonitor: Not enabled")
 	}

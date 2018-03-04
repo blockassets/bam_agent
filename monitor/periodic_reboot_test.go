@@ -13,7 +13,7 @@ func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	initialPeriod := time.Duration(50) * time.Millisecond
 	reboot := func() { count++ }
 
-	monitor := newPeriodicReboot(context, config, &initialPeriod, reboot)
+	monitor := newPeriodicReboot(context, config, initialPeriod, reboot)
 
 	err := monitor.Start()
 	if err != nil {
