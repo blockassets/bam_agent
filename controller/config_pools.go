@@ -63,7 +63,7 @@ func (ctrl PutPoolsCtrl) makeHandler() http.HandlerFunc {
 		})
 }
 
-type GetPoolsCtrl struct {}
+type GetPoolsCtrl struct{}
 
 func (ctrl GetPoolsCtrl) build(cfg *Config) *Controller {
 
@@ -81,7 +81,7 @@ func (ctrl GetPoolsCtrl) makeHandler() http.HandlerFunc {
 			var httpStat int
 
 			pools, err := service.GetPools()
-			if err  != nil {
+			if err != nil {
 				httpStat = http.StatusInternalServerError
 				response = BAMStatus{"Error", err}
 			} else {
