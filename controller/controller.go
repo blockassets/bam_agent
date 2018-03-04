@@ -58,6 +58,7 @@ func Init(e *echo.Echo, cfg *Config) {
 		RebootCtrl{}.build(cfg),
 		CGQuitCtrl{}.build(cfg),
 		PutPoolsCtrl{}.build(cfg),
+		GetPoolsCtrl{}.build(cfg),
 		StatusCtrl{}.build(cfg),
 	}
 

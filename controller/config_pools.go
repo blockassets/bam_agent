@@ -62,3 +62,35 @@ func (ctrl PutPoolsCtrl) makeHandler() http.HandlerFunc {
 			w.Write(resp)
 		})
 }
+
+type GetPoolsCtrl struct {}
+
+func (ctrl GetPoolsCtrl) build(cfg *Config) *Controller {
+
+	return &Controller{
+		Methods: []string{http.MethodGet},
+		Path:    "/config/pools",
+		Handler: ctrl.makeHandler(),
+	}
+}
+
+func (ctrl GetPoolsCtrl) makeHandler() http.HandlerFunc {
+	return makeJsonHandler(
+		func(w http.ResponseWriter, r *http.Request) {
+			var response interface{}
+			var httpStat int
+
+			pools, err := service.GetPools()
+			if err  != nil {
+				httpStat = http.StatusInternalServerError
+				response = BAMStatus{"Error", err}
+			} else {
+				httpStat = http.StatusOK
+				response = pools
+			}
+
+			w.WriteHeader(httpStat)
+			resp, _ := json.Marshal(response)
+			w.Write(resp)
+		})
+}
