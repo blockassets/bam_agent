@@ -26,6 +26,10 @@ type Context struct {
 	waitGroup *sync.WaitGroup
 }
 
+func makeContext() *Context {
+	return &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
+}
+
 func (ctx *Context) Stop() {
 	close(ctx.quit)
 }

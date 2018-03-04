@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"sync"
 	"testing"
 	"time"
 )
@@ -10,7 +9,8 @@ func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	count := 0
 
 	config := &CGMQuitConfig{Enabled: true, Period: 1}
-	context := &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
+
+	context := makeContext()
 	initialPeriod := time.Duration(50) * time.Millisecond
 	quit := func() { count++ }
 
