@@ -6,7 +6,7 @@
 passwd="bwcon"
 export SSHPASS="${passwd}"
 
-export SERVICE="bam_agent"
+export SERVICE="bam_agent-linux-arm"
 
 if [ -e "./workers.txt" ] ; then
 	WORKERS=`cat ./workers.txt`
