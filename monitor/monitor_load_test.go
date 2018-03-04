@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"sync"
 	"testing"
 	"time"
 
@@ -100,15 +99,13 @@ func TestCheckLoad(t *testing.T) {
 func TestLoadMonitor_Start(t *testing.T) {
 	count := 0
 
-	config := &HighLoadConfig{Enabled: true, Period: 1, HighLoadMark: 5.0}
-	sr := NewTestStatRetriever(LevelAboveFive)
+	context := makeContext()
 	tickerPeriod := time.Duration(50) * time.Millisecond
-
+	config := &HighLoadConfig{Enabled: true, Period: tickerPeriod, HighLoadMark: 5.0}
+	sr := NewTestStatRetriever(LevelAboveFive)
 	onHighLoad := func() { count += 1 }
 
-	context := &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
-
-	monitor := newLoadMonitor(context, config, &tickerPeriod, sr, onHighLoad)
+	monitor := newLoadMonitor(context, config, sr, onHighLoad)
 	err := monitor.Start()
 	if err != nil {
 		t.Error(err)

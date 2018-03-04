@@ -26,6 +26,10 @@ type Context struct {
 	waitGroup *sync.WaitGroup
 }
 
+func makeContext() *Context {
+	return &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
+}
+
 func (ctx *Context) Stop() {
 	close(ctx.quit)
 }
@@ -53,7 +57,6 @@ func (mgr *Manager) StartMonitors() {
 
 	log.Println("Monitors being started")
 
-	loadMonitorPeriod := mgr.Config.HighLoad.Period
 	periodicRebootInitial := getRandomizedInitialPeriod(mgr.Config.Reboot.Period)
 	periodicCGMQuitInitial := getRandomizedInitialPeriod(mgr.Config.CGMQuit.Period)
 
@@ -61,7 +64,7 @@ func (mgr *Manager) StartMonitors() {
 	cgQuitFunc := func() { mgr.Client.Quit() }
 
 	mgr.Monitors = &[]Monitor{
-		newLoadMonitor(mgr.NewContext(), &mgr.Config.HighLoad, &loadMonitorPeriod, statRetriever, service.Reboot),
+		newLoadMonitor(mgr.NewContext(), &mgr.Config.HighLoad, statRetriever, service.Reboot),
 		newPeriodicReboot(mgr.NewContext(), &mgr.Config.Reboot, &periodicRebootInitial, service.Reboot),
 		newPeriodicCGMQuit(mgr.NewContext(), &mgr.Config.CGMQuit, &periodicCGMQuitInitial, cgQuitFunc),
 	}
@@ -83,10 +86,54 @@ func (mgr *Manager) StopMonitors() {
 	mgr.Wait()
 }
 
-// If all miners are reset, they come back on line in a random distribution so that we dont get seen as a
-// denial of service attack on the pool. Helper to create randomized initial period
+/*
+	If all miners are reset, they come back on line in a random distribution so that we dont get seen as a
+	denial of service attack on the pool. Helper to create randomized initial period
+*/
 func getRandomizedInitialPeriod(period time.Duration) time.Duration {
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 	return period + time.Duration(r1.Intn(3600))*time.Second
+}
+
+/*
+	We use a helper function to build the goroutine so that we can encapsulate
+	the functionality of having to stop the ticker and inc/dec the waitGroup.
+*/
+func (ctx *Context) makeTickerFunc(doIt func(), period *time.Duration) func() {
+	return func() {
+		ctx.waitGroup.Add(1)
+		ticker := time.NewTicker(*period)
+		for {
+			select {
+			case <-ticker.C:
+				doIt()
+			case <-ctx.quit:
+				ticker.Stop()
+				ctx.waitGroup.Done()
+				return
+			}
+		}
+	}
+}
+
+/*
+	We use a helper function to build the goroutine so that we can encapsulate
+	the functionality of having to stop the timer and inc/dec the waitGroup.
+*/
+func (ctx *Context) makeTimerFunc(doIt func(), period *time.Duration) func() {
+	return func() {
+		ctx.waitGroup.Add(1)
+		timer := time.NewTimer(*period)
+		for {
+			select {
+			case <-timer.C:
+				doIt()
+			case <-ctx.quit:
+				timer.Stop()
+				ctx.waitGroup.Done()
+				return
+			}
+		}
+	}
 }

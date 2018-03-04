@@ -18,15 +18,13 @@ type LoadMonitor struct {
 	*Context
 	config        *HighLoadConfig
 	statRetriever *service.StatRetriever
-	tickerPeriod  *time.Duration
 	onHighLoad    func()
 }
 
-func newLoadMonitor(context *Context, config *HighLoadConfig, tickerPeriod *time.Duration, statRetriever service.StatRetriever, onHighLoad func()) Monitor {
+func newLoadMonitor(context *Context, config *HighLoadConfig, statRetriever service.StatRetriever, onHighLoad func()) Monitor {
 	return &LoadMonitor{
 		Context:       context,
 		config:        config,
-		tickerPeriod:  tickerPeriod,
 		statRetriever: &statRetriever,
 		onHighLoad:    onHighLoad,
 	}
@@ -36,20 +34,9 @@ func (monitor *LoadMonitor) Start() error {
 	if monitor.config.Enabled {
 		log.Printf("LoadMonitor: Checking load > %v every %v\n", monitor.config.HighLoadMark, monitor.config.Period)
 
-		go func() {
-			monitor.waitGroup.Add(1)
-			ticker := time.NewTicker(*monitor.tickerPeriod)
-			for {
-				select {
-				case <-ticker.C:
-					checkLoad(*monitor.statRetriever, monitor.config.HighLoadMark, monitor.onHighLoad)
-				case <-monitor.quit:
-					ticker.Stop()
-					monitor.waitGroup.Done()
-					return
-				}
-			}
-		}()
+		go monitor.makeTickerFunc(func() {
+			checkLoad(*monitor.statRetriever, monitor.config.HighLoadMark, monitor.onHighLoad)
+		}, &monitor.config.Period)()
 	} else {
 		log.Println("LoadMonitor: Not enabled")
 	}

@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"sync"
 	"testing"
 	"time"
 )
@@ -9,8 +8,8 @@ import (
 func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	count := 0
 
+	context := makeContext()
 	config := &RebootConfig{Enabled: true, Period: 1}
-	context := &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
 	initialPeriod := time.Duration(50) * time.Millisecond
 	reboot := func() { count++ }
 
