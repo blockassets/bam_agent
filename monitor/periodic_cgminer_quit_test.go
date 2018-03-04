@@ -14,7 +14,7 @@ func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	initialPeriod := time.Duration(50) * time.Millisecond
 	quit := func() { count++ }
 
-	monitor := newPeriodicCGMQuit(context, config, &initialPeriod, quit)
+	monitor := newPeriodicCGMQuit(context, config, initialPeriod, quit)
 
 	err := monitor.Start()
 	if err != nil {

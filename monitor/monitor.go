@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/blockassets/cgminer_client"
 )
 
@@ -26,6 +27,7 @@ type Context struct {
 	waitGroup *sync.WaitGroup
 }
 
+// For tests only! Uses a new WaitGroup, so don't use when a Manager is in use since that uses a shared WG.
 func makeContext() *Context {
 	return &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
 }
@@ -65,8 +67,8 @@ func (mgr *Manager) StartMonitors() {
 
 	mgr.Monitors = &[]Monitor{
 		newLoadMonitor(mgr.NewContext(), &mgr.Config.HighLoad, statRetriever, service.Reboot),
-		newPeriodicReboot(mgr.NewContext(), &mgr.Config.Reboot, &periodicRebootInitial, service.Reboot),
-		newPeriodicCGMQuit(mgr.NewContext(), &mgr.Config.CGMQuit, &periodicCGMQuitInitial, cgQuitFunc),
+		newPeriodicReboot(mgr.NewContext(), &mgr.Config.Reboot, periodicRebootInitial, service.Reboot),
+		newPeriodicCGMQuit(mgr.NewContext(), &mgr.Config.CGMQuit, periodicCGMQuitInitial, cgQuitFunc),
 	}
 
 	for _, monitor := range *mgr.Monitors {
@@ -98,18 +100,17 @@ func getRandomizedInitialPeriod(period time.Duration) time.Duration {
 
 /*
 	We use a helper function to build the goroutine so that we can encapsulate
-	the functionality of having to stop the ticker and inc/dec the waitGroup.
+	the functionality of having to stop the timer/ticker and inc/dec the waitGroup.
 */
-func (ctx *Context) makeTickerFunc(doIt func(), period *time.Duration) func() {
+func (ctx *Context) makeClockFunc(clock tool.Clock, doIt func()) func() {
 	return func() {
 		ctx.waitGroup.Add(1)
-		ticker := time.NewTicker(*period)
 		for {
 			select {
-			case <-ticker.C:
+			case <-clock.C():
 				doIt()
 			case <-ctx.quit:
-				ticker.Stop()
+				clock.Stop()
 				ctx.waitGroup.Done()
 				return
 			}
@@ -117,23 +118,10 @@ func (ctx *Context) makeTickerFunc(doIt func(), period *time.Duration) func() {
 	}
 }
 
-/*
-	We use a helper function to build the goroutine so that we can encapsulate
-	the functionality of having to stop the timer and inc/dec the waitGroup.
-*/
-func (ctx *Context) makeTimerFunc(doIt func(), period *time.Duration) func() {
-	return func() {
-		ctx.waitGroup.Add(1)
-		timer := time.NewTimer(*period)
-		for {
-			select {
-			case <-timer.C:
-				doIt()
-			case <-ctx.quit:
-				timer.Stop()
-				ctx.waitGroup.Done()
-				return
-			}
-		}
-	}
+func (ctx *Context) makeTickerFunc(doIt func(), period time.Duration) func() {
+	return ctx.makeClockFunc(tool.NewTicker(period), doIt)
+}
+
+func (ctx *Context) makeTimerFunc(doIt func(), period time.Duration) func() {
+	return ctx.makeClockFunc(tool.NewTimer(period), doIt)
 }
