@@ -14,15 +14,15 @@ type CGMQuitConfig struct {
 // Implements the Monitor interface
 type PeriodicCGMQuitMonitor struct {
 	*Context
-	config        *CGMQuitConfig
-	CGMinerQuit   func()
+	config      *CGMQuitConfig
+	CGMinerQuit func()
 }
 
 func newPeriodicCGMQuit(context *Context, config *CGMQuitConfig, CGMQuitFunc func()) Monitor {
 	return &PeriodicCGMQuitMonitor{
-		Context:       context,
-		config:        config,
-		CGMinerQuit:   CGMQuitFunc,
+		Context:     context,
+		config:      config,
+		CGMinerQuit: CGMQuitFunc,
 	}
 }
 

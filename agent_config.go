@@ -12,8 +12,8 @@ import (
 
 const (
 	defaultConfigFilePath = "/etc/"
-	defaultConfigFile = "bam_agent.json"
-	box = "conf"
+	defaultConfigFile     = "bam_agent.json"
+	box                   = "conf"
 )
 
 type AgentConfig struct {
@@ -25,7 +25,7 @@ type AgentConfig struct {
 	2. If the config doesn't exist, load it from the box.
 	3. Attempt to write the config to outputFile.
 	4. Return the parsed json structure.
- */
+*/
 func LoadAgentConfig(outputFile string) (*AgentConfig, error) {
 	var jsonData []byte
 

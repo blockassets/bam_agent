@@ -14,15 +14,15 @@ type RebootConfig struct {
 // Implements the Monitor interface
 type PeriodicRebootMonitor struct {
 	*Context
-	config        *RebootConfig
-	reboot        func()
+	config *RebootConfig
+	reboot func()
 }
 
 func newPeriodicReboot(context *Context, config *RebootConfig, rebootFunc func()) Monitor {
 	return &PeriodicRebootMonitor{
-		Context:       context,
-		config:        config,
-		reboot:        rebootFunc,
+		Context: context,
+		config:  config,
+		reboot:  rebootFunc,
 	}
 }
 
