@@ -8,13 +8,13 @@ import (
 	"github.com/json-iterator/go"
 )
 
+type TimeDuration struct {
+	time.Duration
+}
+
 func RegisterTimeDuration() {
 	jsoniter.RegisterTypeEncoder("time.Duration", &TimeDuration{})
 	jsoniter.RegisterTypeDecoder("time.Duration", &TimeDuration{})
-}
-
-type TimeDuration struct {
-	time.Duration
 }
 
 func (codec *TimeDuration) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator) {
