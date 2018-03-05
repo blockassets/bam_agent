@@ -3,18 +3,19 @@ package monitor
 import (
 	"testing"
 	"time"
+
+	"github.com/blockassets/bam_agent/tool"
 )
 
 func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	count := 0
 
-	config := &CGMQuitConfig{Enabled: true, Period: 1}
+	config := &CGMQuitConfig{Enabled: true, Period: tool.RandomDuration{Duration: time.Duration(50) * time.Millisecond}}
 
 	context := makeContext()
-	initialPeriod := time.Duration(50) * time.Millisecond
 	quit := func() { count++ }
 
-	monitor := newPeriodicCGMQuit(context, config, initialPeriod, quit)
+	monitor := newPeriodicCGMQuit(context, config, quit)
 
 	err := monitor.Start()
 	if err != nil {
@@ -22,7 +23,7 @@ func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	}
 
 	// Sleep to ensure the timer runs once
-	time.Sleep(initialPeriod * 2)
+	time.Sleep(config.Period.Duration * 2)
 
 	// Test that stop cleans up the WaitGroup
 	monitor.Stop()

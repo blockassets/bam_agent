@@ -46,6 +46,7 @@ func main() {
 
 	// Enables jsoniter to parse time.Duration fields in json
 	tool.RegisterTimeDuration()
+	tool.RegisterRandomDuration()
 
 	// Sometime in the next 24 hours check for update to prevent all machines updating
 	// at the same exact time, which could DDOS the network. +1 since rand.Intn is zero based.

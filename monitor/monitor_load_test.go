@@ -100,8 +100,8 @@ func TestLoadMonitor_Start(t *testing.T) {
 	count := 0
 
 	context := makeContext()
-	tickerPeriod := time.Duration(50) * time.Millisecond
-	config := &HighLoadConfig{Enabled: true, Period: tickerPeriod, HighLoadMark: 5.0}
+	period := time.Duration(50) * time.Millisecond
+	config := &HighLoadConfig{Enabled: true, Period: period, HighLoadMark: 5.0}
 	sr := NewTestStatRetriever(LevelAboveFive)
 	onHighLoad := func() { count += 1 }
 
@@ -112,7 +112,7 @@ func TestLoadMonitor_Start(t *testing.T) {
 	}
 
 	// Sleep to ensure the timer runs once
-	time.Sleep(tickerPeriod * 2)
+	time.Sleep(period * 2)
 
 	// Test that stop cleans up the WaitGroup
 	monitor.Stop()
