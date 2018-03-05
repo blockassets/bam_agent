@@ -86,11 +86,7 @@ func prog(state overseer.State) {
 		log.Printf("Self-update interval: %s", interval)
 	}
 
-	cfg, err := LoadAgentConfig(*configFileName)
-	if err != nil {
-		log.Fatalf("Failed to open configuration: %s\nError: %v\n", *configFileName, err)
-		return
-	}
+	cfg, _ := LoadAgentConfig(*configFileName)
 
 	e := echo.New()
 	client := minerClient()
