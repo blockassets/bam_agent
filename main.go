@@ -26,9 +26,9 @@ import (
 
 var (
 	// Makefile build
-	version        = ""
-	interval       time.Duration
-	configFileName *string
+	version          = ""
+	interval time.Duration
+	config   *string
 )
 
 const (
@@ -54,7 +54,7 @@ func main() {
 
 	port := flag.String("port", "1111", "The address to listen on")
 	noUpdate := flag.Bool("no-update", false, "Never do any updates. Example: -no-update=true")
-	configFileName = flag.String("config", "/etc/bam_agent.json", "configuration file, created if it doesn't exist")
+	config = flag.String("config", "/etc/bam_agent.json", "configuration file, created if it doesn't exist")
 	flag.Parse()
 
 	portStr := fmt.Sprintf(":%s", *port)
@@ -87,7 +87,7 @@ func prog(state overseer.State) {
 		log.Printf("Self-update interval: %s", interval)
 	}
 
-	cfg, _ := LoadAgentConfig(*configFileName)
+	cfg, _ := LoadAgentConfig(*config)
 
 	e := echo.New()
 	client := minerClient()

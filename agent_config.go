@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	defaultConfigFilePath = "/etc/"
-	defaultConfigFile     = "bam_agent.json"
-	box                   = "conf"
+	configFilePath = "/etc/"
+	configFileName = "bam_agent.json"
+
 )
 
 type AgentConfig struct {
@@ -29,16 +29,16 @@ type AgentConfig struct {
 func LoadAgentConfig(outputFile string) (*AgentConfig, error) {
 	var jsonData []byte
 
-	readOnly, err := os.Open(defaultConfigFilePath + defaultConfigFile)
+	readOnly, err := os.Open(configFilePath + configFileName)
 	defer readOnly.Close()
 
 	if os.IsNotExist(err) {
-		confBox, err := rice.FindBox(box)
+		confBox, err := rice.FindBox("conf")
 		if err != nil {
 			return nil, err
 		}
 
-		jsonData, err = confBox.Bytes(defaultConfigFile)
+		jsonData, err = confBox.Bytes(configFileName)
 		if err != nil {
 			return nil, err
 		}
