@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/blockassets/bam_agent/service"
+	"github.com/json-iterator/go"
 )
 
 const (
@@ -27,7 +28,7 @@ func (ctrl RebootCtrl) makeHandler() http.HandlerFunc {
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 
-			resp, _ := json.Marshal(BAMStatus{"OK", nil})
+			resp, _ := jsoniter.Marshal(BAMStatus{"OK", nil})
 			w.Write(resp)
 			// leave enough time for http server to respond to caller
 			time.AfterFunc(DELAY_BEFORE_REBOOT, service.Reboot)

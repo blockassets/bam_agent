@@ -7,6 +7,7 @@ import (
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service"
 	"github.com/blockassets/cgminer_client"
+	"github.com/json-iterator/go"
 )
 
 // Implements Builder interface
@@ -45,7 +46,7 @@ func (ctrl CGQuitCtrl) makeHandler() http.HandlerFunc {
 			ctrl.monitorManager.StartMonitors()
 
 			w.WriteHeader(httpStat)
-			resp, _ := json.Marshal(bamStat)
+			resp, _ := jsoniter.Marshal(bamStat)
 			w.Write(resp)
 		})
 }
