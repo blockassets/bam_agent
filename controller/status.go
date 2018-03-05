@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/blockassets/bam_agent/service"
+	"github.com/json-iterator/go"
 )
 
 // Implements Builder interface
@@ -42,7 +43,7 @@ func (ctrl StatusCtrl) makeHandler() http.HandlerFunc {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			resp, _ := json.Marshal(status)
+			resp, _ := jsoniter.Marshal(status)
 			w.Write(resp)
 		})
 }

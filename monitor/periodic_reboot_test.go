@@ -3,17 +3,18 @@ package monitor
 import (
 	"testing"
 	"time"
+
+	"github.com/blockassets/bam_agent/tool"
 )
 
 func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	count := 0
 
 	context := makeContext()
-	config := &RebootConfig{Enabled: true, Period: 1}
-	initialPeriod := time.Duration(50) * time.Millisecond
+	config := &RebootConfig{Enabled: true, Period: tool.RandomDuration{Duration: time.Duration(50) * time.Millisecond}}
 	reboot := func() { count++ }
 
-	monitor := newPeriodicReboot(context, config, initialPeriod, reboot)
+	monitor := newPeriodicReboot(context, config, reboot)
 
 	err := monitor.Start()
 	if err != nil {
@@ -21,7 +22,7 @@ func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	}
 
 	// Sleep to ensure the timer runs once
-	time.Sleep(initialPeriod * 2)
+	time.Sleep(config.Period.Duration * 2)
 
 	// Test that stop cleans up the WaitGroup
 	monitor.Stop()

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"encoding/json"
 	"testing"
 
 	"github.com/Jeffail/gabs"
+	"github.com/json-iterator/go"
 )
 
 var updatePoolsTests = []struct {
@@ -108,7 +108,7 @@ func TestMutatePools(t *testing.T) {
 		}
 
 		pools := &PoolAddresses{}
-		err = json.Unmarshal([]byte(tt.poolsIn), pools)
+		err = jsoniter.Unmarshal([]byte(tt.poolsIn), pools)
 		if err != nil {
 			t.Error(err)
 		}

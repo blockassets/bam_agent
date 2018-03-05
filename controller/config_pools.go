@@ -6,6 +6,7 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service"
+	"github.com/json-iterator/go"
 )
 
 // command to update the ip address for
@@ -58,7 +59,7 @@ func (ctrl PutPoolsCtrl) makeHandler() http.HandlerFunc {
 			}
 
 			w.WriteHeader(httpStat)
-			resp, _ := json.Marshal(bamStat)
+			resp, _ := jsoniter.Marshal(bamStat)
 			w.Write(resp)
 		})
 }
@@ -90,7 +91,7 @@ func (ctrl GetPoolsCtrl) makeHandler() http.HandlerFunc {
 			}
 
 			w.WriteHeader(httpStat)
-			resp, _ := json.Marshal(response)
+			resp, _ := jsoniter.Marshal(response)
 			w.Write(resp)
 		})
 }

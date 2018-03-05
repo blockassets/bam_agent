@@ -5,12 +5,7 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/cgminer_client"
-	"github.com/json-iterator/go"
 	"github.com/labstack/echo"
-)
-
-var (
-	json = jsoniter.ConfigDefault
 )
 
 type BAMStatus struct {

@@ -1,10 +1,10 @@
 package service
 
 import (
-	"encoding/json"
 	"io/ioutil"
 
 	"github.com/Jeffail/gabs"
+	"github.com/json-iterator/go"
 )
 
 //const configFilePath = "/usr/app/conf.default"
@@ -44,7 +44,7 @@ func SaveMinerConfig(bytes []byte) error {
 
 func UpdatePools(poolData []byte) error {
 	pools := &PoolAddresses{}
-	err := json.Unmarshal(poolData, pools)
+	err := jsoniter.Unmarshal(poolData, pools)
 	if err != nil {
 		return err
 	}

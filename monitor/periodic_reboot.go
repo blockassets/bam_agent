@@ -2,36 +2,35 @@ package monitor
 
 import (
 	"log"
-	"time"
+
+	"github.com/blockassets/bam_agent/tool"
 )
 
 type RebootConfig struct {
-	Enabled bool          `json:"enabled"`
-	Period  time.Duration `json:"period"`
+	Enabled bool                `json:"enabled"`
+	Period  tool.RandomDuration `json:"period"`
 }
 
 // Implements the Monitor interface
 type PeriodicRebootMonitor struct {
 	*Context
-	config        *RebootConfig
-	initialPeriod time.Duration
-	reboot        func()
+	config *RebootConfig
+	reboot func()
 }
 
-func newPeriodicReboot(context *Context, config *RebootConfig, initialPeriod time.Duration, rebootFunc func()) Monitor {
+func newPeriodicReboot(context *Context, config *RebootConfig, rebootFunc func()) Monitor {
 	return &PeriodicRebootMonitor{
-		Context:       context,
-		config:        config,
-		initialPeriod: initialPeriod,
-		reboot:        rebootFunc,
+		Context: context,
+		config:  config,
+		reboot:  rebootFunc,
 	}
 }
 
 func (monitor *PeriodicRebootMonitor) Start() error {
 	if monitor.config.Enabled {
-		log.Printf("PeriodicRebootMonitor: reboot in %v", monitor.initialPeriod)
+		log.Printf("PeriodicRebootMonitor: reboot in %v", monitor.config.Period.Duration)
 
-		go monitor.makeTimerFunc(monitor.reboot, monitor.initialPeriod)()
+		go monitor.makeTimerFunc(monitor.reboot, monitor.config.Period.Duration)()
 	} else {
 		log.Println("PeriodicRebootMonitor: Not enabled")
 	}

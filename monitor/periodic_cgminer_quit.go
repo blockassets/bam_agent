@@ -2,36 +2,35 @@ package monitor
 
 import (
 	"log"
-	"time"
+
+	"github.com/blockassets/bam_agent/tool"
 )
 
 type CGMQuitConfig struct {
-	Enabled bool          `json:"enabled"`
-	Period  time.Duration `json:"period"`
+	Enabled bool                `json:"enabled"`
+	Period  tool.RandomDuration `json:"period"`
 }
 
 // Implements the Monitor interface
 type PeriodicCGMQuitMonitor struct {
 	*Context
-	config        *CGMQuitConfig
-	initialPeriod time.Duration
-	CGMinerQuit   func()
+	config      *CGMQuitConfig
+	CGMinerQuit func()
 }
 
-func newPeriodicCGMQuit(context *Context, config *CGMQuitConfig, initialPeriod time.Duration, CGMQuitFunc func()) Monitor {
+func newPeriodicCGMQuit(context *Context, config *CGMQuitConfig, CGMQuitFunc func()) Monitor {
 	return &PeriodicCGMQuitMonitor{
-		Context:       context,
-		config:        config,
-		initialPeriod: initialPeriod,
-		CGMinerQuit:   CGMQuitFunc,
+		Context:     context,
+		config:      config,
+		CGMinerQuit: CGMQuitFunc,
 	}
 }
 
 func (monitor *PeriodicCGMQuitMonitor) Start() error {
 	if monitor.config.Enabled {
-		log.Printf("PeriodicCGMQuitMonitor: cgminer quit in: %v", monitor.initialPeriod)
+		log.Printf("PeriodicCGMQuitMonitor: cgminer quit in: %v", monitor.config.Period.Duration)
 
-		go monitor.makeTimerFunc(monitor.CGMinerQuit, monitor.initialPeriod)()
+		go monitor.makeTimerFunc(monitor.CGMinerQuit, monitor.config.Period.Duration)()
 	} else {
 		log.Println("PeriodicCGMQuitMonitor: Not enabled")
 	}
