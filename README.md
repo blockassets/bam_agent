@@ -6,7 +6,7 @@ This is an agent that is intended to be installed on miners to help facilitate m
 
 Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project.
 
-### Usage (defaults):
+### Running (defaults):
 
 ``
 ./bam_agent-linux-arm -port 1111 -no-update=false
@@ -61,3 +61,51 @@ Enable the service:
 ```
 ssh root@MINER_IP "systemctl enable bam_agent; systemctl start bam_agent"
 ```
+
+## API
+
+### `GET /config/pools`
+
+```
+{"pool1": "", "pool2": "", "pool3": ""}
+```
+
+### `PUT /config/pools`
+
+Send PUT request with json body:
+
+```
+{"pool1": "", "pool2": "", "pool3": ""}
+```
+
+Restarts cgminer.
+
+### `GET /status`
+
+```
+{
+  "agent": "39892e1 2018-03-06 02:06:09",
+  "miner": "value in /usr/app/version.txt",
+  "uptime": "0s"
+}
+```
+
+### `GET /reboot`
+
+Reboots the miner. Obviously be careful with this one. :-)
+
+## Monitors
+
+Monitors are configured by editing the `/etc/bam_agent.conf` file. This file is created when the agent first starts.
+
+### High Load
+
+Enabled by default. If the 5m average load is above 5, `reboot -f` the miner. This works around a bug where the load spikes and the miner stops submitting shares to the pool.
+
+### Periodic Quit cgminer
+
+Disabled by default. Periodically quit the miner app to free up memory and start fresh.
+
+### Periodic Reboot
+
+Disabled by default. Periodically reboot the entire miner.
