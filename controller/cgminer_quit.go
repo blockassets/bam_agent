@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
 	"github.com/blockassets/cgminer_client"
 	"github.com/json-iterator/go"
 )
