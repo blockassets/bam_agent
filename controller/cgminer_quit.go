@@ -37,7 +37,7 @@ func (ctrl CGQuitCtrl) makeHandler() http.HandlerFunc {
 
 			ctrl.monitorManager.StopMonitors()
 
-			err := service.CgmQuit(ctrl.client)
+			err := ctrl.client.Quit()
 			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
