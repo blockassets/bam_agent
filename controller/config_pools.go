@@ -6,6 +6,7 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/cgminer_client"
 	"github.com/json-iterator/go"
 )
 
@@ -23,10 +24,12 @@ import (
 
 // Implements Builder interface
 type PutPoolsCtrl struct {
+	client         *cgminer_client.Client
 	monitorManager *monitor.Manager
 }
 
 func (ctrl PutPoolsCtrl) build(cfg *Config) *Controller {
+	ctrl.client = cfg.Client
 	ctrl.monitorManager = cfg.MonitorManager
 
 	return &Controller{
@@ -50,6 +53,12 @@ func (ctrl PutPoolsCtrl) makeHandler() http.HandlerFunc {
 				ctrl.monitorManager.StopMonitors()
 
 				err = service.UpdatePools(data)
+				if err != nil {
+					httpStat = http.StatusBadGateway
+					bamStat = BAMStatus{"Error", err}
+				}
+
+				err = ctrl.client.Quit()
 				if err != nil {
 					httpStat = http.StatusBadGateway
 					bamStat = BAMStatus{"Error", err}
