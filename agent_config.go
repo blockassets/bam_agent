@@ -15,10 +15,12 @@ const (
 	configFileName = "bam_agent.json"
 )
 
+// AgentConfig represents the json config file that is cached on disk.
 type AgentConfig struct {
 	Monitor monitor.Config `json:"monitor"`
 }
 
+// LoadAgentConfig implements the following sequence of events
 /*
 	1. Look for the config file in /etc/bam_agent.conf
 	2. If the config doesn't exist, load it from the box.

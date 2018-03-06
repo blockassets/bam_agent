@@ -10,17 +10,27 @@ import (
 	"github.com/blockassets/cgminer_client"
 )
 
+/*
+	Describes all the configs for the implemented monitors
+*/
 type Config struct {
 	HighLoad HighLoadConfig `json:"highLoad"`
 	Reboot   RebootConfig   `json:"reboot"`
 	CGMQuit  CGMQuitConfig  `json:"cgMinerQuit"`
 }
 
+/*
+	Monitors have a simple life cycle interface of just Start/Stop.
+*/
 type Monitor interface {
 	Start() error
 	Stop()
 }
 
+/*
+	Context is the implementation struct for the Monitor interface.
+	Each Monitor has a (ctx *Context) which holds the channel for
+*/
 type Context struct {
 	quit      chan bool
 	waitGroup *sync.WaitGroup
@@ -31,16 +41,24 @@ func makeContext() *Context {
 	return &Context{quit: make(chan bool), waitGroup: &sync.WaitGroup{}}
 }
 
+/*
+	Common stop method for all Monitors. Just shut down the channel.
+*/
 func (ctx *Context) Stop() {
 	close(ctx.quit)
 }
 
+/*
+	Interface for the Monitor Managers
+*/
 type Lifecycle interface {
 	StartMonitors()
 	StopMonitors()
 }
 
-// Implements the Lifecycle interface
+/*
+	Implements the Lifecycle interface
+*/
 type Manager struct {
 	Config   *Config
 	Client   *cgminer_client.Client
@@ -48,10 +66,16 @@ type Manager struct {
 	sync.WaitGroup
 }
 
+/*
+	Creates a new Context with the common waitGroup of the manager
+*/
 func (mgr *Manager) NewContext() *Context {
 	return &Context{quit: make(chan bool), waitGroup: &mgr.WaitGroup}
 }
 
+/*
+	Implementation of the Manager interface for starting monitors.
+*/
 func (mgr *Manager) StartMonitors() {
 	// Blocks until all the monitors are finished. Prevents double start.
 	mgr.Wait()
@@ -72,8 +96,11 @@ func (mgr *Manager) StartMonitors() {
 	}
 }
 
+/*
+	Implementation of the Manager interface for stopped monitors. Prevents double stop
+	to prevent a panic()
+*/
 func (mgr *Manager) StopMonitors() {
-
 	log.Println("Monitors being stopped")
 
 	for _, monitor := range *mgr.Monitors {
@@ -104,10 +131,16 @@ func (ctx *Context) makeClockFunc(clock tool.Clock, doIt func()) func() {
 	}
 }
 
+/*
+	Simple function for creating a new Ticker go fun() based on the Clock interface
+*/
 func (ctx *Context) makeTickerFunc(doIt func(), period time.Duration) func() {
 	return ctx.makeClockFunc(tool.NewTicker(period), doIt)
 }
 
+/*
+	Simple function for creating a new Timer go fun() based on the Clock interface
+*/
 func (ctx *Context) makeTimerFunc(doIt func(), period time.Duration) func() {
 	return ctx.makeClockFunc(tool.NewTimer(period), doIt)
 }
