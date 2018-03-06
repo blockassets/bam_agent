@@ -7,8 +7,7 @@ import (
 	"github.com/json-iterator/go"
 )
 
-//const configFilePath = "/usr/app/conf.default"
-const configFilePath = "/tmp/conf.default"
+const configFilePath = "/usr/app/conf.default"
 
 type PoolAddresses struct {
 	Pool1 string `json:"pool1"`
