@@ -64,6 +64,7 @@ type Manager struct {
 	Client   *cgminer_client.Client
 	Monitors *[]Monitor
 	sync.WaitGroup
+	sync.Mutex
 }
 
 /*
@@ -81,16 +82,16 @@ func (mgr *Manager) StartMonitors() {
 	mgr.Wait()
 
 	log.Println("Monitors being started")
-
 	statRetriever := service.NewStatRetriever()
 	cgQuitFunc := func() { mgr.Client.Quit() }
 
+	mgr.Lock()
+	defer mgr.Unlock()
 	mgr.Monitors = &[]Monitor{
 		newLoadMonitor(mgr.NewContext(), &mgr.Config.HighLoad, statRetriever, service.Reboot),
 		newPeriodicReboot(mgr.NewContext(), &mgr.Config.Reboot, service.Reboot),
 		newPeriodicCGMQuit(mgr.NewContext(), &mgr.Config.CGMQuit, cgQuitFunc),
 	}
-
 	for _, monitor := range *mgr.Monitors {
 		monitor.Start()
 	}
@@ -102,9 +103,13 @@ func (mgr *Manager) StartMonitors() {
 */
 func (mgr *Manager) StopMonitors() {
 	log.Println("Monitors being stopped")
-
-	for _, monitor := range *mgr.Monitors {
-		monitor.Stop()
+	mgr.Lock()
+	defer mgr.Unlock()
+	if mgr.Monitors != nil {
+		for _, monitor := range *mgr.Monitors {
+			monitor.Stop()
+		}
+		mgr.Monitors = nil
 	}
 
 	// Blocks until all the monitors are finished
