@@ -36,6 +36,9 @@ dep:
 	@dep ensure
 	@go get github.com/GeertJohan/go.rice/rice
 
+fmt:
+	gofmt -s -w .
+
 rice:
 	rice append --exec $(BINARY_LINUX)
 

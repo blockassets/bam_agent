@@ -26,7 +26,7 @@ import (
 
 var (
 	// Makefile build
-	version          = ""
+	version  = ""
 	interval time.Duration
 	config   *string
 )

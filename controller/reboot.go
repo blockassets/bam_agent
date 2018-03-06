@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DELAY_BEFORE_REBOOT = time.Duration(5) * time.Second
+	delayBeforeReboot = time.Duration(5) * time.Second
 )
 
 // Implements Builder interface
@@ -31,6 +31,6 @@ func (ctrl RebootCtrl) makeHandler() http.HandlerFunc {
 			resp, _ := jsoniter.Marshal(BAMStatus{"OK", nil})
 			w.Write(resp)
 			// leave enough time for http server to respond to caller
-			time.AfterFunc(DELAY_BEFORE_REBOOT, service.Reboot)
+			time.AfterFunc(delayBeforeReboot, service.Reboot)
 		})
 }
