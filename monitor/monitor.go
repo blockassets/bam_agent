@@ -53,7 +53,6 @@ func (mgr *Manager) NewContext() *Context {
 	return &Context{quit: make(chan bool), waitGroup: &mgr.WaitGroup}
 }
 
-
 func (mgr *Manager) StartMonitors() {
 	// Blocks until all the monitors are finished. Prevents double start.
 	mgr.Wait()
@@ -74,7 +73,6 @@ func (mgr *Manager) StartMonitors() {
 	}
 
 }
-
 
 func (mgr *Manager) StopMonitors() {
 
