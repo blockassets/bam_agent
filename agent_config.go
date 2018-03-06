@@ -13,7 +13,6 @@ import (
 const (
 	configFilePath = "/etc/"
 	configFileName = "bam_agent.json"
-
 )
 
 type AgentConfig struct {
