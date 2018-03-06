@@ -50,7 +50,7 @@ func TestManager_StopMonitors(t *testing.T) {
 	monitorManager.StopMonitors()
 	monitorManager.StartMonitors()
 	// let enough time to go through 1 cycle
-	time.Sleep(MonitorCycleDuration * time.Duration(2))
+	time.Sleep(MonitorCycleDuration * 2)
 	monitorManager.StopMonitors()
 	monitorManager.StopMonitors()
 	if count != 1 {
