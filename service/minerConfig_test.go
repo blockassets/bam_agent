@@ -132,3 +132,9 @@ func TestUpdatePools(t *testing.T) {
 		t.Error("Should have had an error on bad input")
 	}
 }
+
+func TestConfigFilePath(t *testing.T) {
+	if configFilePath != "/usr/app/conf.default" {
+		t.Errorf("Expected config file path to be /usr/app/conf.default and got %s", configFilePath)
+	}
+}
