@@ -17,7 +17,7 @@ type StatusCtrl struct {
 type Status struct {
 	Agent  string        `json:"agent"`
 	Miner  string        `json:"miner"`
-	Uptime time.Duration `json:"uptimeInSeconds"`
+	Uptime time.Duration `json:"uptime"`
 }
 
 func (ctrl StatusCtrl) build(cfg *Config) *Controller {
