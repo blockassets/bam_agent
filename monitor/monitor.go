@@ -95,7 +95,6 @@ func (mgr *Manager) StartMonitors() {
 	for _, monitor := range *mgr.Monitors {
 		monitor.Start()
 	}
-
 }
 
 /*

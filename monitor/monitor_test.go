@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	MonitorCycleDuration = time.Duration(50) * time.Millisecond
+	monitorCycleDuration = time.Duration(50) * time.Millisecond
 )
 
 type TestMonitor struct {
@@ -22,7 +22,7 @@ func newTestMonitor(context *Context, doItFunc func()) *TestMonitor {
 
 func (monitor *TestMonitor) Start() error {
 
-	go monitor.makeTimerFunc(monitor.CountIt, MonitorCycleDuration)()
+	go monitor.makeTimerFunc(monitor.CountIt, monitorCycleDuration)()
 
 	return nil
 }
@@ -50,7 +50,7 @@ func TestManager_StopMonitors(t *testing.T) {
 	monitorManager.StopMonitors()
 	monitorManager.StartMonitors()
 	// let enough time to go through 1 cycle
-	time.Sleep(MonitorCycleDuration * 2)
+	time.Sleep(monitorCycleDuration * 2)
 	monitorManager.StopMonitors()
 	monitorManager.StopMonitors()
 	if count != 1 {
