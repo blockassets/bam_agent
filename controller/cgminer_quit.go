@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
 	"github.com/blockassets/cgminer_client"
 	"github.com/json-iterator/go"
 )
@@ -37,7 +36,7 @@ func (ctrl CGQuitCtrl) makeHandler() http.HandlerFunc {
 
 			ctrl.monitorManager.StopMonitors()
 
-			err := service.CgmQuit(ctrl.client)
+			err := ctrl.client.Quit()
 			if err != nil {
 				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
