@@ -15,6 +15,13 @@ type PoolAddresses struct {
 	Pool3 string `json:"pool3"`
 }
 
+type IPAddresses struct {
+	IPAddress string `json:"address"`
+	Netmask   string `json:"netmask"`
+	Gateway   string `json:"gateway"`
+	Dns       string `json:"dns"`
+}
+
 // Local private cache. Always reference this through the LoadMinerConfig() function
 var config *gabs.Container
 
@@ -79,4 +86,35 @@ func GetPools() (*PoolAddresses, error) {
 		Pool2: pool2,
 		Pool3: pool3,
 	}, nil
+}
+
+func UpdateIPAddresses(ipData []byte) error {
+	ipa := &IPAddresses{}
+	err := jsoniter.Unmarshal(ipData, ipa)
+	if err != nil {
+		return err
+	}
+
+	config, err := LoadMinerConfig()
+	if err != nil {
+		return err
+	}
+
+	// Set the /etc/network/interfaces
+	err = SetStaticIP(ipa.IPAddress, ipa.Netmask, ipa.Gateway)
+	if err != nil {
+		return err
+	}
+	// set the miner config
+	bytes := mutateIPAddresses(ipa, config)
+	return SaveMinerConfig(bytes)
+}
+
+func mutateIPAddresses(ipa *IPAddresses, config *gabs.Container) []byte {
+	config.Set(ipa.IPAddress, "ip")
+	config.Set(ipa.Netmask, "mask")
+	config.Set(ipa.Gateway, "gateway")
+	config.Set(ipa.Dns, "dns")
+
+	return config.BytesIndent("", "\t")
 }
