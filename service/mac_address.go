@@ -9,9 +9,7 @@ import (
 // So we take the first physical MAC address enumerated as the primary MAC for the device
 //
 
-const (
-	nullMACAddress = "00:00:00:00:00:00"
-)
+
 
 type NetInfo struct {
 	ifi *[]net.Interface
@@ -26,13 +24,14 @@ func NewNetInfo() *NetInfo {
 	}
 }
 
-func (ni *NetInfo) GetPrimaryMacAddress() string {
+func (ni *NetInfo) GetMacAddress() *string {
 	if ni.ifi != nil {
 		for _, i := range *ni.ifi {
 			if (i.Flags&net.FlagUp != 0) && (bytes.Compare(i.HardwareAddr, nil) != 0) {
-				return i.HardwareAddr.String()
+				mac := i.HardwareAddr.String()
+				return &mac
 			}
 		}
 	}
-	return nullMACAddress
+	return nil
 }

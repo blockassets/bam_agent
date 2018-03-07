@@ -17,20 +17,20 @@ func makeNoPhysicalNetInfo() *NetInfo {
 func TestNetInfo_GetPrimaryMacAddress(t *testing.T) {
 	// Real Network
 	ni := NewNetInfo()
-	mac := ni.GetPrimaryMacAddress()
-	if mac == nullMACAddress {
-		t.Errorf("Expected a valid MAC address, got: %v", mac)
+	mac := ni.GetMacAddress()
+	if mac == nil {
+		t.Errorf("Expected a valid MAC address")
 	}
 
 	ni = makeNetErrNetInfo()
-	mac = ni.GetPrimaryMacAddress()
-	if mac != nullMACAddress {
-		t.Errorf("Expected a NULL MAC address, got: %v", mac)
+	mac = ni.GetMacAddress()
+	if mac != nil {
+		t.Errorf("Did not expect a valid MAC address, got: %v", mac)
 	}
 
 	ni = makeNoPhysicalNetInfo()
-	mac = ni.GetPrimaryMacAddress()
-	if mac != nullMACAddress {
+	mac = ni.GetMacAddress()
+	if mac != nil {
 		t.Errorf("Expected a NULL MAC address, got: %v", mac)
 	}
 }

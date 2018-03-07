@@ -18,7 +18,7 @@ type Status struct {
 	Agent      string        `json:"agent"`
 	Miner      string        `json:"miner"`
 	Uptime     time.Duration `json:"uptime"`
-	MACAddress string        `json:"mac"`
+	MACAddress *string       `json:"mac"`
 }
 
 func (ctrl StatusCtrl) build(cfg *Config) *Controller {
@@ -37,12 +37,13 @@ func (ctrl StatusCtrl) makeHandler() http.HandlerFunc {
 
 			uptime, _ := service.GetUptime()
 			ni := service.NewNetInfo()
+			ni.GetMacAddress()
 
 			status := Status{
 				Agent:  strings.TrimSpace(ctrl.version),
 				Miner:  strings.TrimSpace(service.ReadVersionFile()),
 				Uptime: uptime,
-				MACAddress: ni.GetPrimaryMacAddress(),
+				MACAddress: ni.GetMacAddress(),
 			}
 
 			w.WriteHeader(http.StatusOK)
