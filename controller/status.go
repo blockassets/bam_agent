@@ -5,8 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blockassets/bam_agent/service"
 	"github.com/json-iterator/go"
+
+	"github.com/blockassets/bam_agent/service"
 )
 
 // Implements Builder interface

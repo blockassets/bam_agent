@@ -9,8 +9,6 @@ import (
 // So we take the first physical MAC address enumerated as the primary MAC for the device
 //
 
-
-
 type NetInfo struct {
 	ifi *[]net.Interface
 }
