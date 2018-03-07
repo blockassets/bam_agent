@@ -7,7 +7,6 @@ import (
 
 // The miners we have always have  a single physical network.
 // So we take the first physical MAC address enumerated as the primary MAC for the device
-//
 
 type NetInfo struct {
 	ifi *[]net.Interface

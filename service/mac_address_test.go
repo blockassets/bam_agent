@@ -25,12 +25,12 @@ func TestNetInfo_GetPrimaryMacAddress(t *testing.T) {
 	ni = makeNetErrNetInfo()
 	mac = ni.GetMacAddress()
 	if mac != nil {
-		t.Errorf("Did not expect a valid MAC address, got: %v", mac)
+		t.Errorf("Expected nil, got: %v", mac)
 	}
 
 	ni = makeNoPhysicalNetInfo()
 	mac = ni.GetMacAddress()
 	if mac != nil {
-		t.Errorf("Expected a NULL MAC address, got: %v", mac)
+		t.Errorf("Expected nil, got: %v", mac)
 	}
 }

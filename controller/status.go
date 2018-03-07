@@ -5,9 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/json-iterator/go"
-
 	"github.com/blockassets/bam_agent/service"
+	"github.com/json-iterator/go"
 )
 
 // Implements Builder interface
@@ -38,12 +37,11 @@ func (ctrl StatusCtrl) makeHandler() http.HandlerFunc {
 
 			uptime, _ := service.GetUptime()
 			ni := service.NewNetInfo()
-			ni.GetMacAddress()
 
 			status := Status{
-				Agent:  strings.TrimSpace(ctrl.version),
-				Miner:  strings.TrimSpace(service.ReadVersionFile()),
-				Uptime: uptime,
+				Agent:      strings.TrimSpace(ctrl.version),
+				Miner:      strings.TrimSpace(service.ReadVersionFile()),
+				Uptime:     uptime,
 				MACAddress: ni.GetMacAddress(),
 			}
 
