@@ -15,9 +15,10 @@ type StatusCtrl struct {
 }
 
 type Status struct {
-	Agent  string        `json:"agent"`
-	Miner  string        `json:"miner"`
-	Uptime time.Duration `json:"uptime"`
+	Agent      string        `json:"agent"`
+	Miner      string        `json:"miner"`
+	Uptime     time.Duration `json:"uptime"`
+	MACAddress string        `json:"mac"`
 }
 
 func (ctrl StatusCtrl) build(cfg *Config) *Controller {
@@ -35,11 +36,13 @@ func (ctrl StatusCtrl) makeHandler() http.HandlerFunc {
 		func(w http.ResponseWriter, r *http.Request) {
 
 			uptime, _ := service.GetUptime()
+			ni := service.NewNetInfo()
 
 			status := Status{
 				Agent:  strings.TrimSpace(ctrl.version),
 				Miner:  strings.TrimSpace(service.ReadVersionFile()),
 				Uptime: uptime,
+				MACAddress: ni.GetPrimaryMacAddress(),
 			}
 
 			w.WriteHeader(http.StatusOK)
