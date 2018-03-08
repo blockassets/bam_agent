@@ -257,3 +257,31 @@ func TestMutateDHCPNetConfig(t *testing.T) {
 		t.Errorf("Expected:\n%s\nGot:\n%s\n ", expectedDHCPMutate, buf)
 	}
 }
+
+const (
+	inputUpdateFreq = `{
+	"frequency": "684"
+}`
+	expectedUpdatedFreq = `{
+	"frequency": "100"
+}`
+	frequencyToMutate = `{ "frequency": 100 }`
+)
+
+func TestMutateUpdateFrequency(t *testing.T) {
+	// Use the expected Static configuration as input...
+	jsonConfig, err := gabs.ParseJSON([]byte(inputUpdateFreq))
+	if err != nil {
+		t.Error(err)
+	}
+	mf := &MinerFrequency{}
+	err = jsoniter.Unmarshal([]byte(frequencyToMutate), mf)
+	if err != nil {
+		t.Error(err)
+	}
+	mutated := mutateFrequencyConfig(mf, jsonConfig)
+	buf := string(mutated)
+	if expectedUpdatedFreq != buf {
+		t.Errorf("Expected:\n%s\nGot:\n%s\n ", expectedUpdatedFreq, buf)
+	}
+}
