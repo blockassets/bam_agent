@@ -119,3 +119,31 @@ func mutateStaticNetConfig(netConfig *StaticNetConfig, config *gabs.Container) [
 
 	return config.BytesIndent("", "\t")
 }
+
+
+
+func UpdateDHCPNetConfig() error {
+	config, err := LoadMinerConfig()
+	if err != nil {
+		return err
+	}
+
+	// Set the /etc/network/interfaces
+	err = SetInterfaceToDhcp()
+	if err != nil {
+		return err
+	}
+	// set the miner config
+	bytes := mutateDHCPNetConfig(config)
+	return SaveMinerConfig(bytes)
+}
+
+func mutateDHCPNetConfig(config *gabs.Container) []byte {
+	config.Set(true, "autoNet")
+	config.Set("", "ip")
+	config.Set("", "mask")
+	config.Set("", "gateway")
+	config.Set("", "dns")
+
+	return config.BytesIndent("", "\t")
+}
