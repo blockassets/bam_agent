@@ -173,12 +173,12 @@ func TestConfigFilePath(t *testing.T) {
 }
 
 func TestUpdateIPAddresses(t *testing.T) {
-	err := UpdateIPAddresses(nil)
+	err := UpdateNetConfig(nil)
 	if err == nil {
 		t.Error("Should have had an error on nil input")
 	}
 
-	err = UpdateIPAddresses([]byte("{ this is bad json }"))
+	err = UpdateNetConfig([]byte("{ this is bad json }"))
 	if err == nil {
 		t.Error("Should have had an error on bad input")
 	}
@@ -190,13 +190,13 @@ func TestMutateIPAddresses(t *testing.T) {
 		t.Error(err)
 	}
 
-	ips := &IPAddresses{}
+	ips := &NetConfig{}
 	err = jsoniter.Unmarshal([]byte(IPAddressesToMutate), ips)
 	if err != nil {
 		t.Error(err)
 	}
 
-	mutated := mutateIPAddresses(ips, jsonConfig)
+	mutated := mutateNetConfig(ips, jsonConfig)
 	buf := string(mutated)
 	if expectedOutputIPAddressMutate != buf {
 		t.Errorf("Expected:\n%s\nGot:\n%s\n ", expectedOutputIPAddressMutate, buf)

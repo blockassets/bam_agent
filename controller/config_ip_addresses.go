@@ -37,7 +37,7 @@ func (ctrl PutIpCtrl) makeHandler() http.HandlerFunc {
 			} else {
 				ctrl.monitorManager.StopMonitors()
 
-				err = service.UpdateIPAddresses(data)
+				err = service.UpdateNetConfig(data)
 				if err != nil {
 					httpStat = http.StatusBadGateway
 					bamStat = BAMStatus{"Error", err}

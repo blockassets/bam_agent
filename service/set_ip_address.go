@@ -19,8 +19,7 @@ gateway %s`
 
 // Miners have ipv4 addresses and configuration
 func SetStaticIP(address string, netmask string, gateway string) error {
-	err := writeInterfacesFile(defaultNetworkInterfacesFile, address, netmask, gateway)
-	return err
+	return writeInterfacesFile(defaultNetworkInterfacesFile, address, netmask, gateway)
 }
 
 func writeInterfacesFile(filename string, address string, netmask string, gateway string) error {
@@ -28,6 +27,6 @@ func writeInterfacesFile(filename string, address string, netmask string, gatewa
 		return errors.New("invalid IP address")
 	}
 	out := fmt.Sprintf(interfacesFmt, address, netmask, gateway)
-	err := ioutil.WriteFile(filename, []byte(out), 0644)
-	return err
+	return ioutil.WriteFile(filename, []byte(out), 0644)
+
 }
