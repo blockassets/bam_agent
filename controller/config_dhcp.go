@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
@@ -10,46 +9,35 @@ import (
 )
 
 // Implements Builder interface
-type PutIpCtrl struct {
+type PutDhcpCtrl struct {
 	monitorManager *monitor.Manager
 }
 
-func (ctrl PutIpCtrl) build(cfg *Config) *Controller {
+func (ctrl PutDhcpCtrl) build(cfg *Config) *Controller {
 	ctrl.monitorManager = cfg.MonitorManager
 
 	return &Controller{
 		Methods: []string{http.MethodPut},
-		Path:    "/config/ip",
+		Path:    "/config/dhcp",
 		Handler: ctrl.makeHandler(),
 	}
 }
 
-func (ctrl PutIpCtrl) makeHandler() http.HandlerFunc {
+func (ctrl PutDhcpCtrl) makeHandler() http.HandlerFunc {
 	return makeJsonHandler(
 		func(w http.ResponseWriter, r *http.Request) {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			data, err := ioutil.ReadAll(r.Body)
+			ctrl.monitorManager.StopMonitors()
+
+			err := service.UpdateDHCPNetConfig()
 			if err != nil {
-				httpStat = http.StatusInternalServerError
+				httpStat = http.StatusBadGateway
 				bamStat = BAMStatus{"Error", err}
-			} else {
-				ctrl.monitorManager.StopMonitors()
-
-				err = service.UpdateNetConfig(data)
-				if err != nil {
-					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
-				}
-
-				if err != nil {
-					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
-				}
-
-				ctrl.monitorManager.StartMonitors()
 			}
+
+			ctrl.monitorManager.StartMonitors()
 
 			w.WriteHeader(httpStat)
 			resp, _ := jsoniter.Marshal(bamStat)
