@@ -89,8 +89,8 @@ func GetPools() (*PoolAddresses, error) {
 }
 
 func UpdateNetConfig(ipData []byte) error {
-	ipa := &NetConfig{}
-	err := jsoniter.Unmarshal(ipData, ipa)
+	netConfig := &NetConfig{}
+	err := jsoniter.Unmarshal(ipData, netConfig)
 	if err != nil {
 		return err
 	}
@@ -101,20 +101,20 @@ func UpdateNetConfig(ipData []byte) error {
 	}
 
 	// Set the /etc/network/interfaces
-	err = SetStaticIP(ipa.IPAddress, ipa.Netmask, ipa.Gateway)
+	err = SetStaticIP(netConfig.IPAddress, netConfig.Netmask, netConfig.Gateway)
 	if err != nil {
 		return err
 	}
 	// set the miner config
-	bytes := mutateNetConfig(ipa, config)
+	bytes := mutateNetConfig(netConfig, config)
 	return SaveMinerConfig(bytes)
 }
 
-func mutateNetConfig(ipa *NetConfig, config *gabs.Container) []byte {
-	config.Set(ipa.IPAddress, "ip")
-	config.Set(ipa.Netmask, "mask")
-	config.Set(ipa.Gateway, "gateway")
-	config.Set(ipa.Dns, "dns")
+func mutateNetConfig(netConfig *NetConfig, config *gabs.Container) []byte {
+	config.Set(netConfig.IPAddress, "ip")
+	config.Set(netConfig.Netmask, "mask")
+	config.Set(netConfig.Gateway, "gateway")
+	config.Set(netConfig.Dns, "dns")
 
 	return config.BytesIndent("", "\t")
 }

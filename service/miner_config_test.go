@@ -190,13 +190,13 @@ func TestMutateIPAddresses(t *testing.T) {
 		t.Error(err)
 	}
 
-	ips := &NetConfig{}
-	err = jsoniter.Unmarshal([]byte(IPAddressesToMutate), ips)
+	netConfig := &NetConfig{}
+	err = jsoniter.Unmarshal([]byte(IPAddressesToMutate), netConfig)
 	if err != nil {
 		t.Error(err)
 	}
 
-	mutated := mutateNetConfig(ips, jsonConfig)
+	mutated := mutateNetConfig(netConfig, jsonConfig)
 	buf := string(mutated)
 	if expectedOutputIPAddressMutate != buf {
 		t.Errorf("Expected:\n%s\nGot:\n%s\n ", expectedOutputIPAddressMutate, buf)
