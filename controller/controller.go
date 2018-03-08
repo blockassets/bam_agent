@@ -57,6 +57,7 @@ func Init(e *echo.Echo, cfg *Config) {
 		StatusCtrl{}.build(cfg),
 		PutIpCtrl{}.build(cfg),
 		PutDhcpCtrl{}.build(cfg),
+		PutFrequencyCtrl{}.build(cfg),
 	}
 
 	for _, ctrl := range ctrls {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"io/ioutil"
+	"strconv"
 
 	"github.com/Jeffail/gabs"
 	"github.com/json-iterator/go"
@@ -20,6 +21,10 @@ type StaticNetConfig struct {
 	Netmask   string `json:"netmask"`
 	Gateway   string `json:"gateway"`
 	Dns       string `json:"dns"`
+}
+
+type MinerFrequency struct {
+	Frequency int `json:"frequency"`
 }
 
 // Local private cache. Always reference this through the LoadMinerConfig() function
@@ -143,5 +148,27 @@ func mutateDHCPNetConfig(config *gabs.Container) []byte {
 	config.Set("", "gateway")
 	config.Set("", "dns")
 
+	return config.BytesIndent("", "\t")
+}
+
+func UpdateFrequency(mfData []byte) error {
+	mf := &MinerFrequency{}
+	err := jsoniter.Unmarshal(mfData, mf)
+	if err != nil {
+		return err
+	}
+
+	config, err := LoadMinerConfig()
+	if err != nil {
+		return err
+	}
+
+	// set the miner config
+	bytes := mutateFrequencyConfig(mf, config)
+	return SaveMinerConfig(bytes)
+}
+
+func mutateFrequencyConfig(mf *MinerFrequency, config *gabs.Container) []byte {
+	config.Set(strconv.Itoa(mf.Frequency), "frequency")
 	return config.BytesIndent("", "\t")
 }
