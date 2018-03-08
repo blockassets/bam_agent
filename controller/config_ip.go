@@ -43,11 +43,6 @@ func (ctrl PutIpCtrl) makeHandler() http.HandlerFunc {
 					bamStat = BAMStatus{"Error", err}
 				}
 
-				if err != nil {
-					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
-				}
-
 				ctrl.monitorManager.StartMonitors()
 			}
 
