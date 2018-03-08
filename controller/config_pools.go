@@ -12,8 +12,7 @@ import (
 
 // command to update the ip address for
 // pools
-// POST
-//Just POST this file:
+// PUT
 //{
 //"pool1":"",
 //"pool2":"",
