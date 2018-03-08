@@ -111,6 +111,7 @@ func UpdateStaticNetConfig(ipData []byte) error {
 }
 
 func mutateStaticNetConfig(netConfig *StaticNetConfig, config *gabs.Container) []byte {
+	config.Set(false, "autoNet")
 	config.Set(netConfig.IPAddress, "ip")
 	config.Set(netConfig.Netmask, "mask")
 	config.Set(netConfig.Gateway, "gateway")
