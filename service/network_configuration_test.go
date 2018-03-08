@@ -19,7 +19,7 @@ gateway 3.3.3.3`
 func TestWriteInterfacesFile(t *testing.T) {
 
 	outputFile := "/tmp/interfaces"
-	err := writeInterfacesFile(outputFile, "1.1.1.1", "2.2.2.2", "3.3.3.3")
+	err := writeStaticIpInterfaces(outputFile, "1.1.1.1", "2.2.2.2", "3.3.3.3")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
@@ -38,7 +38,7 @@ func TestWriteInterfacesFile(t *testing.T) {
 		t.Errorf("unexpected output, got %v", out)
 	}
 
-	err = writeInterfacesFile(outputFile, "", "", "")
+	err = writeStaticIpInterfaces(outputFile, "", "", "")
 	if err == nil {
 		t.Errorf("expected error, got nil")
 	}

@@ -15,7 +15,7 @@ type PoolAddresses struct {
 	Pool3 string `json:"pool3"`
 }
 
-type NetConfig struct {
+type StaticNetConfig struct {
 	IPAddress string `json:"address"`
 	Netmask   string `json:"netmask"`
 	Gateway   string `json:"gateway"`
@@ -88,8 +88,8 @@ func GetPools() (*PoolAddresses, error) {
 	}, nil
 }
 
-func UpdateNetConfig(ipData []byte) error {
-	netConfig := &NetConfig{}
+func UpdateStaticNetConfig(ipData []byte) error {
+	netConfig := &StaticNetConfig{}
 	err := jsoniter.Unmarshal(ipData, netConfig)
 	if err != nil {
 		return err
@@ -101,16 +101,16 @@ func UpdateNetConfig(ipData []byte) error {
 	}
 
 	// Set the /etc/network/interfaces
-	err = SetStaticIP(netConfig.IPAddress, netConfig.Netmask, netConfig.Gateway)
+	err = SetInterfaceToStaticIP(netConfig.IPAddress, netConfig.Netmask, netConfig.Gateway)
 	if err != nil {
 		return err
 	}
 	// set the miner config
-	bytes := mutateNetConfig(netConfig, config)
+	bytes := mutateStaticNetConfig(netConfig, config)
 	return SaveMinerConfig(bytes)
 }
 
-func mutateNetConfig(netConfig *NetConfig, config *gabs.Container) []byte {
+func mutateStaticNetConfig(netConfig *StaticNetConfig, config *gabs.Container) []byte {
 	config.Set(netConfig.IPAddress, "ip")
 	config.Set(netConfig.Netmask, "mask")
 	config.Set(netConfig.Gateway, "gateway")
