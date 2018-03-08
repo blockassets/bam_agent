@@ -120,8 +120,6 @@ func mutateStaticNetConfig(netConfig *StaticNetConfig, config *gabs.Container) [
 	return config.BytesIndent("", "\t")
 }
 
-
-
 func UpdateDHCPNetConfig() error {
 	config, err := LoadMinerConfig()
 	if err != nil {

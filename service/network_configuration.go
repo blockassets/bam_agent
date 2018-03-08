@@ -8,9 +8,8 @@ import (
 )
 
 const (
-
 	defaultNetworkInterfacesFile = "/etc/network/interfaces"
-	staticIpInterfacesFmt = `auto lo
+	staticIpInterfacesFmt        = `auto lo
 auto eth0
 iface eth0 inet static
 address %s
@@ -20,7 +19,7 @@ gateway %s`
 auto eth0
 iface lo inet loopback
 iface eth0 inet dhcp`
-	)
+)
 
 // Miners have ipv4 addresses and configuration
 func SetInterfaceToStaticIP(address string, netmask string, gateway string) error {
