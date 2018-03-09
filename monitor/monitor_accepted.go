@@ -37,13 +37,8 @@ func (mon *AcceptedMonitor) Start() error {
 		mon.lastShare = 0
 		go mon.makeTickerFunc(func() {
 			stalled, err := mon.checkAcceptedShare()
-			if err != nil {
-				// do nothing, try again next cycle
-				// as the miner could be in middle of a restart
-			} else {
-				if stalled {
-					mon.onStall()
-				}
+			if err == nil && stalled {
+				mon.onStall()
 			}
 		}, mon.config.Period)()
 	} else {
