@@ -14,19 +14,17 @@ type MockMiner struct {
 	running bool
 	stalled bool
 	devs    []cgminer_client.Dev
-	elapsed int64
-	started time.Time
 }
 
 func newMockMiner() *MockMiner {
 	mm := &MockMiner{}
-	mm.devs = make([]cgminer_client.Dev, 4)
 	return mm
 }
 
 func (mm *MockMiner) Start() {
+	// create a new blank devs array
+	mm.devs = make([]cgminer_client.Dev, 4)
 	mm.running = true
-	mm.started = time.Now()
 }
 
 func (mm *MockMiner) Stall() {
@@ -61,11 +59,13 @@ func TestAcceptedMonitor(t *testing.T) {
 	// 1) Happy path: i.e. accepted shares continue to rise
 	// 2) Test with stall
 	// 3) Test with a miner that is not there or error
+	// 4) Test for a restart of a miner between tests
 
 	mockMiner.Start()
 	testAcceptedSharesRise(t, mockMiner, config)
 	testAcceptedSharesStall(t, mockMiner, config)
 	testAcceptedSharesMinerQuit(t, mockMiner, config)
+	testAcceptedSharesMinerRestart(t, mockMiner, config)
 
 }
 
@@ -122,10 +122,33 @@ func testAcceptedSharesMinerQuit(t *testing.T, mockMiner *MockMiner, config *Acc
 	onStall := func() { stallCount++ }
 
 	mockMiner.Quit()
-
 	context := makeContext()
 	monitor := newAcceptedMonitor(context, config, mockMiner, onStall)
-	// Sleep to ensure the timer runs once
+	// Sleep to ensure the timer is mid cycle
+	time.Sleep(config.Period * 2)
+
+	monitor.Stop()
+	// Make sure monitor is finished before testing results
+	context.waitGroup.Wait()
+
+	if stallCount != 0 {
+		t.Errorf("Expected stallCount to be 0, got %d", stallCount)
+	}
+}
+
+func testAcceptedSharesMinerRestart(t *testing.T, mockMiner *MockMiner, config *AcceptedConfig) {
+	stallCount := 0
+	onStall := func() { stallCount++ }
+
+	mockMiner.Start()
+	context := makeContext()
+	monitor := newAcceptedMonitor(context, config, mockMiner, onStall)
+	// Sleep to ensure the timer has a cycled
+	time.Sleep(config.Period * 2)
+	// restart the miner
+	mockMiner.Quit()
+	mockMiner.Start()
+	// get another cycle
 	time.Sleep(config.Period * 2)
 
 	monitor.Stop()
