@@ -49,7 +49,6 @@ func (mon *AcceptedMonitor) Start() error {
 	} else {
 		log.Println("AcceptedMonitor: Not enabled")
 	}
-
 	return nil
 }
 
@@ -62,7 +61,6 @@ func (mon *AcceptedMonitor) checkAcceptedShare() (bool, error) {
 	// if its less than, then there was a miner restart, so all is good till next check
 	// if its greater than, all is good
 	if mon.lastShare == newShare {
-
 		stalled = true
 	}
 	mon.lastShare = newShare
