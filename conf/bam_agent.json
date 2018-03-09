@@ -12,6 +12,10 @@
 		"cgMinerQuit": {
 			"enabled": false,
 			"period": "24h"
+		},
+		"acceptedShares": {
+			"enabled": true,
+			"period": "5m"
 		}
 	}
 }

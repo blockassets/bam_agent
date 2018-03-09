@@ -14,9 +14,10 @@ import (
 	Describes all the configs for the implemented monitors
 */
 type Config struct {
-	HighLoad HighLoadConfig `json:"highLoad"`
-	Reboot   RebootConfig   `json:"reboot"`
-	CGMQuit  CGMQuitConfig  `json:"cgMinerQuit"`
+	HighLoad       HighLoadConfig `json:"highLoad"`
+	Reboot         RebootConfig   `json:"reboot"`
+	CGMQuit        CGMQuitConfig  `json:"cgMinerQuit"`
+	AcceptedShares AcceptedConfig `json:"acceptedShares"`
 }
 
 /*
@@ -84,6 +85,8 @@ func (mgr *Manager) StartMonitors() {
 	log.Println("Monitors being started")
 	statRetriever := service.NewStatRetriever()
 	cgQuitFunc := func() { mgr.Client.Quit() }
+	onStallFunc := func() { service.Reboot() }
+	getAcceptedFunc := func() int64 { return service.GetAccepted(mgr.Client) }
 
 	mgr.Lock()
 	defer mgr.Unlock()
@@ -91,6 +94,7 @@ func (mgr *Manager) StartMonitors() {
 		newLoadMonitor(mgr.NewContext(), &mgr.Config.HighLoad, statRetriever, service.Reboot),
 		newPeriodicReboot(mgr.NewContext(), &mgr.Config.Reboot, service.Reboot),
 		newPeriodicCGMQuit(mgr.NewContext(), &mgr.Config.CGMQuit, cgQuitFunc),
+		newAcceptedMonitor(mgr.NewContext(), &mgr.Config.AcceptedShares, getAcceptedFunc, onStallFunc),
 	}
 	for _, monitor := range *mgr.Monitors {
 		monitor.Start()
