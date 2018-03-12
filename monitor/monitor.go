@@ -18,6 +18,7 @@ type Config struct {
 	Reboot         RebootConfig   `json:"reboot"`
 	CGMQuit        CGMQuitConfig  `json:"cgMinerQuit"`
 	AcceptedShares AcceptedConfig `json:"acceptedShares"`
+	HighTemp       HighTempConfig `json:"highTemperature"`
 }
 
 /*
@@ -86,6 +87,7 @@ func (mgr *Manager) StartMonitors() {
 	statRetriever := service.NewStatRetriever()
 	cgQuitFunc := func() { mgr.Client.Quit() }
 	onStallFunc := func() { service.Reboot() }
+	onHighTempFunc := func() { service.StopMiner() }
 
 	mgr.Lock()
 	defer mgr.Unlock()
@@ -94,6 +96,7 @@ func (mgr *Manager) StartMonitors() {
 		newPeriodicReboot(mgr.NewContext(), &mgr.Config.Reboot, service.Reboot),
 		newPeriodicCGMQuit(mgr.NewContext(), &mgr.Config.CGMQuit, cgQuitFunc),
 		newAcceptedMonitor(mgr.NewContext(), &mgr.Config.AcceptedShares, mgr.Client, onStallFunc),
+		newHighTempMonitor(mgr.NewContext(), &mgr.Config.HighTemp, mgr.Client, onHighTempFunc),
 	}
 	for _, monitor := range *mgr.Monitors {
 		monitor.Start()
