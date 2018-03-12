@@ -33,7 +33,7 @@ func (mm *TempMockMiner) setTest(test int) {
 
 func (mm *TempMockMiner) Start() {
 	// create a new blank devs array
-	mm.devs = make([]cgminer_client.Dev, 4)
+	mm.devs = make([]cgminer_client.Dev, 1)
 }
 
 func (mm *TempMockMiner) Quit() error {
@@ -42,10 +42,6 @@ func (mm *TempMockMiner) Quit() error {
 
 // funcs from service.Miner Interface
 func (mm *TempMockMiner) Devs() (*[]cgminer_client.Dev, error) {
-	for i, _ := range mm.devs {
-		// have to index as we want to change the value
-		mm.devs[i].Temperature = 99
-	}
 	// vary temp of one of the devices depending on test
 	switch mm.test {
 	case Under100:
