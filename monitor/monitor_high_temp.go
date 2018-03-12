@@ -32,7 +32,7 @@ func newHighTempMonitor(context *Context, config *HighTempConfig, miner service.
 
 func (mon *HighTempMonitor) Start() error {
 	if mon.config.Enabled {
-		log.Printf("HighTempMonitor: Checking for temp every %v\n", mon.config.Period)
+		log.Printf("HighTempMonitor: Checking for temp over %v every %v\n", mon.config.HighTemp, mon.config.Period)
 		go mon.makeTickerFunc(func() {
 			overTemp, err := mon.checkHighTemp()
 			if err == nil && overTemp {
