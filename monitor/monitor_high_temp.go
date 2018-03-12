@@ -18,15 +18,15 @@ type HighTempMonitor struct {
 	*Context
 	config     *HighTempConfig
 	miner      service.Miner
-	OnHighTemp func()
+	onHighTemp func()
 }
 
-func newHighTempMonitor(context *Context, config *HighTempConfig, miner service.Miner, OnHighTemp func()) Monitor {
+func newHighTempMonitor(context *Context, config *HighTempConfig, miner service.Miner, onHighTemp func()) Monitor {
 	return &HighTempMonitor{
 		Context:    context,
 		config:     config,
 		miner:      miner,
-		OnHighTemp: OnHighTemp,
+		onHighTemp: onHighTemp,
 	}
 }
 
@@ -36,7 +36,7 @@ func (mon *HighTempMonitor) Start() error {
 		go mon.makeTickerFunc(func() {
 			overTemp, err := mon.checkHighTemp()
 			if err == nil && overTemp {
-				mon.OnHighTemp()
+				mon.onHighTemp()
 			}
 		}, mon.config.Period)()
 	} else {
