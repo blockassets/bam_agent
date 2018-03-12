@@ -47,3 +47,8 @@ func StopMiner() {
 	log.Printf("CGMiner Service Stop Requested")
 	exec.Command("systemctl stop cgminer").Run()
 }
+
+func StartMiner() {
+	log.Printf("CGMiner Service Start Requested")
+	exec.Command("systemctl start cgminer").Run()
+}
