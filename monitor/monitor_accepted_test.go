@@ -2,7 +2,6 @@ package monitor
 
 import (
 	"errors"
-	"log"
 	"testing"
 	"time"
 
@@ -40,7 +39,6 @@ func (mm *MockMiner) Devs() (*[]cgminer_client.Dev, error) {
 		for i, _ := range mm.devs {
 			// have to index as we want to change the value
 			mm.devs[i].Accepted += 1
-			log.Println("dev.Accepted =", mm.devs[i].Accepted)
 		}
 	}
 	return &mm.devs, nil
