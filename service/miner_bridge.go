@@ -2,6 +2,7 @@ package service
 
 import (
 	"log"
+	"os/exec"
 
 	"github.com/blockassets/cgminer_client"
 )
@@ -43,4 +44,11 @@ func GetTemp(miner Miner) (float64, error) {
 		}
 	}
 	return highestTemp, nil
+}
+
+// Distinct from quiting... this stops it at the Linux service level so it wont
+// automatically restart
+func StopMinerService() {
+	log.Printf("CGMiner Service Stop Requested")
+	exec.Command("systemctl stop cgminer").Run()
 }

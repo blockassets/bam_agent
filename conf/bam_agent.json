@@ -16,6 +16,11 @@
 		"acceptedShares": {
 			"enabled": true,
 			"period": "5m"
+		},
+		"highTemperature": {
+			"enabled": true,
+			"period": "5m",
+			"highTemp": 100.0
 		}
 	}
 }
