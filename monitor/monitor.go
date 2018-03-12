@@ -87,7 +87,7 @@ func (mgr *Manager) StartMonitors() {
 	statRetriever := service.NewStatRetriever()
 	cgQuitFunc := func() { mgr.Client.Quit() }
 	onStallFunc := func() { service.Reboot() }
-	onHighTempFunc := func() { service.StopMinerService() }
+	onHighTempFunc := func() { service.StopMiner() }
 
 	mgr.Lock()
 	defer mgr.Unlock()

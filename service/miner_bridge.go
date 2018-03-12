@@ -36,19 +36,14 @@ func GetTemp(miner Miner) (float64, error) {
 		log.Printf("Error getting Temp: %v", err)
 		return 0, err
 	}
-	// find top temp...
-	highestTemp := float64(0)
-	for _, dev := range *devs {
-		if dev.Temperature > highestTemp {
-			highestTemp = dev.Temperature
-		}
-	}
-	return highestTemp, nil
+	// Temp is same across all boards
+	// so grab first
+	return (*devs)[0].Temperature, nil
 }
 
 // Distinct from quiting... this stops it at the Linux service level so it wont
 // automatically restart
-func StopMinerService() {
+func StopMiner() {
 	log.Printf("CGMiner Service Stop Requested")
 	exec.Command("systemctl stop cgminer").Run()
 }
