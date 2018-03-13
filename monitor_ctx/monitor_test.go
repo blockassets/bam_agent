@@ -19,7 +19,7 @@ func TestStartMonitors(t *testing.T) {
 		newPeriodic(false, 100*time.Millisecond, onTicker3),
 	}
 
-	// Test they satrt and run
+	// Test they start and run
 	stopGroup1 := StartMonitors(context.Background(), *monitors)
 	time.Sleep(202 * time.Millisecond)
 	stopGroup1()

@@ -106,12 +106,11 @@ func TestNewLoadMonitor(t *testing.T) {
 	monitors := &[]Monitor{
 		NewLoadMonitor(config, sr, onHighLoad),
 	}
-	stopMonitors := StartMonitors(context.Background(), *monitors)
 
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 	// Sleep to ensure the timer runs once
 	time.Sleep(config.Period * 2)
 	stopMonitors()
-
 	if count == 0 {
 		t.Errorf("Expected >=1 count, got %d", count)
 	}

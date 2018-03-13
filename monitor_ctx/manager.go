@@ -32,11 +32,9 @@ type Manager struct {
 //
 func Init(config *Config, sr service.StatRetriever, onLoadHigh func()) *Manager {
 	mm := &Manager{}
-
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
 	}
-
 	mm.Start()
 	return mm
 }

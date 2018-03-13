@@ -26,12 +26,11 @@ func TestInit(t *testing.T) {
 	}
 
 	testNestedStopStarts(t, mm, &count, config.HighLoad.Period)
-
 }
 
 func testNestedStopStarts(t *testing.T, mm *Manager, count *int, period time.Duration) {
 	// Simulate Requeat A stoppingMonitors... Request B stopping... Request A starting... Request B starting
-	// Expected resutls are that monitors dont run from Request A until Request B starts
+	// Expected results are that monitors dont run from Request A until Request B starts
 	*count = 0
 	mark := 0
 	mm.Start() // simulates init
