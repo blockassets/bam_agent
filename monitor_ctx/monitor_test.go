@@ -43,4 +43,20 @@ func TestStartMonitors(t *testing.T) {
 	if mark2 != count2 {
 		t.Errorf("Expected count2 (%v) to be same as mark2(%v)", count2, mark2)
 	}
+
+	// they may be all disabled. This shouldn't panic.
+	monitors = &[]Monitor{
+		newPeriodic(false, 50*time.Millisecond, onTicker1),
+		newPeriodic(false, 75*time.Millisecond, onTicker2),
+		newPeriodic(false, 100*time.Millisecond, onTicker3),
+	}
+	stopGroup2 := StartMonitors(context.Background(), *monitors)
+	time.Sleep(202 * time.Millisecond)
+	stopGroup2()
+
+	// No panic on an empty array...
+	monitors = &[]Monitor{}
+	stopGroup3 := StartMonitors(context.Background(), *monitors)
+	time.Sleep(202 * time.Millisecond)
+	stopGroup3()
 }
