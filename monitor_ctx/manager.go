@@ -9,9 +9,9 @@ import (
 
 // Pulls all the monitors together and provides an app level API to start and stop them safely
 //
-// Mutliple requests can call start and stop with no guarantee of order
 // This utility ensures that the monitors are eitehr all stopped, or are all starrted and there are no orphans
-// Access to Start and Stop are synchronized
+// Starts and stops are counted to ensure monitors are started correctly. See below.
+// Start and Stop are synchronized
 //
 //
 type Config struct {
