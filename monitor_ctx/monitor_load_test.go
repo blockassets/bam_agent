@@ -8,7 +8,7 @@ import (
 	"github.com/blockassets/bam_agent/service"
 )
 
-type testStatRetriever struct {
+type TestStatRetriever struct {
 	dataSet int
 }
 
@@ -20,7 +20,7 @@ const (
 	LevelMalformed
 )
 
-func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
+func (sr *TestStatRetriever) GetLoad() (service.LoadAvgs, error) {
 	var data string
 	switch sr.dataSet {
 	case LevelNotEnough:
@@ -39,7 +39,7 @@ func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
 }
 
 func NewTestStatRetriever(dataSet int) service.StatRetriever {
-	return &testStatRetriever{
+	return &TestStatRetriever{
 		dataSet: dataSet,
 	}
 }

@@ -19,8 +19,9 @@ type Config struct {
 }
 
 type Manager struct {
-	monitors *[]Monitor
-	stopFunc func()
+	monitors   *[]Monitor
+	startCount int
+	stopFunc   func()
 	sync.Mutex
 }
 
@@ -29,11 +30,8 @@ type Manager struct {
 // with the dependancies such as the action functions and StatReceivers and Miner interfaces
 // etc...
 //
-func Init(config *Config) *Manager {
+func Init(config *Config, sr service.StatRetriever, onLoadHigh func()) *Manager {
 	mm := &Manager{}
-	// Monitor specific dependancies
-	onLoadHigh := func() { service.Reboot() }
-	sr := service.NewStatRetriever()
 
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
@@ -43,20 +41,45 @@ func Init(config *Config) *Manager {
 	return mm
 }
 
+// The usage model allows for out of sequence starts and stops
+// I.e. the number of stops should match the number of starts before actually starting
+// Example1
+// 		Monitors are started via Init					((started)startCount  == 1)
+// 		Request A arrives, monitors are stopped....  	((stopped)startCount  == 0)
+// 		Request A is being processed
+// 		Request B comes in -> Monitors are requested stopped again ((stillStopped)startCount  == -1)
+// 		Request B is completed, Monitors are asked to start again  ((not started)startCount  == 0)
+//  	Request A is still working...
+// 		Request A requests starts monitors again					((started)startCount  == 1)
+//
+// Example2
+// 		Monitors are started via Init						((started)startCount  == 1)
+// 		Request A arrives, monitors are stopped.... 		((stopped)startCount  == 0
+// 		Request A is being processed
+// 		Request B comes in -> Monitors are requested stopped again ((stillStopped)startCount  == -1)
+//  	Request A is still working...
+// 		Request A requests starts monitors again					((not started)startCount  == 0)
+//		Request B is still working
+//	 	Request B is completed, Monitors are asked to start again	((started)startCount  == 1)
+//
+// These are esentially the same scenarios...
+//
+
 func (mm *Manager) Start() {
 	mm.Lock()
 	defer mm.Unlock()
-	if mm.stopFunc != nil {
-		mm.stopFunc()
+	if mm.startCount == 0 {
+		mm.stopFunc = StartMonitors(context.Background(), *mm.monitors)
 	}
-	mm.stopFunc = StartMonitors(context.Background(), *mm.monitors)
+	mm.startCount++
 }
 
 func (mm *Manager) Stop() {
 	mm.Lock()
 	defer mm.Unlock()
-	if mm.stopFunc != nil {
+	if mm.startCount == 1 {
 		mm.stopFunc()
 		mm.stopFunc = nil
 	}
+	mm.startCount--
 }
