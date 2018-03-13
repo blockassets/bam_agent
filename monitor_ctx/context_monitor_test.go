@@ -14,9 +14,9 @@ func TestStartMonitors(t *testing.T) {
 	onTicker2 := func(ctx context.Context) { count2++ }
 	onTicker3 := func(ctx context.Context) { count3++ }
 	monitors := &[]Monitor{
-		newPeriodicMonitor(true, 50*time.Millisecond, onTicker1),
-		newPeriodicMonitor(true, 75*time.Millisecond, onTicker2),
-		newPeriodicMonitor(false, 100*time.Millisecond, onTicker3),
+		newPeriodic(true, 50*time.Millisecond, onTicker1),
+		newPeriodic(true, 75*time.Millisecond, onTicker2),
+		newPeriodic(false, 100*time.Millisecond, onTicker3),
 	}
 
 	// Test they satrt and run
