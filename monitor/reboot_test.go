@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -10,24 +11,18 @@ import (
 func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	count := 0
 
-	context := makeContext()
-	config := &RebootConfig{Enabled: true, Period: tool.RandomDuration{Duration: time.Duration(50) * time.Millisecond}}
+	config := &RebootConfig{Enabled: true, Period: tool.RandomDuration{Duration: time.Duration(25) * time.Millisecond}}
 	reboot := func() { count++ }
 
-	monitor := newPeriodicReboot(context, config, reboot)
-
-	err := monitor.Start()
-	if err != nil {
-		t.Error(err)
+	monitors := &[]Monitor{
+		NewPeriodicReboot(config, reboot),
 	}
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 
 	// Sleep to ensure the timer runs once
 	time.Sleep(config.Period.Duration * 2)
 
-	// Test that stop cleans up the WaitGroup
-	monitor.Stop()
-	context.waitGroup.Wait()
-
+	stopMonitors()
 	if count == 0 {
 		t.Errorf("Expected >=1 count, got %d", count)
 	}

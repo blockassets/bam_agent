@@ -35,7 +35,7 @@ func (ctrl PutFrequencyCtrl) makeHandler() http.HandlerFunc {
 				httpStat = http.StatusInternalServerError
 				bamStat = BAMStatus{"Error", err}
 			} else {
-				ctrl.monitorManager.StopMonitors()
+				ctrl.monitorManager.Stop()
 
 				err = service.UpdateFrequency(data)
 				if err != nil {
@@ -43,7 +43,7 @@ func (ctrl PutFrequencyCtrl) makeHandler() http.HandlerFunc {
 					bamStat = BAMStatus{"Error", err}
 				}
 
-				ctrl.monitorManager.StartMonitors()
+				ctrl.monitorManager.Start()
 			}
 
 			w.WriteHeader(httpStat)

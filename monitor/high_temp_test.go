@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -60,17 +61,17 @@ func (mm *TempMockMiner) Devs() (*[]cgminer_client.Dev, error) {
 
 func TestHighTempMonitor(t *testing.T) {
 	tempMockMiner := newTempMockMiner()
-	config := &HighTempConfig{Enabled: true, Period: time.Millisecond * 50, HighTemp: 100}
-	context := makeContext()
+	config := &HighTempConfig{Enabled: true, Period: time.Millisecond * 25, HighTemp: 100}
+
 	highTempCount := 0
 	onHighTemp := func() { highTempCount++ }
-	monitor := newHighTempMonitor(context, config, tempMockMiner, onHighTemp)
 
 	tempMockMiner.Start()
-	err := monitor.Start()
-	if err != nil {
-		t.Error(err)
+
+	monitors := &[]Monitor{
+		NewHighTempMonitor(config, tempMockMiner, onHighTemp),
 	}
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 
 	tempMockMiner.setTest(Under100)
 	// Sleep to ensure the timer runs once
@@ -102,8 +103,5 @@ func TestHighTempMonitor(t *testing.T) {
 	if highTempCount != 0 {
 		t.Errorf("Expected highTempCount to be 0, got %d", highTempCount)
 	}
-
-	// Test that stop cleans up the WaitGroup
-	monitor.Stop()
-	context.waitGroup.Wait()
+	stopMonitors()
 }

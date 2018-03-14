@@ -34,7 +34,7 @@ func (ctrl CGQuitCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			ctrl.monitorManager.StopMonitors()
+			ctrl.monitorManager.Stop()
 
 			err := ctrl.client.Quit()
 			if err != nil {
@@ -42,7 +42,7 @@ func (ctrl CGQuitCtrl) makeHandler() http.HandlerFunc {
 				bamStat = BAMStatus{"Error", err}
 			}
 
-			ctrl.monitorManager.StartMonitors()
+			ctrl.monitorManager.Start()
 
 			w.WriteHeader(httpStat)
 			resp, _ := jsoniter.Marshal(bamStat)

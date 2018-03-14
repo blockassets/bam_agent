@@ -1,13 +1,14 @@
 package monitor
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/blockassets/bam_agent/service"
 )
 
-type testStatRetriever struct {
+type TestStatRetriever struct {
 	dataSet int
 }
 
@@ -19,7 +20,7 @@ const (
 	LevelMalformed
 )
 
-func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
+func (sr *TestStatRetriever) GetLoad() (service.LoadAvgs, error) {
 	var data string
 	switch sr.dataSet {
 	case LevelNotEnough:
@@ -38,7 +39,7 @@ func (sr *testStatRetriever) GetLoad() (service.LoadAvgs, error) {
 }
 
 func NewTestStatRetriever(dataSet int) service.StatRetriever {
-	return &testStatRetriever{
+	return &TestStatRetriever{
 		dataSet: dataSet,
 	}
 }
@@ -96,28 +97,20 @@ func TestCheckLoad(t *testing.T) {
 	}
 }
 
-func TestLoadMonitor_Start(t *testing.T) {
-	count := 0
-
-	context := makeContext()
-	period := time.Duration(50) * time.Millisecond
-	config := &HighLoadConfig{Enabled: true, Period: period, HighLoadMark: 5.0}
+func TestNewLoadMonitor(t *testing.T) {
+	config := &HighLoadConfig{Enabled: true, Period: 10 * time.Millisecond, HighLoadMark: 5.0}
 	sr := NewTestStatRetriever(LevelAboveFive)
+	count := 0
 	onHighLoad := func() { count += 1 }
 
-	monitor := newLoadMonitor(context, config, sr, onHighLoad)
-	err := monitor.Start()
-	if err != nil {
-		t.Error(err)
+	monitors := &[]Monitor{
+		NewLoadMonitor(config, sr, onHighLoad),
 	}
 
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 	// Sleep to ensure the timer runs once
-	time.Sleep(period * 2)
-
-	// Test that stop cleans up the WaitGroup
-	monitor.Stop()
-	context.waitGroup.Wait()
-
+	time.Sleep(config.Period * 2)
+	stopMonitors()
 	if count == 0 {
 		t.Errorf("Expected >=1 count, got %d", count)
 	}
