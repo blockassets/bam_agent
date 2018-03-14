@@ -15,7 +15,7 @@ func TestPeriodicRebootMonitor_Start(t *testing.T) {
 	reboot := func() { count++ }
 
 	monitors := &[]Monitor{
-		NewPeriodicReboot( config, reboot),
+		NewPeriodicReboot(config, reboot),
 	}
 	stopMonitors := StartMonitors(context.Background(), *monitors)
 

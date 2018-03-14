@@ -12,10 +12,8 @@ type RebootConfig struct {
 	Period  tool.RandomDuration `json:"period"`
 }
 
-
-
 func NewPeriodicReboot(config *RebootConfig, rebootFunc func()) Monitor {
-	log.Printf("PeriodicRebootMonitor(enabled == %v): reboot in %v ",config.Enabled, config.Period.Duration)
+	log.Printf("PeriodicRebootMonitor(enabled == %v): reboot in %v ", config.Enabled, config.Period.Duration)
 	monitorFunc := func(ctx context.Context) {
 		rebootFunc()
 	}
