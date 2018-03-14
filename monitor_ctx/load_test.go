@@ -98,7 +98,7 @@ func TestCheckLoad(t *testing.T) {
 }
 
 func TestNewLoadMonitor(t *testing.T) {
-	config := &HighLoadConfig{Enabled: true, Period: 50 * time.Millisecond, HighLoadMark: 5.0}
+	config := &HighLoadConfig{Enabled: true, Period: 10 * time.Millisecond, HighLoadMark: 5.0}
 	sr := NewTestStatRetriever(LevelAboveFive)
 	count := 0
 	onHighLoad := func() { count += 1 }

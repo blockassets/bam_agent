@@ -11,10 +11,6 @@ type Periodic struct {
 	monitorFunc MonitorFunc
 }
 
-func newPeriodic(enabled bool, period time.Duration, monitorFunc MonitorFunc) *Periodic {
-	return &Periodic{enabled, period, monitorFunc}
-}
-
 func (pm *Periodic) Enabled() bool {
 	return pm.enabled
 }

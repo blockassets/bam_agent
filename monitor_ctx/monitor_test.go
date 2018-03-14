@@ -14,14 +14,14 @@ func TestStartMonitors(t *testing.T) {
 	onTicker2 := func(ctx context.Context) { count2++ }
 	onTicker3 := func(ctx context.Context) { count3++ }
 	monitors := &[]Monitor{
-		newPeriodic(true, 50*time.Millisecond, onTicker1),
-		newPeriodic(true, 75*time.Millisecond, onTicker2),
-		newPeriodic(false, 100*time.Millisecond, onTicker3),
+		&Periodic{true, 10 * time.Millisecond, onTicker1},
+		&Periodic{true, 30 * time.Millisecond, onTicker2},
+		&Periodic{false, 20 * time.Millisecond, onTicker3},
 	}
 
 	// Test they start and run
 	stopGroup1 := StartMonitors(context.Background(), *monitors)
-	time.Sleep(202 * time.Millisecond)
+	time.Sleep(75 * time.Millisecond)
 	stopGroup1()
 	mark1 := count1
 	mark2 := count2
@@ -36,7 +36,7 @@ func TestStartMonitors(t *testing.T) {
 	}
 
 	// make sure they stop
-	time.Sleep(202 * time.Millisecond)
+	time.Sleep(75 * time.Millisecond)
 	if mark1 != count1 {
 		t.Errorf("Expected count1 (%v) to be same as mark1(%v)", count1, mark1)
 	}
@@ -44,19 +44,17 @@ func TestStartMonitors(t *testing.T) {
 		t.Errorf("Expected count2 (%v) to be same as mark2(%v)", count2, mark2)
 	}
 
-	// they may be all disabled. This shouldn't panic.
+	// they may be all disabled.
+	// Make sure that the subsystem always handles gracefully
 	monitors = &[]Monitor{
-		newPeriodic(false, 50*time.Millisecond, onTicker1),
-		newPeriodic(false, 75*time.Millisecond, onTicker2),
-		newPeriodic(false, 100*time.Millisecond, onTicker3),
+		&Periodic{false, 10 * time.Millisecond, onTicker1},
+		&Periodic{false, 10 * time.Millisecond, onTicker2},
+		&Periodic{false, 10 * time.Millisecond, onTicker3},
 	}
 	stopGroup2 := StartMonitors(context.Background(), *monitors)
-	time.Sleep(202 * time.Millisecond)
 	stopGroup2()
-
-	// No panic on an empty array...
+	// And no panic on an empty array...
 	monitors = &[]Monitor{}
 	stopGroup3 := StartMonitors(context.Background(), *monitors)
-	time.Sleep(202 * time.Millisecond)
 	stopGroup3()
 }
