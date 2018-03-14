@@ -2,6 +2,7 @@ package monitor_ctx
 
 import (
 	"context"
+	"log"
 	"sync"
 
 	"github.com/blockassets/bam_agent/service"
@@ -30,8 +31,13 @@ type Manager struct {
 // with the dependancies such as the action functions and StatReceivers and Miner interfaces
 // etc...
 //
-func Init(config *Config, sr service.StatRetriever, onLoadHigh func()) *Manager {
+func NewManager(config *Config) *Manager {
 	mm := &Manager{}
+	log.Println("Monitors being started")
+	// LoadMonitor dependancies
+	sr := service.NewStatRetriever()
+	onLoadHigh := func() { service.Reboot() }
+
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
 	}
@@ -60,9 +66,9 @@ func Init(config *Config, sr service.StatRetriever, onLoadHigh func()) *Manager 
 //		Request B is still working
 //	 	Request B is completed, Monitors are asked to start again	((started)startCount  == 1)
 //
-// These are esentially the same scenarios...
+// These are essentially the same scenarios...
 //
-
+//
 func (mm *Manager) Start() {
 	mm.Lock()
 	defer mm.Unlock()

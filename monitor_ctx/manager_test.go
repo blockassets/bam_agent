@@ -5,15 +5,17 @@ import (
 	"time"
 )
 
-func TestInit(t *testing.T) {
-	// Monitor specific dependancies
+func TestManager(t *testing.T) {
 	count := 0
 	onLoadHigh := func() { count++ }
-	config := &Config{HighLoadConfig{Enabled: true, Period: 50 * time.Millisecond, HighLoadMark: 5.0}}
+	config := &Config{HighLoadConfig{Enabled: true, Period: 25 * time.Millisecond, HighLoadMark: 5.0}}
 	sr := NewTestStatRetriever(LevelAboveFive)
 
-	// happy path...
-	mm := Init(config, sr, onLoadHigh)
+	mm := &Manager{}
+	mm.monitors = &[]Monitor{
+		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
+	}
+	mm.Start()
 	time.Sleep(config.HighLoad.Period * 2)
 	mm.Stop()
 	mark := count
