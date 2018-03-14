@@ -15,7 +15,7 @@ import (
 // This function will block until all the monitors have finished cleaning up.
 //
 // If this function is not called, the monitors associated with it will continue on until the
-// application terminates. Uses the context package to implement
+// application terminates.
 //
 // see https://golang.org/pkg/context/#CancelFunc and
 //     https://blog.golang.org/context
@@ -42,7 +42,7 @@ func StartMonitors(parent context.Context, monitors []Monitor) (stopFunc func())
 	}
 }
 
-func runMonitor(ctx context.Context, wg *sync.WaitGroup, period time.Duration, onTicker MonitorFunc) {
+func runMonitor(ctx context.Context, wg *sync.WaitGroup, period time.Duration, onTick MonitorFunc) {
 	go func() {
 		wg.Add(1)
 		defer wg.Done()
@@ -53,7 +53,7 @@ func runMonitor(ctx context.Context, wg *sync.WaitGroup, period time.Duration, o
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				onTicker(ctx)
+				onTick(ctx)
 			}
 		}
 	}()
