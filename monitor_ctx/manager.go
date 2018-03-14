@@ -17,9 +17,10 @@ import (
 //
 //
 type Config struct {
-	HighLoad 		HighLoadConfig `json:"highLoad"`
-	AcceptedShares 	AcceptedConfig `json:"acceptedShares"`
-	HighTemp       	HighTempConfig `json:"highTemperature"`
+	HighLoad       HighLoadConfig `json:"highLoad"`
+	AcceptedShares AcceptedConfig `json:"acceptedShares"`
+	HighTemp       HighTempConfig `json:"highTemperature"`
+	CGMQuit        CGMQuitConfig  `json:"cgMinerQuit"`
 }
 
 type Manager struct {
@@ -35,23 +36,24 @@ type Manager struct {
 // etc...
 //
 
-
-func NewManager(config *Config, miner   *cgminer_client.Client) *Manager {
+func NewManager(config *Config, miner *cgminer_client.Client) *Manager {
 	mm := &Manager{}
 	log.Println("Monitors being started")
-	// LoadMonitor dependancies
+	// LoadMonitor dependencies
 	sr := service.NewStatRetriever()
 	onLoadHigh := func() { service.Reboot() }
-	// Accepted share dependancies
+	// Accepted share dependencies
 	onStallFunc := func() { service.Reboot() }
-	// high temp dependancies
+	// high temp dependencies
 	onHighTempFunc := func() { service.StopMiner() }
-
+	// CGMQuit dependencies
+	cgmQuitFunc := func() { miner.Quit() }
 
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
 		NewAcceptedMonitor(&config.AcceptedShares, miner, onStallFunc),
-		NewHighTempMonitor(&config.HighTemp, miner, onHighTempFunc ),
+		NewHighTempMonitor(&config.HighTemp, miner, onHighTempFunc),
+		NewPeriodicCGMQuit(&config.CGMQuit, cgmQuitFunc),
 	}
 	mm.Start()
 	return mm
