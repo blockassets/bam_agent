@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/cgminer_client"
 )
 
 // Pulls all the monitors together and provides an app level API to start and stop them safely
@@ -17,6 +18,7 @@ import (
 //
 type Config struct {
 	HighLoad HighLoadConfig `json:"highLoad"`
+	AcceptedShares AcceptedConfig `json:"acceptedShares"`
 }
 
 type Manager struct {
@@ -31,15 +33,20 @@ type Manager struct {
 // with the dependancies such as the action functions and StatReceivers and Miner interfaces
 // etc...
 //
-func NewManager(config *Config) *Manager {
+
+
+func NewManager(config *Config, client   *cgminer_client.Client) *Manager {
 	mm := &Manager{}
 	log.Println("Monitors being started")
 	// LoadMonitor dependancies
 	sr := service.NewStatRetriever()
 	onLoadHigh := func() { service.Reboot() }
+	// Accepted share dependancies
+	onStallFunc := func() { service.Reboot() }
 
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
+		NewAcceptedMonitor(&config.AcceptedShares, client, onStallFunc),
 	}
 	mm.Start()
 	return mm

@@ -8,26 +8,26 @@ import (
 func TestManager(t *testing.T) {
 	count := 0
 	onLoadHigh := func() { count++ }
-	config := &Config{HighLoadConfig{Enabled: true, Period: 25 * time.Millisecond, HighLoadMark: 5.0}}
+	config := &HighLoadConfig{Enabled: true, Period: 25 * time.Millisecond, HighLoadMark: 5.0}
 	sr := NewTestStatRetriever(LevelAboveFive)
 
 	mm := &Manager{}
 	mm.monitors = &[]Monitor{
-		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
+		NewLoadMonitor(config, sr, onLoadHigh),
 	}
 	mm.Start()
-	time.Sleep(config.HighLoad.Period * 2)
+	time.Sleep(config.Period * 2)
 	mm.Stop()
 	mark := count
 	if mark == 0 {
 		t.Errorf("Expected >=1 count, got %d", mark)
 	}
-	time.Sleep(config.HighLoad.Period * 2)
+	time.Sleep(config.Period * 2)
 	if mark != count {
 		t.Errorf("Expected no change in count(mark = %v), got %v", mark, count)
 	}
 
-	testNestedStopStarts(t, mm, &count, config.HighLoad.Period)
+	testNestedStopStarts(t, mm, &count, config.Period)
 }
 
 func testNestedStopStarts(t *testing.T, mm *Manager, count *int, period time.Duration) {
