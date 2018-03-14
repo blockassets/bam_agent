@@ -13,12 +13,11 @@ type AcceptedConfig struct {
 	Period  time.Duration `json:"period"`
 }
 
-
 func NewAcceptedMonitor(config *AcceptedConfig, miner service.Miner, onStall func()) Monitor {
 	log.Printf("AcceptedShareMonitor: Checking share %v\n", config.Period)
 	lastShare := int64(0)
 	monitorFunc := func(ctx context.Context) {
-		stalled, err := checkAcceptedShare(&lastShare,miner )
+		stalled, err := checkAcceptedShare(&lastShare, miner)
 		if err == nil && stalled {
 			onStall()
 		}
@@ -26,7 +25,7 @@ func NewAcceptedMonitor(config *AcceptedConfig, miner service.Miner, onStall fun
 	return &Periodic{config.Enabled, config.Period, monitorFunc}
 }
 
-func checkAcceptedShare( lastShare *int64, miner service.Miner) (bool, error) {
+func checkAcceptedShare(lastShare *int64, miner service.Miner) (bool, error) {
 	newShare, err := service.GetAccepted(miner)
 	if err != nil {
 		*lastShare = 0

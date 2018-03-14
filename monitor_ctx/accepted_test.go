@@ -66,13 +66,12 @@ func TestAcceptedMonitor(t *testing.T) {
 
 }
 
-func testAcceptedSharesRise(t *testing.T,  config *AcceptedConfig) {
+func testAcceptedSharesRise(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
 	// Need our own miner as the monitor tests effectively run in parallel
 	mockMiner := newMockMiner()
 	mockMiner.Start()
-
 
 	monitors := &[]Monitor{
 		NewAcceptedMonitor(config, mockMiner, onStall),
@@ -89,7 +88,7 @@ func testAcceptedSharesRise(t *testing.T,  config *AcceptedConfig) {
 	}
 }
 
-func testAcceptedSharesStall(t *testing.T,  config *AcceptedConfig) {
+func testAcceptedSharesStall(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
 
@@ -137,7 +136,7 @@ func testAcceptedSharesMinerQuit(t *testing.T, config *AcceptedConfig) {
 func testAcceptedSharesMinerRestart(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
-// Need our own miner as the monitor tests effectively run in parallel
+	// Need our own miner as the monitor tests effectively run in parallel
 	mockMiner := newMockMiner()
 	mockMiner.Start()
 

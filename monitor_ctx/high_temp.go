@@ -25,7 +25,7 @@ func NewHighTempMonitor(config *HighTempConfig, miner service.Miner, onHighTemp 
 	return &Periodic{config.Enabled, config.Period, monitorFunc}
 }
 
-func checkHighTemp( miner service.Miner, highTemp float64) (bool, error) {
+func checkHighTemp(miner service.Miner, highTemp float64) (bool, error) {
 	temp, err := service.GetTemp(miner)
 	if err != nil {
 		return false, err
