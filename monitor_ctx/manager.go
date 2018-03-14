@@ -21,6 +21,7 @@ type Config struct {
 	AcceptedShares AcceptedConfig `json:"acceptedShares"`
 	HighTemp       HighTempConfig `json:"highTemperature"`
 	CGMQuit        CGMQuitConfig  `json:"cgMinerQuit"`
+	Reboot         RebootConfig   `json:"reboot"`
 }
 
 type Manager struct {
@@ -48,12 +49,15 @@ func NewManager(config *Config, miner *cgminer_client.Client) *Manager {
 	onHighTempFunc := func() { service.StopMiner() }
 	// CGMQuit dependencies
 	cgmQuitFunc := func() { miner.Quit() }
+	// Reboot dependancies
+	onRebootFunc := func() { service.Reboot() }
 
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
 		NewAcceptedMonitor(&config.AcceptedShares, miner, onStallFunc),
 		NewHighTempMonitor(&config.HighTemp, miner, onHighTempFunc),
 		NewPeriodicCGMQuit(&config.CGMQuit, cgmQuitFunc),
+		NewPeriodicReboot(&config.Reboot, onRebootFunc),
 	}
 	mm.Start()
 	return mm
