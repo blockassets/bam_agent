@@ -17,8 +17,9 @@ import (
 //
 //
 type Config struct {
-	HighLoad HighLoadConfig `json:"highLoad"`
-	AcceptedShares AcceptedConfig `json:"acceptedShares"`
+	HighLoad 		HighLoadConfig `json:"highLoad"`
+	AcceptedShares 	AcceptedConfig `json:"acceptedShares"`
+	HighTemp       	HighTempConfig `json:"highTemperature"`
 }
 
 type Manager struct {
@@ -35,7 +36,7 @@ type Manager struct {
 //
 
 
-func NewManager(config *Config, client   *cgminer_client.Client) *Manager {
+func NewManager(config *Config, miner   *cgminer_client.Client) *Manager {
 	mm := &Manager{}
 	log.Println("Monitors being started")
 	// LoadMonitor dependancies
@@ -43,10 +44,14 @@ func NewManager(config *Config, client   *cgminer_client.Client) *Manager {
 	onLoadHigh := func() { service.Reboot() }
 	// Accepted share dependancies
 	onStallFunc := func() { service.Reboot() }
+	// high temp dependancies
+	onHighTempFunc := func() { service.StopMiner() }
+
 
 	mm.monitors = &[]Monitor{
 		NewLoadMonitor(&config.HighLoad, sr, onLoadHigh),
-		NewAcceptedMonitor(&config.AcceptedShares, client, onStallFunc),
+		NewAcceptedMonitor(&config.AcceptedShares, miner, onStallFunc),
+		NewHighTempMonitor(&config.HighTemp, miner, onHighTempFunc ),
 	}
 	mm.Start()
 	return mm
