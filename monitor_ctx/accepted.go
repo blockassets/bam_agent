@@ -14,7 +14,7 @@ type AcceptedConfig struct {
 }
 
 func NewAcceptedMonitor(config *AcceptedConfig, miner service.Miner, onStall func()) Monitor {
-	log.Printf("AcceptedShareMonitor: Checking share %v\n", config.Period)
+	log.Printf("AcceptedShareMonitor(enabled == %v): Checking share %v\n",config.Enabled, config.Period)
 	lastShare := int64(0)
 	monitorFunc := func(ctx context.Context) {
 		stalled, err := checkAcceptedShare(&lastShare, miner)

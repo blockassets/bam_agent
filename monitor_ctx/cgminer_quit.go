@@ -13,7 +13,7 @@ type CGMQuitConfig struct {
 }
 
 func NewPeriodicCGMQuit(config *CGMQuitConfig, quitFunc func()) Monitor {
-	log.Printf("PeriodicCGMQuitMonitor: cgminer quit in: %v", config.Period.Duration)
+	log.Printf("PeriodicCGMQuitMonitor(enabled == %v): cgminer quit in: %v",config.Enabled, config.Period.Duration)
 	monitorFunc := func(ctx context.Context) {
 		quitFunc()
 	}

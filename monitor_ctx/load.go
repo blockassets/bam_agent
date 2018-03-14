@@ -15,7 +15,7 @@ type HighLoadConfig struct {
 }
 
 func NewLoadMonitor(config *HighLoadConfig, sr service.StatRetriever, onHighLoad func()) Monitor {
-	log.Printf("LoadMonitor: Checking load > %v every %v\n", config.HighLoadMark, config.Period)
+	log.Printf("LoadMonitor(enabled == %v): Checking load > %v every %v\n", config.Enabled,config.HighLoadMark, config.Period)
 
 	monitorFunc := func(ctx context.Context) { checkLoad(sr, config.HighLoadMark, onHighLoad) }
 

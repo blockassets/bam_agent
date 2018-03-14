@@ -15,7 +15,7 @@ type HighTempConfig struct {
 }
 
 func NewHighTempMonitor(config *HighTempConfig, miner service.Miner, onHighTemp func()) Monitor {
-	log.Printf("HighTempMonitor: Checking for temp over %v every %v\n", config.HighTemp, config.Period)
+	log.Printf("HighTempMonitor(enabled == %v): Checking for temp over %v every %v\n",config.Enabled, config.HighTemp, config.Period)
 	monitorFunc := func(ctx context.Context) {
 		overTemp, err := checkHighTemp(miner, config.HighTemp)
 		if err == nil && overTemp {
