@@ -1,4 +1,4 @@
-package monitor_ctx
+package monitor
 
 import (
 	"context"
@@ -49,7 +49,7 @@ func NewManager(config *Config, miner *cgminer_client.Client) *Manager {
 	onHighTempFunc := func() { service.StopMiner() }
 	// CGMQuit dependencies
 	cgmQuitFunc := func() { miner.Quit() }
-	// Reboot dependancies
+	// Reboot dependencies
 	onRebootFunc := func() { service.Reboot() }
 
 	mm.monitors = &[]Monitor{
@@ -59,7 +59,6 @@ func NewManager(config *Config, miner *cgminer_client.Client) *Manager {
 		NewPeriodicCGMQuit(&config.CGMQuit, cgmQuitFunc),
 		NewPeriodicReboot(&config.Reboot, onRebootFunc),
 	}
-	mm.Start()
 	return mm
 }
 

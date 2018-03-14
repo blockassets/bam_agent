@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -50,7 +51,7 @@ func (mm *MockMiner) Quit() error {
 }
 
 func TestAcceptedMonitor(t *testing.T) {
-	mockMiner := newMockMiner()
+
 	config := &AcceptedConfig{Enabled: true, Period: time.Millisecond * 50}
 
 	// Test for three main conditions
@@ -58,100 +59,101 @@ func TestAcceptedMonitor(t *testing.T) {
 	// 2) Test with stall
 	// 3) Test with a miner that is not there or error
 	// 4) Test for a restart of a miner between tests
-
-	mockMiner.Start()
-	testAcceptedSharesRise(t, mockMiner, config)
-	testAcceptedSharesStall(t, mockMiner, config)
-	testAcceptedSharesMinerQuit(t, mockMiner, config)
-	testAcceptedSharesMinerRestart(t, mockMiner, config)
+	testAcceptedSharesRise(t, config)
+	testAcceptedSharesStall(t, config)
+	testAcceptedSharesMinerQuit(t, config)
+	testAcceptedSharesMinerRestart(t, config)
 
 }
 
-func testAcceptedSharesRise(t *testing.T, mockMiner *MockMiner, config *AcceptedConfig) {
+func testAcceptedSharesRise(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
+	// Need our own miner as the monitor tests effectively run in parallel
+	mockMiner := newMockMiner()
+	mockMiner.Start()
 
-	// Monitors are only meant to run once... behaviour is undefined for starting an instance twice
-	context := makeContext()
-	monitor := newAcceptedMonitor(context, config, mockMiner, onStall)
-	err := monitor.Start()
-	if err != nil {
-		t.Error(err)
+	monitors := &[]Monitor{
+		NewAcceptedMonitor(config, mockMiner, onStall),
 	}
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 
 	// Sleep to ensure the timer runs once
 	time.Sleep(config.Period * 2)
 
-	monitor.Stop()
-	// Make sure monitor is finished before testing results
-	context.waitGroup.Wait()
+	stopMonitors()
 
 	if stallCount != 0 {
 		t.Errorf("Expected stallCount to be 0, got %d", stallCount)
 	}
 }
 
-func testAcceptedSharesStall(t *testing.T, mockMiner *MockMiner, config *AcceptedConfig) {
+func testAcceptedSharesStall(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
 
+	// Need our own miner as the monitor tests effectively run in parallel
+	mockMiner := newMockMiner()
+	mockMiner.Start()
 	mockMiner.Stall()
 
-	context := makeContext()
-	monitor := newAcceptedMonitor(context, config, mockMiner, onStall)
-	err := monitor.Start()
-	if err != nil {
-		t.Error(err)
+	monitors := &[]Monitor{
+		NewAcceptedMonitor(config, mockMiner, onStall),
 	}
+	stopMonitors := StartMonitors(context.Background(), *monitors)
+
 	// Sleep to ensure the timer runs once
 	time.Sleep(config.Period * 2)
 
-	monitor.Stop()
-	// Make sure monitor is finished before testing results
-	context.waitGroup.Wait()
+	stopMonitors()
 
 	if stallCount == 0 {
 		t.Errorf("Expected stallCount to be > 0")
 	}
 }
 
-func testAcceptedSharesMinerQuit(t *testing.T, mockMiner *MockMiner, config *AcceptedConfig) {
+func testAcceptedSharesMinerQuit(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
-
+	// Need our own miner as the monitor tests effectively run in parallel
+	mockMiner := newMockMiner()
+	mockMiner.Start()
 	mockMiner.Quit()
-	context := makeContext()
-	monitor := newAcceptedMonitor(context, config, mockMiner, onStall)
+
+	monitors := &[]Monitor{
+		NewAcceptedMonitor(config, mockMiner, onStall),
+	}
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 	// Sleep to ensure the timer is mid cycle
 	time.Sleep(config.Period * 2)
-
-	monitor.Stop()
-	// Make sure monitor is finished before testing results
-	context.waitGroup.Wait()
+	stopMonitors()
 
 	if stallCount != 0 {
 		t.Errorf("Expected stallCount to be 0, got %d", stallCount)
 	}
 }
 
-func testAcceptedSharesMinerRestart(t *testing.T, mockMiner *MockMiner, config *AcceptedConfig) {
+func testAcceptedSharesMinerRestart(t *testing.T, config *AcceptedConfig) {
 	stallCount := 0
 	onStall := func() { stallCount++ }
-
+	// Need our own miner as the monitor tests effectively run in parallel
+	mockMiner := newMockMiner()
 	mockMiner.Start()
-	context := makeContext()
-	monitor := newAcceptedMonitor(context, config, mockMiner, onStall)
+
+	monitors := &[]Monitor{
+		NewAcceptedMonitor(config, mockMiner, onStall),
+	}
+	stopMonitors := StartMonitors(context.Background(), *monitors)
 	// Sleep to ensure the timer has a cycled
 	time.Sleep(config.Period * 2)
 	// restart the miner
 	mockMiner.Quit()
+	time.Sleep(config.Period * 2)
 	mockMiner.Start()
 	// get another cycle
 	time.Sleep(config.Period * 2)
 
-	monitor.Stop()
-	// Make sure monitor is finished before testing results
-	context.waitGroup.Wait()
+	stopMonitors()
 
 	if stallCount != 0 {
 		t.Errorf("Expected stallCount to be 0, got %d", stallCount)

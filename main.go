@@ -91,11 +91,12 @@ func prog(state overseer.State) {
 
 	e := echo.New()
 	client := minerClient()
-	monitorManager := &monitor.Manager{Config: &cfg.Monitor, Client: client}
+	monitorManager := monitor.NewManager(&cfg.Monitor, client)
 
 	// Start the server and monitors in the background
 	go func() {
-		monitorManager.StartMonitors()
+
+		monitorManager.Start()
 		startServer(e, state, client, monitorManager)
 	}()
 
@@ -103,7 +104,7 @@ func prog(state overseer.State) {
 	<-state.GracefulShutdown
 
 	// Stop monitors from executing
-	monitorManager.StopMonitors()
+	monitorManager.Stop()
 
 	// After 10 seconds we gracefully shutdown the server
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

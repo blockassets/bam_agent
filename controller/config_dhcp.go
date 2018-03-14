@@ -29,7 +29,7 @@ func (ctrl PutDhcpCtrl) makeHandler() http.HandlerFunc {
 			bamStat := BAMStatus{"OK", nil}
 			httpStat := http.StatusOK
 
-			ctrl.monitorManager.StopMonitors()
+			ctrl.monitorManager.Stop()
 
 			err := service.UpdateDHCPNetConfig()
 			if err != nil {
@@ -37,7 +37,7 @@ func (ctrl PutDhcpCtrl) makeHandler() http.HandlerFunc {
 				bamStat = BAMStatus{"Error", err}
 			}
 
-			ctrl.monitorManager.StartMonitors()
+			ctrl.monitorManager.Start()
 
 			w.WriteHeader(httpStat)
 			resp, _ := jsoniter.Marshal(bamStat)

@@ -1,4 +1,4 @@
-package monitor_ctx
+package monitor
 
 import (
 	"context"
@@ -8,21 +8,22 @@ import (
 	"github.com/blockassets/bam_agent/tool"
 )
 
-func TestPeriodicRebootMonitor_Start(t *testing.T) {
+func TestPeriodicCGMQuitMonitor_Start(t *testing.T) {
 	count := 0
-
-	config := &RebootConfig{Enabled: true, Period: tool.RandomDuration{Duration: time.Duration(25) * time.Millisecond}}
-	reboot := func() { count++ }
+	config := &CGMQuitConfig{Enabled: true, Period: tool.RandomDuration{Duration: time.Duration(25) * time.Millisecond}}
+	quit := func() { count++ }
 
 	monitors := &[]Monitor{
-		NewPeriodicReboot(config, reboot),
+		NewPeriodicCGMQuit(config, quit),
 	}
 	stopMonitors := StartMonitors(context.Background(), *monitors)
 
 	// Sleep to ensure the timer runs once
 	time.Sleep(config.Period.Duration * 2)
 
+	// Test that stop cleans up the WaitGroup
 	stopMonitors()
+
 	if count == 0 {
 		t.Errorf("Expected >=1 count, got %d", count)
 	}
