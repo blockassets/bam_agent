@@ -81,7 +81,12 @@ func program(state overseer.State) {
 */
 func main() {
 	cmdLine = tool.NewCmdLine()
-	overseerRun(cmdLine.Port)
+
+	if cmdLine.NoUpdate {
+		program(overseer.State{Address: cmdLine.Port})
+	} else {
+		overseerRun(cmdLine.Port)
+	}
 }
 
 func overseerRun(port string) {
