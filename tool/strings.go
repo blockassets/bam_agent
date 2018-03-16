@@ -7,5 +7,8 @@ func TrimToNil(str string) *string {
 		return nil
 	}
 	res := strings.TrimSpace(str)
+	if len(res) == 0 {
+		return nil
+	}
 	return &res
 }
