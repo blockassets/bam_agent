@@ -25,8 +25,8 @@ func TestManager(t *testing.T) {
 	mm.Stop()
 
 	// By the time we stop, we have run the reboot at least once
-	if reboot.Counter > 0 {
-		t.Fatalf("Expected > 0 count, got %d", reboot.Counter)
+	if reboot.Counter == 0 {
+		t.Fatalf("Expected == 0 count, got %d", reboot.Counter)
 	}
 }
 
