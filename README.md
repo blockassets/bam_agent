@@ -78,6 +78,28 @@ ssh root@MINER_IP "systemctl enable bam_agent; systemctl start bam_agent"
 
 ## API
 
+### `GET /cgminer/start`
+
+```
+Starts cgminer via systemd
+```
+
+### `GET /cgminer/quit`
+
+```
+Stops cgminer via cgminer API call (systemd will restart it)
+```
+
+### `PUT /config/frequency`
+
+Send PUT request with json body:
+
+```
+{"frequency": "684"}
+```
+
+Restarts cgminer.
+
 ### `GET /config/pools`
 
 ```
@@ -94,13 +116,34 @@ Send PUT request with json body:
 
 Restarts cgminer.
 
+### `PUT /config/dhcp`
+
+Updates `/usr/app/conf.default` and `/etc/network/interfaces`
+
+```
+NO BODY NECESSARY
+```
+
+Call `/reboot` to make the changes take effect
+
+### `PUT /config/ip`
+
+Updates `/usr/app/conf.default` and `/etc/network/interfaces`
+
+```
+{"ip": "10.10.0.11", "mask": "255.255.252.0", "gateway": "10.10.0.1", "dns": "8.8.8.8"}
+```
+
+Call `/reboot` to make the changes take effect
+
 ### `GET /status`
 
 ```
 {
   "agent": "39892e1 2018-03-06 02:06:09",
   "miner": "value in /usr/app/version.txt",
-  "uptime": "0s"
+  "uptime": "0s",
+  "mac": "ab:bc:32:b2:81:79
 }
 ```
 
@@ -114,15 +157,24 @@ if you do run this from your browser (not really advised), it won't get cached.
 Monitors allow us to execute code periodically.
 Monitors are configured by editing the `/etc/bam_agent.conf` file. This file is created when the agent first starts.
 
+### Accepted shares
+
+Enabled by default. If the miner has not accepted any shares after 5m, reboot.
+
 ### High Load
 
 Enabled by default. If the 5m average load is above 5, `reboot -f` the miner. This works around a bug where the load 
 spikes and the miner stops submitting shares to the pool.
 
-### Periodic Quit cgminer
+### High Temp
+
+Enabled by default. Runs every 5m and checks to see if the temperature is over 100c. If so, it uses systemd to 
+shut cgminer down. A reboot will enable things again.
+
+### Quit cgminer
 
 Disabled by default. Periodically quit the miner app to free up memory and start fresh.
 
-### Periodic Reboot
+### Reboot
 
 Disabled by default. Periodically reboot the entire miner.

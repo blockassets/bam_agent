@@ -46,8 +46,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "f3a52638aeadcd5d6ba1d747b8c552c8e0066312"
-  version = "v1.13.5"
+  revision = "45a97ce8abeff27aeeac668fa01cb85103b0d17e"
+  version = "v1.13.10"
 
 [[projects]]
   branch = "master"
@@ -153,6 +153,38 @@
   revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
 
 [[projects]]
+  name = "go.uber.org/atomic"
+  packages = ["."]
+  revision = "8474b86a5a6f79c443ce4b2992817ff32cf208b8"
+  version = "v1.3.1"
+
+[[projects]]
+  name = "go.uber.org/dig"
+  packages = [
+    ".",
+    "internal/digreflect"
+  ]
+  revision = "d100de9c8cc8358591507951141bc107713ba671"
+  version = "v1.3.0"
+
+[[projects]]
+  name = "go.uber.org/fx"
+  packages = [
+    ".",
+    "internal/fxlog",
+    "internal/fxreflect",
+    "internal/lifecycle"
+  ]
+  revision = "35bf66c87beb2c8ec1a68cf00b54542e2d169c0b"
+  version = "v1.4.0"
+
+[[projects]]
+  name = "go.uber.org/multierr"
+  packages = ["."]
+  revision = "3c4937480c32f4c13a875a1829af76c98ca3d40a"
+  version = "v1.1.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
@@ -170,6 +202,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "11a5860195f545a471672e5f05a5164ecd882776d4da7df5bdc5ff8f4a91514c"
+  inputs-digest = "9e1a7d8814d033f8f91b9b9dd35c094d12863885f4ad7921ed95296f430cd3a7"
   solver-name = "gps-cdcl"
   solver-version = 1

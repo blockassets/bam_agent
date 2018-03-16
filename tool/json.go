@@ -13,6 +13,11 @@ type TimeDuration struct {
 	time.Duration
 }
 
+func RegisterJsonTypes() {
+	RegisterTimeDuration()
+	RegisterRandomDuration()
+}
+
 func RegisterTimeDuration() {
 	jsoniter.RegisterTypeEncoder("time.Duration", &TimeDuration{})
 	jsoniter.RegisterTypeDecoder("time.Duration", &TimeDuration{})

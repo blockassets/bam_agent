@@ -5,49 +5,50 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/os"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-// Implements Builder interface
-type PutIpCtrl struct {
-	monitorManager *monitor.Manager
-}
+func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner.ConfigNetwork) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/config/ip",
+			Methods: []string{http.MethodPut},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bamStat := BAMStatus{"OK", nil}
+				httpStat := http.StatusOK
 
-func (ctrl PutIpCtrl) build(cfg *Config) *Controller {
-	ctrl.monitorManager = cfg.MonitorManager
+				// Declare things ahead of time to make the boolean logic below easier. grrrlang.
+				var err error
+				var data []byte
 
-	return &Controller{
-		Methods: []string{http.MethodPut},
-		Path:    "/config/ip",
-		Handler: ctrl.makeHandler(),
-	}
-}
+				data, err = ioutil.ReadAll(r.Body)
+				if err == nil {
+					mgr.Stop()
+					defer mgr.Start()
 
-func (ctrl PutIpCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			bamStat := BAMStatus{"OK", nil}
-			httpStat := http.StatusOK
+					var netData *miner.NetworkData
+					netData, err = cfgNet.Parse(data)
 
-			data, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				httpStat = http.StatusInternalServerError
-				bamStat = BAMStatus{"Error", err}
-			} else {
-				ctrl.monitorManager.StopMonitors()
+					if err == nil {
+						err = cfgNet.Save(netData)
+						if err == nil {
+							err = networking.SetStatic(netData.IPAddress, netData.Netmask, netData.Gateway)
+						}
+					}
+				}
 
-				err = service.UpdateStaticNetConfig(data)
 				if err != nil {
 					httpStat = http.StatusBadGateway
 					bamStat = BAMStatus{"Error", err}
 				}
 
-				ctrl.monitorManager.StartMonitors()
-			}
-
-			w.WriteHeader(httpStat)
-			resp, _ := jsoniter.Marshal(bamStat)
-			w.Write(resp)
-		})
+				w.WriteHeader(httpStat)
+				resp, _ := jsoniter.Marshal(bamStat)
+				w.Write(resp)
+			}),
+		},
+	}
 }

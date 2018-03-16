@@ -14,3 +14,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/jpillora/overseer"
+
+[[constraint]]
+  name = "go.uber.org/fx"
+  version = "1.4.0"

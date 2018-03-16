@@ -5,49 +5,48 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-// Implements Builder interface
-type PutFrequencyCtrl struct {
-	monitorManager *monitor.Manager
-}
+func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq miner.ConfigFrequency, client miner.Client) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/config/frequency",
+			Methods: []string{http.MethodPut},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bamStat := BAMStatus{"OK", nil}
+				httpStat := http.StatusOK
 
-func (ctrl PutFrequencyCtrl) build(cfg *Config) *Controller {
-	ctrl.monitorManager = cfg.MonitorManager
+				// Declare things ahead of time to make the boolean logic below easier. grrrlang.
+				var err error
+				var data []byte
 
-	return &Controller{
-		Methods: []string{http.MethodPut},
-		Path:    "/config/frequency",
-		Handler: ctrl.makeHandler(),
-	}
-}
+				data, err = ioutil.ReadAll(r.Body)
+				if err == nil {
+					mgr.Stop()
+					defer mgr.Start()
 
-func (ctrl PutFrequencyCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			bamStat := BAMStatus{"OK", nil}
-			httpStat := http.StatusOK
+					var freq *miner.FrequencyData
+					freq, err = cfgFreq.Parse(data)
+					if err == nil {
+						err = cfgFreq.Save(freq.Frequency)
+						if err == nil {
+							err = client.Quit()
+						}
+					}
+				}
 
-			data, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				httpStat = http.StatusInternalServerError
-				bamStat = BAMStatus{"Error", err}
-			} else {
-				ctrl.monitorManager.StopMonitors()
-
-				err = service.UpdateFrequency(data)
 				if err != nil {
-					httpStat = http.StatusBadGateway
+					httpStat = http.StatusInternalServerError
 					bamStat = BAMStatus{"Error", err}
 				}
 
-				ctrl.monitorManager.StartMonitors()
-			}
-
-			w.WriteHeader(httpStat)
-			resp, _ := jsoniter.Marshal(bamStat)
-			w.Write(resp)
-		})
+				w.WriteHeader(httpStat)
+				resp, _ := jsoniter.Marshal(bamStat)
+				w.Write(resp)
+			}),
+		},
+	}
 }

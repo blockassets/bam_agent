@@ -1,4 +1,12 @@
 {
+	"cmdLine": {
+		"port": ":1111"
+	},
+	"controller": {
+		"reboot": {
+			"delay": "5s"
+		}
+	},
 	"monitor": {
 		"highLoad": {
 			"enabled": true,

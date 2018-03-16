@@ -2,51 +2,41 @@ package controller
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/service/agent"
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/os"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-// Implements Builder interface
-type StatusCtrl struct {
-	version string
+type StatusResponse struct {
+	Agent  *string       `json:"agent"`
+	Miner  *string       `json:"miner"`
+	Uptime time.Duration `json:"uptime"`
+	Mac    *string       `json:"mac"`
 }
 
-type Status struct {
-	Agent      string        `json:"agent"`
-	Miner      string        `json:"miner"`
-	Uptime     time.Duration `json:"uptime"`
-	MACAddress *string       `json:"mac"`
-}
+func NewStatusCtrl(agentVersion agent.Version, minerVersion miner.Version, getUptimeResult os.UptimeResultFunc, netInfo os.NetInfo) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/status",
+			Methods: []string{http.MethodGet},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				uptime := getUptimeResult()
 
-func (ctrl StatusCtrl) build(cfg *Config) *Controller {
-	ctrl.version = cfg.Version
+				status := StatusResponse{
+					Agent:  tool.TrimToNil(agentVersion.V),
+					Miner:  tool.TrimToNil(minerVersion.V),
+					Uptime: uptime.Duration,
+					Mac:    netInfo.GetMacAddress(),
+				}
 
-	return &Controller{
-		Methods: []string{http.MethodGet},
-		Path:    "/status",
-		Handler: ctrl.makeHandler(),
+				w.WriteHeader(http.StatusOK)
+				resp, _ := jsoniter.Marshal(status)
+				w.Write(resp)
+			}),
+		},
 	}
-}
-
-func (ctrl StatusCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-
-			uptime, _ := service.GetUptime()
-			ni := service.NewNetInfo()
-
-			status := Status{
-				Agent:      strings.TrimSpace(ctrl.version),
-				Miner:      strings.TrimSpace(service.ReadVersionFile()),
-				Uptime:     uptime,
-				MACAddress: ni.GetMacAddress(),
-			}
-
-			w.WriteHeader(http.StatusOK)
-			resp, _ := jsoniter.Marshal(status)
-			w.Write(resp)
-		})
 }
