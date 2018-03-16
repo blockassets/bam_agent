@@ -24,9 +24,9 @@ func TestManager(t *testing.T) {
 	time.Sleep(config.Period * 2)
 	mm.Stop()
 
-	// By the time we stop, we have run the reboot twice
-	if reboot.Counter != 2 {
-		t.Fatalf("Expected 2 count, got %d", reboot.Counter)
+	// By the time we stop, we have run the reboot at least once
+	if reboot.Counter > 0 {
+		t.Fatalf("Expected > 0 count, got %d", reboot.Counter)
 	}
 }
 
