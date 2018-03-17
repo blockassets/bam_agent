@@ -29,7 +29,7 @@ signed. All merges to master require a PR and passing unit tests. Builds are tes
 and serves the /status page. Travis CI automates the updates to the release page. Updates have their downloaded 
 binaries hash checked. Updates are zero downtime.
 
-### Install onto miner
+## Install onto miner
 
 The [releases tab](https://github.com/blockassets/bam_agent/releases) has `master` binaries cross compiled for ARM 
 suitable for running on the miner. These are built automatically on 
@@ -72,8 +72,10 @@ ssh root@MINER_IP "systemctl enable bam_agent; systemctl start bam_agent"
 
 ## Building from source
 
-* Install golang
-* Install [dep](https://github.com/golang/dep)
+We recommend that you download prebuilt binaries from the releases tab. However, if you would like to build your own...
+
+* Install golang (OSX, use brew)
+* Install [dep](https://github.com/golang/dep) (OSX, use brew)
 * `git clone https://github.com/blockassets/bam_agent.git`
 * `make dep`
 * `make arm` (Builds binary for arm)
