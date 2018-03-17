@@ -80,4 +80,13 @@ func TestMultipleStopStarts(t *testing.T) {
 	if mm.startCount != 1 {
 		t.Fatalf("expected startCount 1, got %v", mm.startCount)
 	}
+
+	// Now we are back to the beginning again
+	mm.Stop()
+	if stopCount != 1 {
+		t.Fatalf("expected stopCount 1, got %v", stopCount)
+	}
+	if mm.startCount != 0 {
+		t.Fatalf("expected startCount 0, got %v", mm.startCount)
+	}
 }

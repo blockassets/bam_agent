@@ -35,13 +35,17 @@ func TestStartMonitors(t *testing.T) {
 	stopGroup1()
 
 	if count1 < 3 {
-		t.Fatalf("Expected count1 to be greater than 2, got %v", count1)
+		t.Fatalf("expected count1 to be greater than 2, got %v", count1)
 	}
 	if count2 < 2 {
-		t.Fatalf("Expected count2 to be at least 2, got %v", count2)
+		t.Fatalf("expected count2 to be at least 2, got %v", count2)
 	}
 	if count3 != 0 {
-		t.Fatalf("Expected count3 to be 0, got %v", count3)
+		t.Fatalf("expected count3 to be 0, got %v", count3)
+	}
+
+	if monitors[2].IsEnabled() {
+		t.Fatalf("expected last monitor to not be enabled, got %v", monitors[2].IsEnabled())
 	}
 }
 
@@ -66,7 +70,7 @@ func TestStopMonitors(t *testing.T) {
 	time.Sleep(15 * time.Millisecond)
 	stopGroup1()
 	// make sure they stop
-	time.Sleep(40 * time.Millisecond)
+	time.Sleep(15 * time.Millisecond)
 
 	if count1 != 1 {
 		t.Fatalf("expected count1 to be 1, got %v", count1)
@@ -78,5 +82,9 @@ func TestStopMonitors(t *testing.T) {
 
 	if count3 != 0 {
 		t.Fatalf("expected count3 to be 0, got %v", count3)
+	}
+
+	if monitors[2].IsEnabled() {
+		t.Fatalf("expected last monitor to not be enabled, got %v", monitors[2].IsEnabled())
 	}
 }
