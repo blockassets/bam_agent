@@ -48,6 +48,10 @@ func (codec *TimeDuration) IsEmpty(ptr unsafe.Pointer) bool {
 	return ts.Nanoseconds() == 0
 }
 
+// Type insurance
+var _ jsoniter.ValEncoder = &RandomDuration{}
+var _ jsoniter.ValDecoder = &RandomDuration{}
+
 type RandomDuration struct {
 	time.Duration
 }
@@ -62,7 +66,6 @@ func (codec *RandomDuration) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	*((*time.Duration)(ptr)) = getRandomizedDuration(val)
 }
 

@@ -7,53 +7,47 @@ import (
 	"path/filepath"
 
 	"github.com/GeertJohan/go.rice"
+	"github.com/Jeffail/gabs"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
 
-type Config struct {
-	CmdLine    tool.CmdLine     `json:"cmdLine"`
-	Monitor    MonitorConfig    `json:"monitor"`
-	Controller ControllerConfig `json:"controller"`
+type Config interface {
+	Load() error
+	Save() error
+	Original() *gabs.Container
+	Loaded() *FileConfig
 }
 
-/*
-	1. Look for the config file in /etc/bam_agent.conf
-	2. If the config doesn't exist, load it from the box.
-	3. Attempt to write the config to outputFile.
-	4. Return the parsed json structure.
-*/
-func (cfg *Config) Load() error {
-	var jsonData []byte
+type ConfigData struct {
+	cmdLine   tool.CmdLine
+	originalData *gabs.Container
+	loadedData  *FileConfig
+}
 
-	readOnly, err := os.Open(cfg.CmdLine.AgentConfigPath)
-	defer readOnly.Close()
+func (cfg *ConfigData) Original() *gabs.Container {
+	return cfg.originalData
+}
 
-	if os.IsNotExist(err) {
-		confBox, err := rice.FindBox("../../conf")
-		if err != nil {
-			return err
-		}
+func (cfg *ConfigData) Loaded() *FileConfig {
+	return cfg.loadedData
+}
 
-		_, file := filepath.Split(cfg.CmdLine.AgentConfigPath)
-		jsonData, err = confBox.Bytes(file)
-		if err != nil {
-			return err
-		}
-
-		err = ioutil.WriteFile(cfg.CmdLine.AgentConfigPath, jsonData, 0664)
-		if err != nil {
-			log.Println("Warning: failed to write default bam_agent config file:", err)
-		}
-	} else {
-		jsonData, err = ioutil.ReadAll(readOnly)
-		if err != nil {
-			return err
-		}
+func (cfg *ConfigData) Load() error {
+	jsonData, err := loadJson(cfg.cmdLine.AgentConfigPath)
+	if err != nil {
+		return err
 	}
 
-	err = jsoniter.Unmarshal(jsonData, &cfg)
+	// Need to keep a copy of the original for modifying and writing out
+	cfg.originalData, err = gabs.ParseJSON(jsonData)
+	if err != nil {
+		return err
+	}
+
+	// This transforms fields into data we can use in the app
+	err = jsoniter.Unmarshal(jsonData, &cfg.loadedData)
 	if err != nil {
 		return err
 	}
@@ -61,21 +55,84 @@ func (cfg *Config) Load() error {
 	return nil
 }
 
+func (cfg *ConfigData) Data() Config {
+	return cfg
+}
+
+func (cfg *ConfigData) Save() error {
+	err := save(cfg.cmdLine.AgentConfigPath, cfg.originalData.Bytes())
+	if err != nil {
+		return err
+	}
+
+	err = cfg.Load()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+/*
+	1. Look for the config file in /etc/bam_agent.conf
+	2. If the config doesn't exist, load it from the box.
+	3. Attempt to write the config to outputFile.
+*/
+func loadJson(path string) ([]byte, error) {
+	var jsonData []byte
+
+	readOnly, err := os.Open(path)
+	defer readOnly.Close()
+
+	// Determine how to get the data, either on disk or load default file
+	if os.IsNotExist(err) {
+		confBox, err := rice.FindBox("../../conf")
+		if err != nil {
+			return nil, err
+		}
+
+		_, file := filepath.Split(path)
+		jsonData, err = confBox.Bytes(file)
+		if err != nil {
+			return nil, err
+		}
+
+		err = ioutil.WriteFile(path, jsonData, 0664)
+		if err != nil {
+			log.Println("Warning: failed to write default bam_agent config file:", err)
+		}
+	} else {
+		jsonData, err = ioutil.ReadAll(readOnly)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return jsonData, nil
+}
+
+func save(path string, bytes []byte) error {
+	return ioutil.WriteFile(path, bytes, 0644)
+}
+
 /*
 	Returns a loaded config object based on the
 	parameters passed in from the cmdLine.
 */
-func NewConfig(cmdLine tool.CmdLine) (Config, error) {
+func NewConfig(cmdLine tool.CmdLine) Config {
 	tool.RegisterJsonTypes()
 
-	cfg := &Config{CmdLine: cmdLine}
-	err := cfg.Load()
+	cfg := ConfigData{cmdLine: cmdLine}
+	cfg.Load()
+	cfg.Save()
 
-	return *cfg, err
+	return &cfg
 }
 
 var ConfigModule = fx.Options(
-	fx.Provide(func(cmdLine tool.CmdLine) (Config, error) {
+	fx.Provide(func(cmdLine tool.CmdLine) Config {
 		return NewConfig(cmdLine)
 	}),
+
+	ConfigMonitorModule,
+	ConfigControllerModule,
 )

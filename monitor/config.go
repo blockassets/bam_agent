@@ -9,16 +9,16 @@ import (
 // the config file (Entity) and the monitor layer clean via a DTO. Managed through the
 // dependency injection so it is all cleanly done.
 var ConfigProviders = fx.Options(
-	fx.Provide(func(cfg agent.Config) AcceptedConfig {
-		value := cfg.Monitor.AcceptedShares
+	fx.Provide(func(cfg agent.MonitorConfig) AcceptedConfig {
+		value := cfg.AcceptedShares
 		return AcceptedConfig{
 			Enabled: value.Enabled,
 			Period:  value.Period,
 		}
 	}),
 
-	fx.Provide(func(cfg agent.Config) HighLoadConfig {
-		value := cfg.Monitor.HighLoad
+	fx.Provide(func(cfg agent.MonitorConfig) HighLoadConfig {
+		value := cfg.HighLoad
 		return HighLoadConfig{
 			Enabled:      value.Enabled,
 			Period:       value.Period,
@@ -26,8 +26,8 @@ var ConfigProviders = fx.Options(
 		}
 	}),
 
-	fx.Provide(func(cfg agent.Config) HighTempConfig {
-		value := cfg.Monitor.HighTemp
+	fx.Provide(func(cfg agent.MonitorConfig) HighTempConfig {
+		value := cfg.HighTemp
 		return HighTempConfig{
 			Enabled:  value.Enabled,
 			Period:   value.Period,
@@ -35,16 +35,16 @@ var ConfigProviders = fx.Options(
 		}
 	}),
 
-	fx.Provide(func(cfg agent.Config) CGMQuitConfig {
-		value := cfg.Monitor.CGMQuit
+	fx.Provide(func(cfg agent.MonitorConfig) CGMQuitConfig {
+		value := cfg.CGMQuit
 		return CGMQuitConfig{
 			Enabled: value.Enabled,
 			Period:  value.Period.Duration,
 		}
 	}),
 
-	fx.Provide(func(cfg agent.Config) RebootConfig {
-		value := cfg.Monitor.Reboot
+	fx.Provide(func(cfg agent.MonitorConfig) RebootConfig {
+		value := cfg.Reboot
 		return RebootConfig{
 			Enabled: value.Enabled,
 			Period:  value.Period.Duration,

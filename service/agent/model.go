@@ -6,6 +6,12 @@ import (
 	"github.com/blockassets/bam_agent/tool"
 )
 
+type FileConfig struct {
+	CmdLine    tool.CmdLine     `json:"cmdLine"`
+	Monitor    MonitorConfig    `json:"monitor"`
+	Controller ControllerConfig `json:"controller"`
+}
+
 // Controller
 type ControllerConfig struct {
 	Reboot ControllerRebootConfig `json:"reboot"`

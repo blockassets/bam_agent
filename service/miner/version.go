@@ -36,7 +36,7 @@ func readBWVersionFile() string {
 }
 
 /*
-	Config is currently unused, but in the future on other miners,
+	ConfigData is currently unused, but in the future on other miners,
 	we might get the version information from another source and we
 	would likely pass that in via the agent config.
 */

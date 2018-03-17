@@ -61,9 +61,9 @@ func NewManager(e *echo.Echo, g Group) Manager {
 var Module = fx.Options(
 
 	// Copy the config to keep the dependencies clean
-	fx.Provide(func(cfg agent.Config) RebootConfig {
+	fx.Provide(func(cfg agent.ControllerConfig) RebootConfig {
 		return RebootConfig{
-			Delay: cfg.Controller.Reboot.Delay,
+			Delay: cfg.Reboot.Delay,
 		}
 	}),
 

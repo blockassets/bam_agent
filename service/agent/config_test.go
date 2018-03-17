@@ -2,18 +2,14 @@ package agent
 
 import (
 	"testing"
-	"time"
 
 	"github.com/blockassets/bam_agent/tool"
 )
 
 func TestNewConfig(t *testing.T) {
-	cfg, err := NewConfig(tool.NewCmdLine())
-	if err != nil {
-		t.Fatal(err)
-	}
+	cfg := NewConfig(tool.NewCmdLine())
 
-	if cfg.Controller.Reboot.Delay != time.Duration(5)*time.Second {
-		t.Fatalf("expected 5s and got %s", cfg.Controller.Reboot)
+	if ! cfg.Loaded().Monitor.HighLoad.Enabled {
+		t.Fatalf("expected highLoad to be enabled")
 	}
 }

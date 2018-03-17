@@ -8,9 +8,7 @@ import (
 )
 
 func TestNewVersion(t *testing.T) {
-	mockCmdLine := tool.CmdLine{}
-
-	cfg, _ := agent.NewConfig(mockCmdLine)
+	cfg := agent.NewConfig(tool.CmdLine{})
 	version := NewVersion(cfg)
 
 	if len(version.V) != 0 {
