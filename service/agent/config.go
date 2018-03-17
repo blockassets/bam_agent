@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/Jeffail/gabs"
@@ -28,6 +29,7 @@ type ConfigData struct {
 	cmdLine      tool.CmdLine
 	originalData *gabs.Container
 	loadedData   *FileConfig
+	sync.Mutex
 }
 
 func (cfg *ConfigData) Original() *gabs.Container {
@@ -64,6 +66,9 @@ func (cfg *ConfigData) Data() Config {
 }
 
 func (cfg *ConfigData) Update(path string, data interface{}) error {
+	cfg.Lock()
+	defer cfg.Unlock()
+
 	err := configUpdate(cfg.Original(), path, data)
 	if err != nil {
 		return err

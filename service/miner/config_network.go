@@ -1,6 +1,8 @@
 package miner
 
 import (
+	"sync"
+
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
@@ -20,6 +22,7 @@ type ConfigNetwork interface {
 
 type NetworkHelper struct {
 	Config
+	sync.Mutex
 }
 
 func (helper NetworkHelper) Parse(data []byte) (*NetworkData, error) {
@@ -47,6 +50,9 @@ func (helper NetworkHelper) Get() (*NetworkData, error) {
 }
 
 func (helper NetworkHelper) Save(data *NetworkData) error {
+	helper.Lock()
+	defer helper.Unlock()
+
 	c := helper.Data()
 	if len(data.IPAddress) == 0 {
 		c.Set(true, "autoNet")
@@ -60,7 +66,7 @@ func (helper NetworkHelper) Save(data *NetworkData) error {
 }
 
 func NewConfigNetwork(config Config) ConfigNetwork {
-	return &NetworkHelper{config}
+	return &NetworkHelper{Config: config}
 }
 
 var NetworkModule = fx.Provide(NewConfigNetwork)

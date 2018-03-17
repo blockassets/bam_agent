@@ -2,6 +2,7 @@ package miner
 
 import (
 	"strconv"
+	"sync"
 
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
@@ -23,6 +24,7 @@ type ConfigFrequency interface {
 
 type FrequencyHelper struct {
 	Config
+	sync.Mutex
 }
 
 func (helper FrequencyHelper) Get() int64 {
@@ -39,6 +41,8 @@ func (helper FrequencyHelper) Get() int64 {
 }
 
 func (helper FrequencyHelper) Save(frequency int64) error {
+	helper.Lock()
+	defer helper.Unlock()
 	c := helper.Config.Data()
 	c.Set(strconv.FormatInt(frequency, 10), "frequency")
 	return helper.Config.Save()

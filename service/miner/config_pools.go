@@ -1,6 +1,8 @@
 package miner
 
 import (
+	"sync"
+
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
@@ -19,10 +21,11 @@ type ConfigPools interface {
 
 type PoolHelper struct {
 	Config
+	sync.Mutex
 }
 
 func NewPoolHelper(config Config) ConfigPools {
-	return &PoolHelper{config}
+	return &PoolHelper{Config: config}
 }
 
 var PoolModule = fx.Provide(NewPoolHelper)
@@ -37,6 +40,9 @@ func (helper PoolHelper) Parse(data []byte) (*PoolAddresses, error) {
 }
 
 func (helper PoolHelper) Save(pools *PoolAddresses) error {
+	helper.Lock()
+	defer helper.Unlock()
+
 	c := helper.Data()
 	c.Set(pools.Pool1, "pool1")
 	c.Set(pools.Pool2, "pool2")
