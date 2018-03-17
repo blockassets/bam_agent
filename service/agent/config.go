@@ -4,13 +4,16 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/GeertJohan/go.rice"
 	"github.com/Jeffail/gabs"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
+)
+
+const (
+	defaultConfigFile = "bam_agent.json"
 )
 
 type Config interface {
@@ -21,9 +24,9 @@ type Config interface {
 }
 
 type ConfigData struct {
-	cmdLine   tool.CmdLine
+	cmdLine      tool.CmdLine
 	originalData *gabs.Container
-	loadedData  *FileConfig
+	loadedData   *FileConfig
 }
 
 func (cfg *ConfigData) Original() *gabs.Container {
@@ -60,7 +63,12 @@ func (cfg *ConfigData) Data() Config {
 }
 
 func (cfg *ConfigData) Save() error {
-	err := save(cfg.cmdLine.AgentConfigPath, cfg.originalData.Bytes())
+	pretty, err := jsoniter.MarshalIndent(cfg.originalData.Data(), "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = save(cfg.cmdLine.AgentConfigPath, pretty)
 	if err != nil {
 		return err
 	}
@@ -80,18 +88,18 @@ func (cfg *ConfigData) Save() error {
 func loadJson(path string) ([]byte, error) {
 	var jsonData []byte
 
-	readOnly, err := os.Open(path)
+	readOnly, errOpen := os.Open(path)
 	defer readOnly.Close()
 
 	// Determine how to get the data, either on disk or load default file
-	if os.IsNotExist(err) {
+	stat, errStat := readOnly.Stat()
+	if errStat != nil || os.IsNotExist(errOpen) || stat.Size() == 0 {
 		confBox, err := rice.FindBox("../../conf")
 		if err != nil {
 			return nil, err
 		}
 
-		_, file := filepath.Split(path)
-		jsonData, err = confBox.Bytes(file)
+		jsonData, err = confBox.Bytes(defaultConfigFile)
 		if err != nil {
 			return nil, err
 		}
@@ -101,9 +109,9 @@ func loadJson(path string) ([]byte, error) {
 			log.Println("Warning: failed to write default bam_agent config file:", err)
 		}
 	} else {
-		jsonData, err = ioutil.ReadAll(readOnly)
-		if err != nil {
-			return nil, err
+		jsonData, errOpen = ioutil.ReadAll(readOnly)
+		if errOpen != nil {
+			return nil, errOpen
 		}
 	}
 

@@ -3,7 +3,6 @@ package agent
 import (
 	"testing"
 	"time"
-
 )
 
 func TestControllerHelper_Get(t *testing.T) {
@@ -11,7 +10,7 @@ func TestControllerHelper_Get(t *testing.T) {
 	cfg := NewConfigController(mc)
 
 	data := cfg.Get()
-	if data.Reboot.Delay != time.Duration(5) * time.Second {
+	if data.Reboot.Delay != time.Duration(5)*time.Second {
 		t.Fatalf("expected reboot false, got %v", data.Reboot.Delay)
 	}
 }
@@ -35,12 +34,12 @@ func TestControllerHelper_Update(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if ! mc.CalledSave {
+	if !mc.CalledSave {
 		t.Fatalf("expected called save to be run, got %v", mc.CalledSave)
 	}
 
 	data := cfg.Get()
-	if data.Reboot.Delay != time.Duration(100) * time.Hour {
+	if data.Reboot.Delay != time.Duration(100)*time.Hour {
 		t.Fatalf("expected duration > 100, got: %v", data.Reboot.Delay)
 	}
 

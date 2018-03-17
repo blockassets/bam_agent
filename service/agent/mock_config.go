@@ -13,10 +13,10 @@ import (
 var _ Config = &MockConfig{}
 
 type MockConfig struct {
-	cmdLine   tool.CmdLine
-	originalData  *gabs.Container
-	loadedData  *FileConfig
-	CalledSave bool
+	cmdLine      tool.CmdLine
+	originalData *gabs.Container
+	loadedData   *FileConfig
+	CalledSave   bool
 }
 
 func (cfg *MockConfig) Original() *gabs.Container {
@@ -33,7 +33,7 @@ func (cfg *MockConfig) Load() error {
 		return err
 	}
 
-	data, err := confBox.Bytes("bam_agent.json")
+	data, err := confBox.Bytes(defaultConfigFile)
 	if err != nil {
 		return err
 	}

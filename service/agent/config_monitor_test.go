@@ -38,12 +38,12 @@ func TestMonitorHelper_Update(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if ! mc.CalledSave {
+	if !mc.CalledSave {
 		t.Fatalf("expected called save to be run, got %v", mc.CalledSave)
 	}
 
 	data := cfg.Get()
-	if data.Reboot.Period.Duration < time.Duration(100) * time.Hour {
+	if data.Reboot.Period.Duration < time.Duration(100)*time.Hour {
 		t.Fatalf("expected duration > 100, got: %v", data.Reboot.Period.Duration)
 	}
 
