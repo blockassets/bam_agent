@@ -15,6 +15,8 @@ Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project
 ./bam_agent-linux-arm -port 1111 -no-update=false
 ``
 
+A config file is writen to `/etc/bam_agent.json`.
+
 ## Automatic updates
 
 By default, the BAM Agent will automatically attempt to self update from the Github 
@@ -161,7 +163,7 @@ if you do run this from your browser (not really advised), it won't get cached.
 ## Monitors
 
 Monitors allow us to execute code periodically.
-Monitors are configured by editing the `/etc/bam_agent.conf` file. This file is created when the agent first starts.
+Monitors are configured by editing the `/etc/bam_agent.json` file. This file is created when the agent first starts.
 
 ### Accepted shares
 
