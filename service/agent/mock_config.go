@@ -51,6 +51,11 @@ func (cfg *MockConfig) Load() error {
 	return nil
 }
 
+func (cfg *MockConfig) Update(path string, data interface{}) error {
+	configUpdate(cfg.Original(), path, data)
+	return cfg.Save()
+}
+
 func (cfg *MockConfig) Save() error {
 	cfg.CalledSave = true
 	err := jsoniter.UnmarshalFromString(cfg.originalData.String(), cfg.loadedData)

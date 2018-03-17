@@ -41,7 +41,7 @@ func TestNewConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if fileConfig.Controller.Reboot.Delay != time.Duration(5) * time.Second {
+	if fileConfig.Controller.Reboot.Delay != time.Duration(5)*time.Second {
 		t.Fatalf("expected 5s and got %v", fileConfig.Controller.Reboot.Delay)
 	}
 }

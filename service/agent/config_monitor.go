@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"github.com/Jeffail/gabs"
-	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
 
@@ -20,20 +18,7 @@ func (mh *MonitorHelper) Get() MonitorConfig {
 }
 
 func (mh *MonitorHelper) Update(mc MonitorConfig) error {
-	converted, err := jsoniter.Marshal(mc)
-	if err != nil {
-		return err
-	}
-
-	updated, err := gabs.ParseJSON(converted)
-	if err != nil {
-		return err
-	}
-
-	orig := mh.Original()
-	orig.Set(updated.Data(), "monitor")
-
-	return mh.Save()
+	return mh.Config.Update("monitor", mc)
 }
 
 func NewConfigMonitor(cfg Config) ConfigMonitor {

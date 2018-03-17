@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"github.com/Jeffail/gabs"
-	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
 
@@ -20,20 +18,7 @@ func (ch *ControllerHelper) Get() ControllerConfig {
 }
 
 func (ch *ControllerHelper) Update(cc ControllerConfig) error {
-	converted, err := jsoniter.Marshal(cc)
-	if err != nil {
-		return err
-	}
-
-	updated, err := gabs.ParseJSON(converted)
-	if err != nil {
-		return err
-	}
-
-	orig := ch.Original()
-	orig.Set(updated.Data(), "controller")
-
-	return ch.Save()
+	return ch.Config.Update("controller", cc)
 }
 
 func NewConfigController(cfg Config) ConfigController {

@@ -21,6 +21,7 @@ type Config interface {
 	Save() error
 	Original() *gabs.Container
 	Loaded() *FileConfig
+	Update(path string, data interface{}) error
 }
 
 type ConfigData struct {
@@ -60,6 +61,29 @@ func (cfg *ConfigData) Load() error {
 
 func (cfg *ConfigData) Data() Config {
 	return cfg
+}
+
+func (cfg *ConfigData) Update(path string, data interface{}) error {
+	err := configUpdate(cfg.Original(), path, data)
+	if err != nil {
+		return err
+	}
+	return cfg.Save()
+}
+
+func configUpdate(original *gabs.Container, path string, data interface{}) error {
+	converted, err := jsoniter.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	updated, err := gabs.ParseJSON(converted)
+	if err != nil {
+		return err
+	}
+
+	_, err = original.Set(updated.Data(), path)
+	return err
 }
 
 func (cfg *ConfigData) Save() error {
