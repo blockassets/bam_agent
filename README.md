@@ -5,6 +5,8 @@
 This is an agent that is intended to be installed on miners to help facilitate management of them via HTTP as well 
 as monitoring for issues internal to the miner.
 
+Currently, the agent targets the BW-L21 miner, but in the future we will target all miners. Pull requests welcome.
+
 Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project.
 
 ## Running (defaults):
