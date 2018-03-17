@@ -4,33 +4,28 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/service/os"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-const (
-	delayBeforeReboot = time.Duration(5) * time.Second
-)
-
-// Implements Builder interface
-type RebootCtrl struct{}
-
-func (ctrl RebootCtrl) build(cfg *Config) *Controller {
-	return &Controller{
-		Methods: []string{http.MethodGet},
-		Path:    "/reboot",
-		Handler: ctrl.makeHandler(),
-	}
+type RebootConfig struct {
+	Delay time.Duration
 }
 
-func (ctrl RebootCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
+func NewRebootCtrl(cfg RebootConfig, reboot os.Reboot) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/reboot",
+			Methods: []string{http.MethodGet},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
 
-			resp, _ := jsoniter.Marshal(BAMStatus{"OK", nil})
-			w.Write(resp)
-			// leave enough time for http server to respond to caller
-			time.AfterFunc(delayBeforeReboot, service.Reboot)
-		})
+				resp, _ := jsoniter.Marshal(BAMStatus{"OK", nil})
+				w.Write(resp)
+				// leave enough time for http server to respond to caller
+				time.AfterFunc(cfg.Delay, func() { reboot.Reboot() })
+			}),
+		},
+	}
 }

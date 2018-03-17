@@ -1,59 +1,90 @@
 package monitor
 
 import (
+	"context"
 	"testing"
 	"time"
 )
 
-const (
-	monitorCycleDuration = time.Duration(50) * time.Millisecond
-)
-
-type TestMonitor struct {
-	*Context
-	CountIt func()
-}
-
-func newTestMonitor(context *Context, doItFunc func()) *TestMonitor {
-	return &TestMonitor{
-		Context: context,
-		CountIt: doItFunc}
-}
-
-func (monitor *TestMonitor) Start() error {
-
-	go monitor.makeTimerFunc(monitor.CountIt, monitorCycleDuration)()
-
-	return nil
-}
-
-type testManager struct {
-	Manager
-}
-
-var count int
-
-func (mgr *testManager) StartMonitors() {
-	context := makeContext()
-	doIt := func() { count++ }
-
-	mgr.Monitors = &[]Monitor{newTestMonitor(context, doIt)}
-
-	for _, monitor := range *mgr.Monitors {
-		monitor.Start()
+func NewMockMonitor(enabled bool, period time.Duration, onTick OnTick) Monitor {
+	return &Data{
+		Enabled: enabled,
+		Period:  period * time.Millisecond,
+		OnTick:  onTick,
 	}
 }
 
-func TestManager_StopMonitors(t *testing.T) {
-	monitorManager := &testManager{Manager{Config: nil, Client: nil}}
+func TestStartMonitors(t *testing.T) {
+	count1 := 0
+	count2 := 0
+	count3 := 0
 
-	monitorManager.StopMonitors()
-	monitorManager.StartMonitors()
-	// let enough time to go through 1 cycle
-	time.Sleep(monitorCycleDuration * 2)
-	monitorManager.StopMonitors()
-	monitorManager.StopMonitors()
-	if count != 1 {
-		t.Errorf("Expected count to be 1, got %v", count)
+	onTicker1 := func() TickerFunc { return func(ctx context.Context) { count1++ } }
+	onTicker2 := func() TickerFunc { return func(ctx context.Context) { count2++ } }
+	onTicker3 := func() TickerFunc { return func(ctx context.Context) { count3++ } }
+
+	monitors := []Monitor{
+		NewMockMonitor(true, time.Duration(10), onTicker1),
+		NewMockMonitor(true, time.Duration(30), onTicker2),
+		NewMockMonitor(false, time.Duration(20), onTicker3),
+	}
+
+	// Test they start and run
+	stopGroup1 := StartMonitors(context.Background(), monitors)
+	time.Sleep(75 * time.Millisecond)
+	stopGroup1()
+
+	if count1 < 3 {
+		t.Fatalf("expected count1 to be greater than 2, got %v", count1)
+	}
+	if count2 < 2 {
+		t.Fatalf("expected count2 to be at least 2, got %v", count2)
+	}
+	if count3 != 0 {
+		t.Fatalf("expected count3 to be 0, got %v", count3)
+	}
+
+	if monitors[2].IsEnabled() {
+		t.Fatalf("expected last monitor to not be enabled, got %v", monitors[2].IsEnabled())
+	}
+}
+
+func TestStopMonitors(t *testing.T) {
+
+	count1 := 0
+	count2 := 0
+	count3 := 0
+
+	onTicker1 := func() TickerFunc { return func(ctx context.Context) { count1++ } }
+	onTicker2 := func() TickerFunc { return func(ctx context.Context) { count2++ } }
+	onTicker3 := func() TickerFunc { return func(ctx context.Context) { count3++ } }
+
+	monitors := []Monitor{
+		NewMockMonitor(true, time.Duration(10), onTicker1),
+		NewMockMonitor(true, time.Duration(30), onTicker2),
+		NewMockMonitor(false, time.Duration(20), onTicker3),
+	}
+
+	// Test they start and run
+	stopGroup1 := StartMonitors(context.Background(), monitors)
+	time.Sleep(15 * time.Millisecond)
+	stopGroup1()
+	// make sure they stop
+	time.Sleep(15 * time.Millisecond)
+
+	if count1 != 1 {
+		t.Fatalf("expected count1 to be 1, got %v", count1)
+	}
+
+	if count2 != 0 {
+		t.Fatalf("expected count1 to be 0, got %v", count2)
+	}
+
+	if count3 != 0 {
+		t.Fatalf("expected count3 to be 0, got %v", count3)
+	}
+
+	if monitors[2].IsEnabled() {
+		t.Fatalf("expected last monitor to not be enabled, got %v", monitors[2].IsEnabled())
 	}
 }

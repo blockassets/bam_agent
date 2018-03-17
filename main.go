@@ -1,75 +1,102 @@
 package main
 
 import (
-	"context"
-	"flag"
-	"fmt"
 	"log"
 	"math/rand"
-	"net/http"
-	"os"
-	"runtime"
-	"strconv"
 	"time"
 
-	"github.com/GeertJohan/go.rice"
-	"github.com/blockassets/bam_agent/controller"
 	"github.com/blockassets/bam_agent/fetcher"
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/service/agent"
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/os"
 	"github.com/blockassets/bam_agent/tool"
-	"github.com/blockassets/cgminer_client"
 	"github.com/jpillora/overseer"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"go.uber.org/fx"
 )
 
 var (
-	// Makefile build
-	version  = ""
-	interval time.Duration
-	config   *string
+	cmdLine tool.CmdLine
 )
 
 const (
-	max24HourInt = 23
-	ghUser       = "blockassets"
-	ghRepo       = "bam_agent"
-
-	minerHostname = "localhost"
-	minerTimeout  = 5 * time.Second
-	minerPort     = int64(4028)
+	ghUser = "blockassets"
+	ghRepo = "bam_agent"
 )
 
-func main() {
+func setup(version agent.Version) {
 	rand.Seed(time.Now().UTC().UnixNano())
+	log.Printf("Agent version: %s ", version.V)
+}
 
-	// Enables jsoniter to parse time.Duration fields in json
-	tool.RegisterTimeDuration()
-	tool.RegisterRandomDuration()
+func webServer(ws *WebServer) {
+	ws.Start()
+}
 
-	// Sometime in the next 24 hours check for update to prevent all machines updating
-	// at the same exact time, which could DDOS the network. +1 since rand.Intn is zero based.
-	interval = time.Duration(rand.Intn(max24HourInt)+1) * time.Hour
+func monitors(mgr monitor.Manager) {
+	mgr.Start()
+}
 
-	port := flag.String("port", "1111", "The address to listen on")
-	noUpdate := flag.Bool("no-update", false, "Never do any updates. Example: -no-update=true")
-	config = flag.String("config", "/etc/bam_agent.json", "configuration file, created if it doesn't exist")
-	flag.Parse()
+func program(state overseer.State) {
+	cmdLineProvider := fx.Provide(func() tool.CmdLine {
+		return cmdLine
+	})
 
-	portStr := fmt.Sprintf(":%s", *port)
+	stateProvider := fx.Provide(func() overseer.State {
+		return state
+	})
 
-	if *noUpdate {
-		prog(overseer.State{Address: portStr})
+	app := fx.New(
+		cmdLineProvider,
+		stateProvider,
+
+		agent.ConfigModule,
+		agent.VersionModule,
+
+		miner.ConfigModule,
+		miner.ClientModule,
+		miner.VersionModule,
+
+		os.MinerModule,
+		os.NetInfoModule,
+		os.NetworkingModule,
+		os.RebootModule,
+		os.StatRetrieverModule,
+		os.UptimeModule,
+
+		monitor.Module,
+		WebServerModule,
+
+		fx.Invoke(setup, webServer, monitors),
+	)
+
+	app.Run()
+}
+
+/*
+	main() gets called 2x when we use overseer. It first starts up a master process and then
+	starts the app again as a child process. This means that the command line arguments need to
+	be parsed twice. So, we cache them and then make them available to fx injection in the program() function
+	by creating a provider for them.
+*/
+func main() {
+	cmdLine = tool.NewCmdLine()
+
+	if cmdLine.NoUpdate {
+		program(overseer.State{Address: cmdLine.Port})
 	} else {
-		overseerRun(portStr, interval)
+		overseerRun(cmdLine.Port)
 	}
 }
 
-func overseerRun(port string, interval time.Duration) {
+func overseerRun(port string) {
+	interval := time.Duration(rand.Intn(23)+1) * time.Hour // within the next 24 hours
+
 	overseer.Run(overseer.Config{
-		Program: prog,
-		Address: port,
+		Debug:     true,
+		NoRestart: true, // We allow the OS to restart things
+		Program:   program,
+		Address:   port,
 		// The default is to check on startup, but we really just want to check in the next interval
 		// in order to prevent DDOS'ing the whole network if we restart all machines. I copied the overseer
 		// version of the github fetcher into this project and modified the logic there.
@@ -79,71 +106,4 @@ func overseerRun(port string, interval time.Duration) {
 			Interval: interval,
 		},
 	})
-}
-
-func prog(state overseer.State) {
-	log.Printf("%s %s %s %s on port %s", os.Args[0], version, runtime.GOOS, runtime.GOARCH, state.Address)
-	if state.Listener != nil {
-		log.Printf("Self-update interval: %s", interval)
-	}
-
-	cfg, _ := LoadAgentConfig(*config)
-
-	e := echo.New()
-	client := minerClient()
-	monitorManager := &monitor.Manager{Config: &cfg.Monitor, Client: client}
-
-	// Start the server and monitors in the background
-	go func() {
-		monitorManager.StartMonitors()
-		startServer(e, state, client, monitorManager)
-	}()
-
-	// Blocks until we receive a shutdown notice
-	<-state.GracefulShutdown
-
-	// Stop monitors from executing
-	monitorManager.StopMonitors()
-
-	// After 10 seconds we gracefully shutdown the server
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
-	} else {
-		log.Println("Shutdown")
-	}
-}
-
-func startServer(e *echo.Echo, state overseer.State, client *cgminer_client.Client, monitorManager *monitor.Manager) {
-	e.HideBanner = true
-
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	// Must exist here and not as a controller due to issues with rice not supporting nested boxes
-	// https://github.com/GeertJohan/go.rice#todo--development  "find boxes in imported packages"
-	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
-
-	controller.Init(e, &controller.Config{Version: version, Client: client, MonitorManager: monitorManager})
-
-	// Start server
-	if state.Listener != nil {
-		e.Listener = state.Listener
-	}
-	e.Logger.Fatal(e.Start(state.Address))
-}
-
-func minerClient() *cgminer_client.Client {
-	port := minerPort
-
-	config, err := service.LoadMinerConfig()
-	if err == nil {
-		port, err = strconv.ParseInt(config.Path("api-port").Data().(string), 10, 64)
-		if err != nil {
-			port = minerPort
-		}
-	}
-
-	return cgminer_client.New(minerHostname, port, minerTimeout)
 }

@@ -5,101 +5,80 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
-	"github.com/blockassets/cgminer_client"
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
+	"go.uber.org/fx"
 )
 
-// command to update the ip address for
-// pools
-// PUT
-//{
-//"pool1":"",
-//"pool2":"",
-//"pool3":""
-//}
-// eg { "pool1":"111.2.3.4", "pool2":"112.3.4.5", "pool3":"113.4.5.6"}
-// and we update the conf.default file on the miner
+func NewPutPoolsCtrl(mgr monitor.Manager, poolCfg miner.ConfigPools, client miner.Client) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/config/pools",
+			Methods: []string{http.MethodPut},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bamStat := BAMStatus{"OK", nil}
+				httpStat := http.StatusOK
 
-// Implements Builder interface
-type PutPoolsCtrl struct {
-	client         *cgminer_client.Client
-	monitorManager *monitor.Manager
-}
+				// Declare things ahead of time to make the boolean logic below easier. grrrlang.
+				var err error
+				var data []byte
 
-func (ctrl PutPoolsCtrl) build(cfg *Config) *Controller {
-	ctrl.client = cfg.Client
-	ctrl.monitorManager = cfg.MonitorManager
+				data, err = ioutil.ReadAll(r.Body)
+				if err == nil {
+					mgr.Stop()
+					defer mgr.Start()
 
-	return &Controller{
-		Methods: []string{http.MethodPut},
-		Path:    "/config/pools",
-		Handler: ctrl.makeHandler(),
-	}
-}
+					var pools *miner.PoolAddresses
+					pools, err = poolCfg.Parse(data)
+					if err == nil {
+						err = poolCfg.Save(pools)
+						if err == nil {
+							err = client.Quit()
+						}
+					}
+				}
 
-func (ctrl PutPoolsCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			bamStat := BAMStatus{"OK", nil}
-			httpStat := http.StatusOK
-
-			data, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				httpStat = http.StatusInternalServerError
-				bamStat = BAMStatus{"Error", err}
-			} else {
-				ctrl.monitorManager.StopMonitors()
-
-				err = service.UpdatePools(data)
 				if err != nil {
-					httpStat = http.StatusBadGateway
+					httpStat = http.StatusInternalServerError
 					bamStat = BAMStatus{"Error", err}
 				}
 
-				err = ctrl.client.Quit()
-				if err != nil {
-					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
-				}
-
-				ctrl.monitorManager.StartMonitors()
-			}
-
-			w.WriteHeader(httpStat)
-			resp, _ := jsoniter.Marshal(bamStat)
-			w.Write(resp)
-		})
-}
-
-type GetPoolsCtrl struct{}
-
-func (ctrl GetPoolsCtrl) build(cfg *Config) *Controller {
-
-	return &Controller{
-		Methods: []string{http.MethodGet},
-		Path:    "/config/pools",
-		Handler: ctrl.makeHandler(),
+				w.WriteHeader(httpStat)
+				resp, _ := jsoniter.Marshal(bamStat)
+				w.Write(resp)
+			}),
+		},
 	}
 }
 
-func (ctrl GetPoolsCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			var response interface{}
-			var httpStat int
+func NewGetPoolsCtrl(poolCfg miner.ConfigPools) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/config/pools",
+			Methods: []string{http.MethodGet},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var response interface{}
+				var httpStat int
 
-			pools, err := service.GetPools()
-			if err != nil {
-				httpStat = http.StatusInternalServerError
-				response = BAMStatus{"Error", err}
-			} else {
-				httpStat = http.StatusOK
-				response = pools
-			}
+				pools, err := poolCfg.Get()
+				if err != nil {
+					httpStat = http.StatusInternalServerError
+					response = BAMStatus{"Error", err}
+				} else {
+					httpStat = http.StatusOK
+					response = pools
+				}
 
-			w.WriteHeader(httpStat)
-			resp, _ := jsoniter.Marshal(response)
-			w.Write(resp)
-		})
+				w.WriteHeader(httpStat)
+				resp, _ := jsoniter.Marshal(response)
+				w.Write(resp)
+			}),
+		},
+	}
 }
+
+var ConfigPoolsModule = fx.Provide(
+	NewPutPoolsCtrl,
+	NewGetPoolsCtrl,
+)

@@ -3,29 +3,34 @@ package controller
 import (
 	"net/http"
 
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/monitor"
+	"github.com/blockassets/bam_agent/service/os"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-// Implements Builder interface
-type CGStartCtrl struct{}
+func NewCGStartCtrl(mgr monitor.Manager, miner os.Miner) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/cgminer/start",
+			Methods: []string{http.MethodGet},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bamStat := BAMStatus{"OK", nil}
+				httpStat := http.StatusOK
 
-func (ctrl CGStartCtrl) build(cfg *Config) *Controller {
-	return &Controller{
-		Methods: []string{http.MethodGet},
-		Path:    "/cgminer/start",
-		Handler: ctrl.makeHandler(),
+				mgr.Stop()
+				defer mgr.Start()
+
+				err := miner.Start()
+				if err != nil {
+					httpStat = http.StatusBadGateway
+					bamStat = BAMStatus{"Error", err}
+				}
+
+				w.WriteHeader(httpStat)
+				resp, _ := jsoniter.Marshal(bamStat)
+				w.Write(resp)
+			}),
+		},
 	}
-}
-
-func (ctrl CGStartCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			// we dont need to protect from reboot while doing this by stopping the monitors
-			service.StartMiner()
-
-			resp, _ := jsoniter.Marshal(BAMStatus{"OK", nil})
-			w.Write(resp)
-		})
 }

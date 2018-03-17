@@ -2,7 +2,6 @@ package fetcher
 
 import (
 	"compress/gzip"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -10,6 +9,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/json-iterator/go"
 )
 
 //Github uses the Github V3 API to retrieve the latest release
@@ -84,7 +85,7 @@ func (h *Github) Fetch() (io.Reader, error) {
 	}
 	//clear assets
 	h.latestRelease.Assets = nil
-	if err := json.NewDecoder(resp.Body).Decode(&h.latestRelease); err != nil {
+	if err := jsoniter.NewDecoder(resp.Body).Decode(&h.latestRelease); err != nil {
 		return nil, fmt.Errorf("invalid request info (%s)", err)
 	}
 	resp.Body.Close()

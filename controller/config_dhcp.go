@@ -4,43 +4,38 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service"
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/os"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-// Implements Builder interface
-type PutDhcpCtrl struct {
-	monitorManager *monitor.Manager
-}
+func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner.ConfigNetwork) Result {
+	return Result{
+		Controller: &Controller{
+			Path:    "/config/dhcp",
+			Methods: []string{http.MethodPut},
+			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				bamStat := BAMStatus{"OK", nil}
+				httpStat := http.StatusOK
 
-func (ctrl PutDhcpCtrl) build(cfg *Config) *Controller {
-	ctrl.monitorManager = cfg.MonitorManager
+				mgr.Stop()
+				defer mgr.Start()
 
-	return &Controller{
-		Methods: []string{http.MethodPut},
-		Path:    "/config/dhcp",
-		Handler: ctrl.makeHandler(),
+				err := cfgNet.Save(&miner.NetworkData{})
+				if err == nil {
+					err = networking.SetDHCP()
+				}
+
+				if err != nil {
+					httpStat = http.StatusBadGateway
+					bamStat = BAMStatus{"Error", err}
+				}
+
+				w.WriteHeader(httpStat)
+				resp, _ := jsoniter.Marshal(bamStat)
+				w.Write(resp)
+			}),
+		},
 	}
-}
-
-func (ctrl PutDhcpCtrl) makeHandler() http.HandlerFunc {
-	return makeJsonHandler(
-		func(w http.ResponseWriter, r *http.Request) {
-			bamStat := BAMStatus{"OK", nil}
-			httpStat := http.StatusOK
-
-			ctrl.monitorManager.StopMonitors()
-
-			err := service.UpdateDHCPNetConfig()
-			if err != nil {
-				httpStat = http.StatusBadGateway
-				bamStat = BAMStatus{"Error", err}
-			}
-
-			ctrl.monitorManager.StartMonitors()
-
-			w.WriteHeader(httpStat)
-			resp, _ := jsoniter.Marshal(bamStat)
-			w.Write(resp)
-		})
 }

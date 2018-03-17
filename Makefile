@@ -5,8 +5,9 @@ BINARY_LINUX=bam_agent-linux-arm
 
 DATE=$(shell date -u '+%Y-%m-%d %H:%M:%S')
 COMMIT=$(shell git log --format=%h -1)
+VERSION_PATH=github.com/blockassets/bam_agent/service/agent.version
 
-build: VERSION=main.version=$(COMMIT) $(DATE)
+build: VERSION=$(VERSION_PATH)=$(COMMIT) $(DATE)
 build: COMPILE_FLAGS=-o $(BINARY) -ldflags="-X '$(VERSION)'"
 build:
 	go build $(COMPILE_FLAGS)
@@ -14,7 +15,7 @@ build:
 arm-build: GOOS=linux
 arm-build: GOARCH=arm
 arm-build: GOARM=7
-arm-build: VERSION=main.version=$(TRAVIS_BUILD_NUMBER) $(COMMIT) $(DATE) $(GOOS) $(GOARCH)
+arm-build: VERSION=$(VERSION_PATH)=$(TRAVIS_BUILD_NUMBER) $(COMMIT) $(DATE) $(GOOS) $(GOARCH)
 arm-build: COMPILE_FLAGS=-o $(BINARY_LINUX) -ldflags="-s -w -X '$(VERSION)'" # -s -w makes binary size smaller
 arm-build:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) go build $(COMPILE_FLAGS)

@@ -9,8 +9,20 @@ import (
 	"github.com/json-iterator/go"
 )
 
+/*
+	The code in this file is all tested indirectly in the rest of the
+	application. For some reason, tests can't be easily written. They
+	just don't seem to work correctly with jsoniter. Maybe something
+	to do with package scope and the registration.
+*/
+
 type TimeDuration struct {
 	time.Duration
+}
+
+func RegisterJsonTypes() {
+	RegisterTimeDuration()
+	RegisterRandomDuration()
 }
 
 func RegisterTimeDuration() {
@@ -36,6 +48,10 @@ func (codec *TimeDuration) IsEmpty(ptr unsafe.Pointer) bool {
 	return ts.Nanoseconds() == 0
 }
 
+// Type insurance
+var _ jsoniter.ValEncoder = &RandomDuration{}
+var _ jsoniter.ValDecoder = &RandomDuration{}
+
 type RandomDuration struct {
 	time.Duration
 }
@@ -50,7 +66,6 @@ func (codec *RandomDuration) Decode(ptr unsafe.Pointer, iter *jsoniter.Iterator)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	*((*time.Duration)(ptr)) = getRandomizedDuration(val)
 }
 
