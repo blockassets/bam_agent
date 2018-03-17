@@ -9,6 +9,13 @@ import (
 	"github.com/json-iterator/go"
 )
 
+/*
+	The code in this file is all tested indirectly in the rest of the
+	application. For some reason, tests can't be easily written. They
+	just don't seem to work correctly with jsoniter. Maybe something
+	to do with package scope and the registration.
+*/
+
 type TimeDuration struct {
 	time.Duration
 }
