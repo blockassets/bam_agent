@@ -13,6 +13,8 @@ Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project
 ./bam_agent-linux-arm -port 1111 -no-update=false
 ``
 
+## Automatic updates
+
 By default, the BAM Agent will automatically attempt to self update from the Github 
 [latest release](https://github.com/blockassets/bam_agent/releases) tab. It chooses a random hour of the day to update. 
 This way, if you have a number of machines, they will not all DDOS Github and your network. You can override the update 
@@ -143,7 +145,7 @@ Call `/reboot` to make the changes take effect
   "agent": "39892e1 2018-03-06 02:06:09",
   "miner": "value in /usr/app/version.txt",
   "uptime": "0s",
-  "mac": "ab:bc:32:b2:81:79
+  "mac": "ab:bc:32:b2:81:79"
 }
 ```
 
