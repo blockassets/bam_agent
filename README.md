@@ -12,7 +12,7 @@ Thanks to [HyperBitShop.io](https://hyperbitshop.io) for sponsoring this project
 ## Running (defaults):
 
 ``
-./bam_agent-linux-arm -port 1111 -no-update=false
+./bam_agent-linux-arm -port=1111 -no-update=false
 ``
 
 A config file is writen to `/etc/bam_agent.json`.
@@ -22,7 +22,7 @@ A config file is writen to `/etc/bam_agent.json`.
 By default, the BAM Agent will automatically attempt to self update from the Github 
 [latest release](https://github.com/blockassets/bam_agent/releases) tab. It chooses a random hour of the day to update. 
 This way, if you have a number of machines, they will not all DDOS Github and your network. You can override the update 
-behavior to not perform any updates by setting `-no-update=false` when starting the agent.
+behavior to not perform any updates by setting `-no-update=true` when starting the agent.
 
 Automatic updates brings security into question. You don't want someone being able to install a binary on your
 machine that has not been developed in a secure fashion. We employ a strict process around this that is completely
@@ -167,16 +167,16 @@ Monitors are configured by editing the `/etc/bam_agent.json` file. This file is 
 
 ### Accepted shares
 
-Enabled by default. If the miner has not accepted any shares after 5m, reboot.
+**Enabled by default.** If the miner has not accepted any shares after 5m, reboot. This works around a bug where the miner software stops submitting shares to the pool, yet continues doing work.
 
-### High Load
+### High load
 
-Enabled by default. If the 5m average load is above 5, `reboot -f` the miner. This works around a bug where the load 
+**Enabled by default.** If the 5m average load is above 5, `reboot -f` the miner. This works around a bug where the load 
 spikes and the miner stops submitting shares to the pool.
 
-### High Temp
+### High temp
 
-Enabled by default. Runs every 5m and checks to see if the temperature is over 100c. If so, it uses systemd to 
+**Enabled by default.** Runs every 5m and checks to see if the temperature is over 100c. If so, it uses systemd to 
 shut cgminer down. A reboot will enable things again.
 
 ### Quit cgminer
@@ -185,4 +185,4 @@ Disabled by default. Periodically quit the miner app to free up memory and start
 
 ### Reboot
 
-Disabled by default. Periodically reboot the entire miner.
+Disabled by default. Periodically reboot the entire miner to free up memory and start fresh.
