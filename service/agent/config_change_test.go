@@ -1,23 +1,17 @@
 package agent
 
 import (
-"io/ioutil"
-"os"
-"testing"
+	"io/ioutil"
+	"os"
+	"testing"
 
-
-
-
-"github.com/blockassets/bam_agent/tool"
-
+	"github.com/blockassets/bam_agent/tool"
 )
 
-// simulate a BAM agent binary update that adds a structure to the defualt BAM interface
+// simulate a BAM agent binary update that adds a structure to the default BAM interface
 // by saving a previous config file that doesnt have the current monitors in it
-//
 
-const prior_config_version =
-	`{
+const priorConfigVersion = `{
 	"cmdLine": {
 		"port": ":1111"
 	},
@@ -32,24 +26,19 @@ const prior_config_version =
 func TestStructChangeToConfig(t *testing.T) {
 	file, err := ioutil.TempFile("/tmp", "agent-config")
 	defer os.Remove(file.Name())
-	fileName := file.Name()
-	file.Write([]byte( prior_config_version))
-	file.Close()
 
+	ioutil.WriteFile(file.Name(), []byte(priorConfigVersion), 644)
+	file.Close()
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	cfg := NewConfig(tool.CmdLine{
-		AgentConfigPath: fileName,
+		AgentConfigPath: file.Name(),
 	})
 
 	if !cfg.Loaded().Monitor.HighLoad.Enabled {
 		t.Fatalf("expected highLoad to be enabled")
 	}
-
 }
-
-
-
