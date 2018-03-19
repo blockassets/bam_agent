@@ -2,6 +2,7 @@ package controller
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -19,6 +20,20 @@ const (
     "shelf": 5,
     "position": 5
 }`
+	testZeroShelfData = `{
+    "facility": "",
+    "row": "",
+    "shelf": 0,
+    "position": 5
+}`
+
+	testZeroPositionData = `{
+    "facility": "",
+    "row": "",
+    "shelf": 5,
+    "position": 0
+}`
+
 )
 
 func TestNewConfigLocationCtrl(t *testing.T) {
@@ -71,5 +86,55 @@ func TestNewConfigLocationCtrl(t *testing.T) {
 	loc := cfg.Get()
 	if loc.Position != 5 {
 		t.Fatalf("expected Position = 5, got %v", loc.Position)
+	}
+}
+
+func TestZeroShelfLocation (t *testing.T) {
+	mc := agent.NewMockConfig()
+	mgr := monitor.NewMockManager()
+	cfg := agent.NewConfigLocation(mc)
+
+	result := NewPutLocationCtrl(&mgr, cfg)
+	ctrl := result.Controller
+	put := strings.NewReader(testZeroShelfData)
+	req := httptest.NewRequest("PUT", "/doesnotmatter", put)
+	w := httptest.NewRecorder()
+	ctrl.Handler.ServeHTTP(w, req)
+
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
+	stat := &struct { Status string }{""}
+	err := jsoniter.Unmarshal(body, stat)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println(stat.Status)
+	if stat.Status  == "OK" {
+		t.Fatal("expected an Error")
+	}
+}
+
+func TestZeroPositionLocation (t *testing.T) {
+	mc := agent.NewMockConfig()
+	mgr := monitor.NewMockManager()
+	cfg := agent.NewConfigLocation(mc)
+
+	result := NewPutLocationCtrl(&mgr, cfg)
+	ctrl := result.Controller
+	put := strings.NewReader(testZeroPositionData)
+	req := httptest.NewRequest("PUT", "/doesnotmatter", put)
+	w := httptest.NewRecorder()
+	ctrl.Handler.ServeHTTP(w, req)
+
+	resp := w.Result()
+	body, _ := ioutil.ReadAll(resp.Body)
+	stat := &struct { Status string }{""}
+	err := jsoniter.Unmarshal(body, stat)
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Println(stat.Status)
+	if stat.Status  == "OK" {
+		t.Fatal("expected an Error")
 	}
 }

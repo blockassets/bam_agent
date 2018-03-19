@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 
@@ -31,8 +32,11 @@ func NewPutLocationCtrl(mgr monitor.Manager, location agent.ConfigLocation) Resu
 					var inLocation agent.LocationConfig
 					err = jsoniter.Unmarshal(data, &inLocation)
 					if err == nil {
-						err = location.Update(inLocation)
-
+						if inLocation.Position > 0 && inLocation.Shelf > 0 {
+							err = location.Update(inLocation)
+						} else {
+							err = errors.New("position and shelf must be greater than 0")
+						}
 					}
 				}
 
