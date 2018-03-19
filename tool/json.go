@@ -87,3 +87,19 @@ func getRandomizedDuration(duration time.Duration) time.Duration {
 	r1 := rand.New(s1)
 	return duration + time.Duration(r1.Intn(3600))*time.Second
 }
+
+/*
+	Merges source into/over destination
+*/
+func Merge(src []byte, dst []byte) ([]byte, error) {
+	var mergeMap map[string]interface{}
+	err := jsoniter.Unmarshal(dst, &mergeMap)
+	if err != nil {
+		return nil, err
+	}
+	err = jsoniter.Unmarshal(src, &mergeMap)
+	if err != nil {
+		return nil, err
+	}
+	return jsoniter.Marshal(mergeMap)
+}

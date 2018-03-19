@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -41,24 +42,35 @@ func (cfg *ConfigData) Loaded() *FileConfig {
 }
 
 func (cfg *ConfigData) Load() error {
-	jsonData, err := loadJson(cfg.cmdLine.AgentConfigPath)
+	// Load both the default file and the config file
+	jsonData, errFile := loadJsonFile(cfg.cmdLine.AgentConfigPath)
+	jsonDefaults, errDefaults := loadJsonDefaults()
+
+	// Should never reach this since defaults load from the box
+	if errDefaults != nil {
+		return errDefaults
+	}
+
+	// No config file, so use the defaults
+	if errFile != nil {
+		jsonData = jsonDefaults
+	}
+
+	// Merge our saved data over the json defaults so
+	// that we automatically pick up new configuration defaults over time
+	mergedStr, err := tool.Merge(jsonData, jsonDefaults)
 	if err != nil {
 		return err
 	}
 
-	// Need to keep a copy of the original for modifying and writing out
-	cfg.originalData, err = gabs.ParseJSON(jsonData)
+	// Store a copy of the merged data as 'original' data
+	cfg.originalData, err = gabs.ParseJSON(mergedStr)
 	if err != nil {
 		return err
 	}
 
-	// This transforms fields into data we can use in the app
-	err = jsoniter.Unmarshal(jsonData, &cfg.loadedData)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	// Load our config into FileConfig{}, which does json transforms
+	return jsoniter.Unmarshal(mergedStr, &cfg.loadedData)
 }
 
 func (cfg *ConfigData) Data() Config {
@@ -109,42 +121,33 @@ func (cfg *ConfigData) Save() error {
 	return nil
 }
 
-/*
-	1. Look for the config file in /etc/bam_agent.conf
-	2. If the config doesn't exist, load it from the box.
-	3. Attempt to write the config to outputFile.
-*/
-func loadJson(path string) ([]byte, error) {
-	var jsonData []byte
+func loadJsonFile(path string) ([]byte, error) {
+	file, err := os.Open(path)
+	defer file.Close()
 
-	readOnly, errOpen := os.Open(path)
-	defer readOnly.Close()
-
-	// Determine how to get the data, either on disk or load default file
-	stat, errStat := readOnly.Stat()
-	if errStat != nil || os.IsNotExist(errOpen) || stat.Size() == 0 {
-		confBox, err := rice.FindBox("../../conf")
-		if err != nil {
-			return nil, err
-		}
-
-		jsonData, err = confBox.Bytes(defaultConfigFile)
-		if err != nil {
-			return nil, err
-		}
-
-		err = ioutil.WriteFile(path, jsonData, 0664)
-		if err != nil {
-			log.Println("Warning: failed to write default bam_agent config file:", err)
-		}
-	} else {
-		jsonData, errOpen = ioutil.ReadAll(readOnly)
-		if errOpen != nil {
-			return nil, errOpen
-		}
+	if err != nil || os.IsNotExist(err) {
+		return nil, err
 	}
 
-	return jsonData, nil
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	if stat.Size() == 0 {
+		return nil, errors.New("empty file")
+	}
+
+	return ioutil.ReadAll(file)
+}
+
+func loadJsonDefaults() ([]byte, error) {
+	confBox, err := rice.FindBox("../../conf")
+	if err != nil {
+		return nil, err
+	}
+
+	return confBox.Bytes(defaultConfigFile)
 }
 
 func save(path string, bytes []byte) error {
@@ -159,7 +162,11 @@ func NewConfig(cmdLine tool.CmdLine) Config {
 	tool.RegisterJsonTypes()
 
 	cfg := ConfigData{cmdLine: cmdLine}
-	cfg.Load()
+	err := cfg.Load()
+	// Should never have this issue
+	if err != nil {
+		log.Panic(err)
+	}
 	cfg.Save()
 
 	return &cfg
