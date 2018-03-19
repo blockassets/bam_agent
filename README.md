@@ -160,6 +160,18 @@ Call `/reboot` to make the changes take effect
 Reboots the miner. Obviously be careful with this one. :-) Do note that we send HTTP expiry headers so that
 if you do run this from your browser (not really advised), it won't get cached.
 
+### `POST /update`
+
+Upload a compressed archive of files and execute an enclosed shell script. This allows one to easily distribute
+updates to the miners.
+
+1. Create a folder and put a script in it called `update.sh`
+1. .tar.gz the folder
+1. HTTP file upload the compressed archive with the form parameter name of `file`
+1. Optionally add a `script` form parameter to override the default `update.sh` name
+
+Returns the stdout/stderr of the script.
+
 ## Monitors
 
 Monitors allow us to execute code periodically.
@@ -167,7 +179,8 @@ Monitors are configured by editing the `/etc/bam_agent.json` file. This file is 
 
 ### Accepted shares
 
-**Enabled by default.** If the miner has not accepted any shares after 5m, reboot. This works around a bug where the miner software stops submitting shares to the pool, yet continues doing work.
+**Enabled by default.** If the miner has not accepted any shares after 5m, reboot. This works around a bug where the 
+miner software stops submitting shares to the pool, yet continues doing work.
 
 ### High load
 

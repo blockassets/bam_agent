@@ -15,7 +15,7 @@ import (
 )
 
 func TestNewConfigIPCtrl(t *testing.T) {
-	file, err := ioutil.TempFile("/tmp", "network-ip")
+	file, err := ioutil.TempFile("", "network-ip")
 	defer file.Close()
 	defer os.Remove(file.Name())
 
