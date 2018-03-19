@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/GeertJohan/go.rice"
 	"github.com/blockassets/bam_agent/controller"
+	"github.com/blockassets/bam_agent/tool"
 	"github.com/jpillora/overseer"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -18,19 +18,21 @@ type WebServer struct {
 	echo  *echo.Echo
 	ctrl  controller.Manager
 	state overseer.State
+	staticRiceBox tool.StaticRiceBox
 }
 
-func NewWebServer(e *echo.Echo, ctrl controller.Manager, state overseer.State) *WebServer {
+func NewWebServer(e *echo.Echo, ctrl controller.Manager, state overseer.State, staticRiceBox tool.StaticRiceBox) *WebServer {
 	return &WebServer{
 		echo:  e,
 		ctrl:  ctrl,
 		state: state,
+		staticRiceBox: staticRiceBox,
 	}
 }
 
 func (server *WebServer) Start() {
 	go func() {
-		go run(server.echo, server.state)
+		go run(server.echo, server.state, server.staticRiceBox)
 
 		// Blocks until we receive a shutdown notice
 		<-server.state.GracefulShutdown
@@ -54,15 +56,13 @@ func stop(server *WebServer) {
 	}
 }
 
-func run(e *echo.Echo, state overseer.State) {
+func run(e *echo.Echo, state overseer.State, staticRiceBox tool.StaticRiceBox) {
 	e.HideBanner = true
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Must exist here and not as a controller due to issues with rice not supporting nested boxes
-	// https://github.com/GeertJohan/go.rice#todo--development  "find boxes in imported packages"
-	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer(rice.MustFindBox("static").HTTPBox())))
+	e.GET("/favicon.ico", echo.WrapHandler(http.FileServer((*staticRiceBox).HTTPBox())))
 
 	// Start server
 	if state.Listener != nil {
