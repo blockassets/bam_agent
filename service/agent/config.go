@@ -50,7 +50,7 @@ func (cfg *ConfigData) Load() error {
 		return errDefaults
 	}
 
-	// No defaults file means we use that as our basis
+	// No config file, so use the defaults
 	if errFile != nil || jsonData == nil || len(jsonData) == 0 {
 		jsonData = jsonDefaults
 	}
@@ -62,7 +62,7 @@ func (cfg *ConfigData) Load() error {
 		return err
 	}
 
-	// Store a copy of the 'original' data
+	// Store a copy of the merged data as 'original' data
 	cfg.originalData, err = gabs.ParseJSON(mergedStr)
 	if err != nil {
 		return err
