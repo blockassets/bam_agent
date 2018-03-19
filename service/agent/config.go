@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -51,7 +52,7 @@ func (cfg *ConfigData) Load() error {
 	}
 
 	// No config file, so use the defaults
-	if errFile != nil || jsonData == nil || len(jsonData) == 0 {
+	if errFile != nil {
 		jsonData = jsonDefaults
 	}
 
@@ -129,8 +130,12 @@ func loadJsonFile(path string) ([]byte, error) {
 	}
 
 	stat, err := file.Stat()
-	if err != nil || stat.Size() == 0 {
+	if err != nil {
 		return nil, err
+	}
+
+	if stat.Size() == 0 {
+		return nil, errors.New("empty file")
 	}
 
 	return ioutil.ReadAll(file)
