@@ -19,9 +19,9 @@ fi
 dowork() {
 	ipaddr=$1
 	echo "----------- ${ipaddr} start"
-	sshpass -e scp -o StrictHostKeychecking=no ${SERVICE} root@$ipaddr:/usr/bin
+	sshpass -e scp -o StrictHostKeychecking=no ${SERVICE}.gz root@$ipaddr:/usr/bin
 	sshpass -e scp -o StrictHostKeychecking=no ${SERVICE}.service root@$ipaddr:/etc/systemd/system
-	sshpass -e ssh -o StrictHostKeychecking=no root@$ipaddr "chmod ugo+x /usr/bin/${SERVICE}; systemctl enable ${SERVICE}; systemctl start ${SERVICE};"
+	sshpass -e ssh -o StrictHostKeychecking=no root@$ipaddr "rm -f /usr/bin/${SERVICE}; gunzip /usr/bin/${SERVICE}.gz; chmod ugo+x /usr/bin/${SERVICE}; systemctl enable ${SERVICE}; systemctl stop ${SERVICE}; systemctl start ${SERVICE}"
 	echo "----------- ${ipaddr} finish"
 }
 
