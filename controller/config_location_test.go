@@ -33,7 +33,6 @@ const (
     "shelf": 5,
     "position": 0
 }`
-
 )
 
 func TestNewConfigLocationCtrl(t *testing.T) {
@@ -89,7 +88,7 @@ func TestNewConfigLocationCtrl(t *testing.T) {
 	}
 }
 
-func TestZeroShelfLocation (t *testing.T) {
+func TestZeroShelfLocation(t *testing.T) {
 	mc := agent.NewMockConfig()
 	mgr := monitor.NewMockManager()
 	cfg := agent.NewConfigLocation(mc)
@@ -103,18 +102,18 @@ func TestZeroShelfLocation (t *testing.T) {
 
 	resp := w.Result()
 	body, _ := ioutil.ReadAll(resp.Body)
-	stat := &struct { Status string }{""}
+	stat := &struct{ Status string }{""}
 	err := jsoniter.Unmarshal(body, stat)
 	if err != nil {
 		t.Fatal(err)
 	}
 	log.Println(stat.Status)
-	if stat.Status  == "OK" {
+	if stat.Status == "OK" {
 		t.Fatal("expected an Error")
 	}
 }
 
-func TestZeroPositionLocation (t *testing.T) {
+func TestZeroPositionLocation(t *testing.T) {
 	mc := agent.NewMockConfig()
 	mgr := monitor.NewMockManager()
 	cfg := agent.NewConfigLocation(mc)
@@ -128,13 +127,13 @@ func TestZeroPositionLocation (t *testing.T) {
 
 	resp := w.Result()
 	body, _ := ioutil.ReadAll(resp.Body)
-	stat := &struct { Status string }{""}
+	stat := &struct{ Status string }{""}
 	err := jsoniter.Unmarshal(body, stat)
 	if err != nil {
 		t.Fatal(err)
 	}
 	log.Println(stat.Status)
-	if stat.Status  == "OK" {
+	if stat.Status == "OK" {
 		t.Fatal("expected an Error")
 	}
 }

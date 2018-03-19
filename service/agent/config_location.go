@@ -1,16 +1,27 @@
 package agent
 
 import (
+	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
 
 type ConfigLocation interface {
+	Parse(data []byte) (*LocationConfig, error)
 	Get() LocationConfig
 	Update(mc LocationConfig) error
 }
 
 type LocationHelper struct {
 	Config
+}
+
+func (mh *LocationHelper) Parse(data []byte) (*LocationConfig, error) {
+	locationCfg := &LocationConfig{}
+	err := jsoniter.Unmarshal(data, locationCfg)
+	if err != nil {
+		return nil, err
+	}
+	return locationCfg, nil
 }
 
 func (mh *LocationHelper) Get() LocationConfig {

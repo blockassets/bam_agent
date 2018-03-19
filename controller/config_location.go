@@ -23,17 +23,17 @@ func NewPutLocationCtrl(mgr monitor.Manager, location agent.ConfigLocation) Resu
 				// Declare things ahead of time to make the boolean logic below easier. grrrlang.
 				var err error
 				var data []byte
+				var inLocation *agent.LocationConfig
 
 				data, err = ioutil.ReadAll(r.Body)
 				if err == nil {
 					mgr.Stop()
 					defer mgr.Start()
 
-					var inLocation agent.LocationConfig
-					err = jsoniter.Unmarshal(data, &inLocation)
+					inLocation, err = location.Parse(data)
 					if err == nil {
 						if inLocation.Position > 0 && inLocation.Shelf > 0 {
-							err = location.Update(inLocation)
+							err = location.Update(*inLocation)
 						} else {
 							err = errors.New("position and shelf must be greater than 0")
 						}
