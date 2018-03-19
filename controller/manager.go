@@ -81,5 +81,6 @@ var Module = fx.Options(
 		NewGetPoolsCtrl,
 		NewRebootCtrl,
 		NewStatusCtrl,
+		NewPutLocationCtrl,
 	),
 )

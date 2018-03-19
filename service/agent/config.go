@@ -179,4 +179,5 @@ var ConfigModule = fx.Options(
 
 	ConfigMonitorModule,
 	ConfigControllerModule,
+	ConfigLocationModule,
 )
