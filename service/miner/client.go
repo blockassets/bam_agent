@@ -14,7 +14,6 @@ var (
 
 type Client interface {
 	Quit() error
-	Devs() (*[]Dev, error)
 	GetAccepted() (int64, error)
 	GetTemp() (float64, error)
 }
@@ -24,20 +23,25 @@ type Dev struct {
 	Temperature float64 `json:"Temperature"`
 }
 
-//type BWMinerClient struct {
-//	client *cgminer_client.Client
-//}
+// create an interface to the actual miner client, so we can mock it out in testing
+type CgminerClientInterface interface {
+	Devs() (*[]cgminer_client.Dev, error)
+	Quit() error
+	Restart() error
+	Summary() (*cgminer_client.Summary, error)
+	ChipStat() (*[]cgminer_client.ChipStat, error)
+}
 
 type CGMinerClient struct {
-	client *cgminer_client.Client
+	client CgminerClientInterface
 }
 
 func (c CGMinerClient) Quit() error {
 	return c.client.Quit()
 }
 
-func (c CGMinerClient) Devs() (*[]Dev, error) {
-	clientDevs, err := c.Devs()
+func (c CGMinerClient) devs() (*[]Dev, error) {
+	clientDevs, err := c.client.Devs()
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +57,7 @@ func (c CGMinerClient) Devs() (*[]Dev, error) {
 }
 
 func (c CGMinerClient) GetAccepted() (int64, error) {
-	devs, err := c.Devs()
+	devs, err := c.client.Devs()
 	if err != nil {
 		return 0, err
 	}
@@ -65,7 +69,7 @@ func (c CGMinerClient) GetAccepted() (int64, error) {
 }
 
 func (c CGMinerClient) GetTemp() (float64, error) {
-	devs, err := c.Devs()
+	devs, err := c.client.Devs()
 	if err != nil {
 		return 0, err
 	}
