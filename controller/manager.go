@@ -9,8 +9,9 @@ import (
 )
 
 type BAMStatus struct {
-	Status string
-	Error  error
+	Status  string
+	Error   error
+	Message string
 }
 
 type Controller struct {
@@ -81,5 +82,6 @@ var Module = fx.Options(
 		NewGetPoolsCtrl,
 		NewRebootCtrl,
 		NewStatusCtrl,
+		NewUpdateCtrl,
 	),
 )

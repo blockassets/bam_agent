@@ -24,7 +24,7 @@ const priorConfigVersion = `{
 `
 
 func TestNewConfig(t *testing.T) {
-	file, err := ioutil.TempFile("/tmp", "agent-config")
+	file, err := ioutil.TempFile("", "agent-config")
 	defer file.Close()
 	defer os.Remove(file.Name())
 	if err != nil {
@@ -63,7 +63,7 @@ func TestNewConfig(t *testing.T) {
 // simulate a BAM agent binary update that adds a structure to the default BAM interface
 // by saving a previous config file that doesnt have the current monitors in it
 func TestStructChangeToConfig(t *testing.T) {
-	file, err := ioutil.TempFile("/tmp", "agent-config")
+	file, err := ioutil.TempFile("", "agent-config")
 	defer os.Remove(file.Name())
 
 	// Write out an old version of a file

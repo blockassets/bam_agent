@@ -11,7 +11,7 @@ func TestNewNetworking(t *testing.T) {
 	netmask := "255.255.240.0"
 	gateway := "10.10.0.2"
 
-	file, err := ioutil.TempFile("/tmp", "network-test")
+	file, err := ioutil.TempFile("", "network-test")
 	defer file.Close()
 	defer os.Remove(file.Name())
 	if err != nil {

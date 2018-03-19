@@ -40,7 +40,7 @@ func (server *WebServer) Start() {
 }
 
 func (server *WebServer) Stop() {
-	server.state.GracefulShutdown<-true
+	server.state.GracefulShutdown <- true
 }
 
 func stop(server *WebServer) {
