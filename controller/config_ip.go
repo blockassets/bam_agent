@@ -17,7 +17,7 @@ func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner
 			Path:    "/config/ip",
 			Methods: []string{http.MethodPut},
 			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bamStat := BAMStatus{"OK", nil}
+				bamStat := BAMStatus{Status: "OK"}
 				httpStat := http.StatusOK
 
 				// Declare things ahead of time to make the boolean logic below easier. grrrlang.
@@ -41,8 +41,8 @@ func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner
 				}
 
 				if err != nil {
-					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
+					httpStat = http.StatusInternalServerError
+					bamStat = BAMStatus{Status: "Error", Error: err}
 				}
 
 				w.WriteHeader(httpStat)

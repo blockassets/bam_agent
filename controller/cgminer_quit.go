@@ -18,13 +18,13 @@ func NewCGQuitCtrl(mgr monitor.Manager, client miner.Client) Result {
 				mgr.Stop()
 				defer mgr.Start()
 
-				bamStat := BAMStatus{"OK", nil}
+				bamStat := BAMStatus{Status: "OK"}
 				httpStat := http.StatusOK
 
 				err := client.Quit()
 				if err != nil {
 					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
+					bamStat = BAMStatus{Status: "Error", Error: err}
 				}
 
 				w.WriteHeader(httpStat)

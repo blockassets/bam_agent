@@ -21,7 +21,7 @@ func NewRebootCtrl(cfg RebootConfig, reboot os.Reboot) Result {
 			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 
-				resp, _ := jsoniter.Marshal(BAMStatus{"OK", nil})
+				resp, _ := jsoniter.Marshal(BAMStatus{Status: "OK"})
 				w.Write(resp)
 				// leave enough time for http server to respond to caller
 				time.AfterFunc(cfg.Delay, func() { reboot.Reboot() })

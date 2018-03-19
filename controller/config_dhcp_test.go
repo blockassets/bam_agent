@@ -14,7 +14,7 @@ import (
 )
 
 func TestNewConfigDHCPCtrl(t *testing.T) {
-	file, err := ioutil.TempFile("/tmp", "network-dhcp")
+	file, err := ioutil.TempFile("", "network-dhcp")
 	defer file.Close()
 	defer os.Remove(file.Name())
 
