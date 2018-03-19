@@ -28,7 +28,7 @@ func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet min
 				}
 
 				if err != nil {
-					httpStat = http.StatusBadGateway
+					httpStat = http.StatusInternalServerError
 					bamStat = BAMStatus{"Error", err}
 				}
 

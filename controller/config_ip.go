@@ -41,7 +41,7 @@ func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner
 				}
 
 				if err != nil {
-					httpStat = http.StatusBadGateway
+					httpStat = http.StatusInternalServerError
 					bamStat = BAMStatus{"Error", err}
 				}
 
