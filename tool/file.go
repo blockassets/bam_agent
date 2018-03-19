@@ -17,6 +17,5 @@ func IsDirectory(dir string) (bool, error) {
 }
 
 func IsExecutable(mode os.FileMode) bool {
-	return !mode.IsDir() && (mode.Perm() & 0111) > 0
+	return !mode.IsDir() && (mode.Perm()&0111) > 0
 }
-

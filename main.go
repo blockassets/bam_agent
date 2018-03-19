@@ -84,7 +84,7 @@ func main() {
 
 	if cmdLine.NoUpdate {
 		program(overseer.State{
-			Address: cmdLine.Port,
+			Address:          cmdLine.Port,
 			GracefulShutdown: make(chan bool, 1),
 		})
 	} else {
