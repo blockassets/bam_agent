@@ -2,6 +2,12 @@
 	"cmdLine": {
 		"port": ":1111"
 	},
+	"location": {
+		"facility": "",
+		"row": "",
+		"shelf": 1,
+		"position": 1
+	},
 	"controller": {
 		"reboot": {
 			"delay": "5s"
