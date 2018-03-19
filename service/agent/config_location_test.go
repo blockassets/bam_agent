@@ -25,8 +25,7 @@ func TestLocationHelper_Update(t *testing.T) {
 
 	updateCfg := LocationConfig{
 		Position: newPosition,
-		}
-
+	}
 
 	err := cfg.Update(updateCfg)
 	if err != nil {
@@ -38,7 +37,7 @@ func TestLocationHelper_Update(t *testing.T) {
 	}
 
 	data = cfg.Get()
-	if data.Position !=  updateCfg.Position {
+	if data.Position != updateCfg.Position {
 		t.Fatalf("expected Position to be: %v, got: %v", newPosition, data.Position)
 	}
 

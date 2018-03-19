@@ -8,19 +8,18 @@ import (
 
 type FileConfig struct {
 	CmdLine    tool.CmdLine     `json:"cmdLine"`
-	Location   LocationConfig	`json:"location"`
+	Location   LocationConfig   `json:"location"`
 	Monitor    MonitorConfig    `json:"monitor"`
 	Controller ControllerConfig `json:"controller"`
 }
 
 // Location
 type LocationConfig struct {
-	Facility string	`json:"facility"`
-	Row string	`json:"row"`
-	Shelf int	`json:"shelf"`
-	Position int	`json:"position"`
+	Facility string `json:"facility"`
+	Row      string `json:"row"`
+	Shelf    int    `json:"shelf"`
+	Position int    `json:"position"`
 }
-
 
 // Controller
 type ControllerConfig struct {
