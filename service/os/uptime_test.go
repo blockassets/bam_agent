@@ -15,7 +15,7 @@ func TestParseUptime(t *testing.T) {
 	}
 
 	if result.Duration.String() != "362h25m50s" {
-		t.Fatalf("expected 362h25m50 but got %s", result.Duration)
+		t.Fatalf("expected 362h25m50s but got %s", result.Duration)
 	}
 
 	result = parseUptime("123")
