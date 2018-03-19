@@ -35,15 +35,23 @@ func (server *WebServer) Start() {
 		// Blocks until we receive a shutdown notice
 		<-server.state.GracefulShutdown
 
-		// After 10 seconds we gracefully shutdown the server
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := server.echo.Shutdown(ctx); err != nil {
-			server.echo.Logger.Fatal(err)
-		} else {
-			log.Println("Shutdown")
-		}
+		stop(server)
 	}()
+}
+
+func (server *WebServer) Stop() {
+	server.state.GracefulShutdown<-true
+}
+
+func stop(server *WebServer) {
+	// After 10 seconds we gracefully shutdown the server
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := server.echo.Shutdown(ctx); err != nil {
+		server.echo.Logger.Fatal(err)
+	} else {
+		log.Println("Shutdown")
+	}
 }
 
 func run(e *echo.Echo, state overseer.State) {
