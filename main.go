@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/blockassets/bam_agent/fetcher"
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service/agent"
@@ -46,9 +47,20 @@ func program(state overseer.State) {
 		return state
 	})
 
+	staticRiceBox := fx.Provide(func() tool.StaticRiceBox {
+		return rice.MustFindBox("static")
+	})
+
+	confRiceBox := fx.Provide(func() tool.ConfRiceBox {
+		return rice.MustFindBox("conf")
+	})
+
 	app := fx.New(
 		cmdLineProvider,
 		stateProvider,
+
+		staticRiceBox,
+		confRiceBox,
 
 		agent.ConfigModule,
 		agent.VersionModule,

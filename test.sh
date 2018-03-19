@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-make build
+make build rice-build
 
 # Start bam_agent
 ./bam_agent -no-update & PID=$!

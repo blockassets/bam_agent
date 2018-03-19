@@ -1,13 +1,12 @@
 package agent
 
 import (
-	"errors"
+	"bytes"
 	"io/ioutil"
 	"log"
 	"os"
 	"sync"
 
-	"github.com/GeertJohan/go.rice"
 	"github.com/Jeffail/gabs"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
@@ -27,6 +26,7 @@ type Config interface {
 }
 
 type ConfigData struct {
+	defaultConfig []byte
 	cmdLine      tool.CmdLine
 	originalData *gabs.Container
 	loadedData   *FileConfig
@@ -42,35 +42,28 @@ func (cfg *ConfigData) Loaded() *FileConfig {
 }
 
 func (cfg *ConfigData) Load() error {
-	// Load both the default file and the config file
-	jsonData, errFile := loadJsonFile(cfg.cmdLine.AgentConfigPath)
-	jsonDefaults, errDefaults := loadJsonDefaults()
+	jsonData := loadJsonFile(cfg.cmdLine.AgentConfigPath)
 
-	// Should never reach this since defaults load from the box
-	if errDefaults != nil {
-		return errDefaults
-	}
-
-	// No config file, so use the defaults
-	if errFile != nil {
-		jsonData = jsonDefaults
-	}
+	var err error
+	var merged = cfg.defaultConfig
 
 	// Merge our saved data over the json defaults so
 	// that we automatically pick up new configuration defaults over time
-	mergedStr, err := tool.Merge(jsonData, jsonDefaults)
-	if err != nil {
-		return err
+	if bytes.Compare(jsonData, cfg.defaultConfig) != 0 {
+		merged, err = tool.Merge(jsonData, cfg.defaultConfig)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Store a copy of the merged data as 'original' data
-	cfg.originalData, err = gabs.ParseJSON(mergedStr)
+	cfg.originalData, err = gabs.ParseJSON(merged)
 	if err != nil {
 		return err
 	}
 
 	// Load our config into FileConfig{}, which does json transforms
-	return jsoniter.Unmarshal(mergedStr, &cfg.loadedData)
+	return jsoniter.Unmarshal(merged, &cfg.loadedData)
 }
 
 func (cfg *ConfigData) Data() Config {
@@ -121,33 +114,32 @@ func (cfg *ConfigData) Save() error {
 	return nil
 }
 
-func loadJsonFile(path string) ([]byte, error) {
+var emptyJson = []byte("{}")
+
+func loadJsonFile(path string) []byte {
 	file, err := os.Open(path)
 	defer file.Close()
 
+
 	if err != nil || os.IsNotExist(err) {
-		return nil, err
+		return emptyJson
 	}
 
 	stat, err := file.Stat()
 	if err != nil {
-		return nil, err
+		return emptyJson
 	}
 
 	if stat.Size() == 0 {
-		return nil, errors.New("empty file")
+		return emptyJson
 	}
 
-	return ioutil.ReadAll(file)
-}
-
-func loadJsonDefaults() ([]byte, error) {
-	confBox, err := rice.FindBox("../../conf")
+	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return emptyJson
 	}
 
-	return confBox.Bytes(defaultConfigFile)
+	return data
 }
 
 func save(path string, bytes []byte) error {
@@ -158,10 +150,10 @@ func save(path string, bytes []byte) error {
 	Returns a loaded config object based on the
 	parameters passed in from the cmdLine.
 */
-func NewConfig(cmdLine tool.CmdLine) Config {
+func NewConfig(cmdLine tool.CmdLine, defaultConfig []byte) Config {
 	tool.RegisterJsonTypes()
 
-	cfg := ConfigData{cmdLine: cmdLine}
+	cfg := ConfigData{cmdLine: cmdLine, defaultConfig: defaultConfig}
 	err := cfg.Load()
 	// Should never have this issue
 	if err != nil {
@@ -173,8 +165,13 @@ func NewConfig(cmdLine tool.CmdLine) Config {
 }
 
 var ConfigModule = fx.Options(
-	fx.Provide(func(cmdLine tool.CmdLine) Config {
-		return NewConfig(cmdLine)
+	fx.Provide(func(cmdLine tool.CmdLine, confRiceBox tool.ConfRiceBox) Config {
+		data, err := (*confRiceBox).Bytes("bam_agent.json")
+		if err != nil {
+			log.Panic("could not load bam_agent.json from rice")
+			return nil
+		}
+		return NewConfig(cmdLine, data)
 	}),
 
 	ConfigMonitorModule,

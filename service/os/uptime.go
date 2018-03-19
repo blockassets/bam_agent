@@ -51,7 +51,7 @@ func parseUptime(data string) UptimeResult {
 		return UptimeResult{time.Duration(0), err}
 	}
 
-	return UptimeResult{time.Duration(flt), nil}
+	return UptimeResult{time.Duration(flt) * time.Second, nil}
 }
 
 var UptimeModule = fx.Provide(NewUptimeResultFunc)

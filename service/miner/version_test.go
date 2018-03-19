@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewVersion(t *testing.T) {
-	cfg := agent.NewConfig(tool.CmdLine{})
+	cfg := agent.NewConfig(tool.CmdLine{}, []byte("{}"))
 	version := NewVersion(cfg)
 
 	if len(version.V) != 0 {

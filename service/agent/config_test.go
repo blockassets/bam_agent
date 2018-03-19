@@ -23,6 +23,11 @@ const priorConfigVersion = `{
 }
 `
 
+func defaultConfig() []byte {
+	data, _ := ioutil.ReadFile("../../conf/bam_agent.json")
+	return data
+}
+
 func TestNewConfig(t *testing.T) {
 	file, err := ioutil.TempFile("", "agent-config")
 	defer file.Close()
@@ -31,10 +36,17 @@ func TestNewConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	data := defaultConfig()
+	if len(data) == 0 {
+		t.Fatal("no data!")
+	}
+
 	// Test loading an empty file
 	cfg := NewConfig(tool.CmdLine{
-		AgentConfigPath: file.Name(),
-	})
+			AgentConfigPath: file.Name(),
+		},
+		data,
+	)
 
 	if !cfg.Loaded().Monitor.HighLoad.Enabled {
 		t.Fatalf("expected highLoad to be enabled")
@@ -76,7 +88,7 @@ func TestStructChangeToConfig(t *testing.T) {
 
 	cfg := NewConfig(tool.CmdLine{
 		AgentConfigPath: file.Name(),
-	})
+	}, defaultConfig())
 
 	if !cfg.Loaded().Monitor.HighLoad.Enabled {
 		t.Fatalf("expected highLoad to be enabled")
