@@ -16,7 +16,7 @@ func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet min
 			Path:    "/config/dhcp",
 			Methods: []string{http.MethodPut},
 			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bamStat := BAMStatus{"OK", nil}
+				bamStat := BAMStatus{Status: "OK"}
 				httpStat := http.StatusOK
 
 				mgr.Stop()
@@ -29,7 +29,7 @@ func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet min
 
 				if err != nil {
 					httpStat = http.StatusInternalServerError
-					bamStat = BAMStatus{"Error", err}
+					bamStat = BAMStatus{Status: "Error", Error: err}
 				}
 
 				w.WriteHeader(httpStat)

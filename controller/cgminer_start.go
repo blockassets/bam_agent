@@ -15,7 +15,7 @@ func NewCGStartCtrl(mgr monitor.Manager, miner os.Miner) Result {
 			Path:    "/cgminer/start",
 			Methods: []string{http.MethodGet},
 			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bamStat := BAMStatus{"OK", nil}
+				bamStat := BAMStatus{Status: "OK"}
 				httpStat := http.StatusOK
 
 				mgr.Stop()
@@ -24,7 +24,7 @@ func NewCGStartCtrl(mgr monitor.Manager, miner os.Miner) Result {
 				err := miner.Start()
 				if err != nil {
 					httpStat = http.StatusBadGateway
-					bamStat = BAMStatus{"Error", err}
+					bamStat = BAMStatus{Status: "Error", Error: err}
 				}
 
 				w.WriteHeader(httpStat)

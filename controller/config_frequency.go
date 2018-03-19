@@ -16,7 +16,7 @@ func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq miner.ConfigFrequency, 
 			Path:    "/config/frequency",
 			Methods: []string{http.MethodPut},
 			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bamStat := BAMStatus{"OK", nil}
+				bamStat := BAMStatus{Status: "OK"}
 				httpStat := http.StatusOK
 
 				// Declare things ahead of time to make the boolean logic below easier. grrrlang.
@@ -40,7 +40,7 @@ func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq miner.ConfigFrequency, 
 
 				if err != nil {
 					httpStat = http.StatusInternalServerError
-					bamStat = BAMStatus{"Error", err}
+					bamStat = BAMStatus{Status: "Error", Error: err}
 				}
 
 				w.WriteHeader(httpStat)
