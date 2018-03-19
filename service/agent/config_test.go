@@ -83,7 +83,7 @@ func TestStructChangeToConfig(t *testing.T) {
 	}
 
 	// Test that the file is merged on top of the defaults
-	if cfg.Loaded().Controller.Reboot.Delay != time.Duration(10) * time.Second {
+	if cfg.Loaded().Controller.Reboot.Delay != time.Duration(10)*time.Second {
 		t.Fatalf("expected 10s controller reboot delay, got %v", cfg.Loaded().Controller.Reboot.Delay)
 	}
 
@@ -93,7 +93,7 @@ func TestStructChangeToConfig(t *testing.T) {
 
 	// We should have saved the file as part of the load
 	fileData, err := ioutil.ReadFile(file.Name())
-	if ! strings.Contains(string(fileData), ":2222") {
+	if !strings.Contains(string(fileData), ":2222") {
 		t.Fatalf("expected file data to have updated port number")
 	}
 }
