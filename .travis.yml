@@ -7,15 +7,11 @@ install:
   - dep ensure
   - go get github.com/GeertJohan/go.rice/rice
 stages:
-  - test
   - name: deploy
-    if: branch = master
 jobs:
   include:
-  - stage: test
-    script: make test-all
   - stage: deploy
-    script: make arm
+    script: make test-all arm
     before_deploy:
       - git config --local user.name "lookfirst"
       - git config --local user.email "latchkey@gmail.com"
@@ -27,4 +23,5 @@ jobs:
       file: bam_agent-linux-arm.gz
       skip_cleanup: true
       on:
+        branch: master
         repo: blockassets/bam_agent
