@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
@@ -17,6 +19,7 @@ import (
 
 const (
 	defaultUpdateScriptName = "update.sh"
+	execTimeout = time.Duration(60) * time.Second
 )
 
 func NewUpdateCtrl() Result {
@@ -63,9 +66,13 @@ func unZipAndUpdate(file io.Reader, script string) ([]byte, error) {
 		if err == nil {
 			updateSh, err = findUpdateScript(tempDir, script)
 			if err == nil {
-				cmd := exec.Command(*updateSh, "")
+				ctx, cancel := context.WithTimeout(context.Background(), execTimeout)
+				defer cancel()
+
+				cmd := exec.CommandContext(ctx, "/bin/sh", *updateSh)
 				dir, _ := filepath.Split(*updateSh)
 				cmd.Dir = dir
+
 				return cmd.CombinedOutput()
 			}
 		}
