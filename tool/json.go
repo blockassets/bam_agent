@@ -89,17 +89,47 @@ func getRandomizedDuration(duration time.Duration) time.Duration {
 }
 
 /*
-	Merges source into/over destination
+	Recursively merges source into/over destination
 */
 func Merge(src []byte, dst []byte) ([]byte, error) {
-	var mergeMap map[string]interface{}
-	err := jsoniter.Unmarshal(dst, &mergeMap)
+	var err error
+
+	var srcObj interface{}
+	err = jsoniter.Unmarshal(src, &srcObj)
 	if err != nil {
 		return nil, err
 	}
-	err = jsoniter.Unmarshal(src, &mergeMap)
+
+	var dstObj interface{}
+	err = jsoniter.Unmarshal(dst, &dstObj)
 	if err != nil {
 		return nil, err
 	}
-	return jsoniter.Marshal(mergeMap)
+
+	return jsoniter.Marshal(merge1(srcObj, dstObj))
+}
+
+// https://play.golang.org/p/8jlJUbEJKf
+func merge1(x1, x2 interface{}) interface{} {
+	switch x1 := x1.(type) {
+	case map[string]interface{}:
+		x2, ok := x2.(map[string]interface{})
+		if !ok {
+			return x1
+		}
+		for k, v2 := range x2 {
+			if v1, ok := x1[k]; ok {
+				x1[k] = merge1(v1, v2)
+			} else {
+				x1[k] = v2
+			}
+		}
+	case nil:
+		// merge(nil, map[string]interface{...}) -> map[string]interface{...}
+		x2, ok := x2.(map[string]interface{})
+		if ok {
+			return x2
+		}
+	}
+	return x1
 }
