@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"errors"
+
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
@@ -29,7 +31,11 @@ func (mh *LocationHelper) Get() LocationConfig {
 }
 
 func (mh *LocationHelper) Update(mc LocationConfig) error {
-	return mh.Config.Update("location", mc)
+	if mc.Position > 0 && mc.Shelf > 0 {
+		return mh.Config.Update("location", mc)
+	} else {
+		return errors.New("location position and shelf must be greater than 0")
+	}
 }
 
 func NewConfigLocation(cfg Config) ConfigLocation {

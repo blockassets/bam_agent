@@ -16,6 +16,9 @@ func TestLocationHelper_Get(t *testing.T) {
 
 func TestLocationHelper_Update(t *testing.T) {
 	const newPosition = 5
+	const invalidPosition = 0
+	const defaultShelf = 1
+	const invalidShelf = 0
 	mc := NewMockConfig()
 	cfg := NewConfigLocation(mc)
 	data := cfg.Get()
@@ -25,6 +28,7 @@ func TestLocationHelper_Update(t *testing.T) {
 
 	updateCfg := LocationConfig{
 		Position: newPosition,
+		Shelf:    defaultShelf,
 	}
 
 	err := cfg.Update(updateCfg)
@@ -47,4 +51,22 @@ func TestLocationHelper_Update(t *testing.T) {
 	if path != newPos {
 		t.Fatalf("expected position to be %v, got %v", newPosition, path)
 	}
+
+	invalidPositionCfg := LocationConfig{
+		Position: invalidPosition,
+		Shelf:    defaultShelf,
+	}
+	err = cfg.Update(invalidPositionCfg)
+	if err == nil {
+		t.Fatal("Expected an error on an invlalid position")
+	}
+	invalidShelfCfg := LocationConfig{
+		Position: newPosition,
+		Shelf:    invalidShelf,
+	}
+	err = cfg.Update(invalidShelfCfg)
+	if err == nil {
+		t.Fatal("Expected an error on an invlalid shelf")
+	}
+
 }
