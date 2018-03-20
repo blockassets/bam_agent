@@ -76,16 +76,16 @@ func TestFileUpload(t *testing.T) {
 	}
 }
 
+func TestFileUploadDefaultScriptName(t *testing.T) {
+	commonFileUploadTest(t, defaultUpdateScriptName)
+}
+
 func TestFileUploadDifferentScriptName(t *testing.T) {
 	commonFileUploadTest(t, "foo.sh")
 }
 
 func TestFileUploadScriptExecutionFailure(t *testing.T) {
 	commonFileUploadTest(t, "fail.sh")
-}
-
-func TestFileUploadDefaultScriptName(t *testing.T) {
-	commonFileUploadTest(t, defaultUpdateScriptName)
 }
 
 func commonFileUploadTest(t *testing.T, scriptName string) {
@@ -118,8 +118,16 @@ func commonFileUploadTest(t *testing.T, scriptName string) {
 			t.Fatalf("expected failed, got %s", bodyStr)
 		}
 
+		if !strings.Contains(bodyStr, "exit status 1") {
+			t.Fatalf("expected exit status 1, got %s", bodyStr)
+		}
+
 		if resResult.StatusCode != http.StatusInternalServerError {
 			t.Fatalf("expected 500, got %v", resResult.StatusCode)
+		}
+
+		if resResult.Header.Get("Content-Type") != "application/json; charset=utf-8" {
+			t.Fatalf("expected application/json; charset=utf-8, got %v", resResult.Header.Get("Content-Type"))
 		}
 	} else {
 		if !strings.Contains(bodyStr, "got here") {
@@ -128,6 +136,10 @@ func commonFileUploadTest(t *testing.T, scriptName string) {
 
 		if resResult.StatusCode != http.StatusOK {
 			t.Fatalf("expected 200, got %v", resResult.StatusCode)
+		}
+
+		if resResult.Header.Get("Content-Type") != "text/plain" {
+			t.Fatalf("expected text/plain, got %v", resResult.Header.Get("Content-Type"))
 		}
 	}
 }

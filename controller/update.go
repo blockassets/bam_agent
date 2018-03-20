@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"os/exec"
@@ -37,14 +38,18 @@ func NewUpdateCtrl() Result {
 					script = defaultUpdateScriptName
 				}
 
-				gzFileData, _, err := r.FormFile("file")
+				var gzFileData multipart.File
+				gzFileData, _, err = r.FormFile("file")
 				if err == nil {
 					response, err = unZipAndUpdate(gzFileData, script)
+					if err == nil {
+						w.Header().Set("Content-Type", "text/plain")
+					}
 				}
 
 				if err != nil {
 					status = http.StatusInternalServerError
-					response, _ = jsoniter.Marshal(BAMStatus{Status: "Error", Error: err, Message: string(response)})
+					response, _ = jsoniter.Marshal(BAMStatus{Status: "Error", Error: err, Message: fmt.Sprintf("%s\n%s", response, err)})
 				}
 
 				w.WriteHeader(status)
