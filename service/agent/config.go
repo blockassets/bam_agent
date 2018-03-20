@@ -27,9 +27,9 @@ type Config interface {
 
 type ConfigData struct {
 	defaultConfig []byte
-	cmdLine      tool.CmdLine
-	originalData *gabs.Container
-	loadedData   *FileConfig
+	cmdLine       tool.CmdLine
+	originalData  *gabs.Container
+	loadedData    *FileConfig
 	sync.Mutex
 }
 
@@ -119,7 +119,6 @@ var emptyJson = []byte("{}")
 func loadJsonFile(path string) []byte {
 	file, err := os.Open(path)
 	defer file.Close()
-
 
 	if err != nil || os.IsNotExist(err) {
 		return emptyJson

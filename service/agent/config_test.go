@@ -43,8 +43,8 @@ func TestNewConfig(t *testing.T) {
 
 	// Test loading an empty file
 	cfg := NewConfig(tool.CmdLine{
-			AgentConfigPath: file.Name(),
-		},
+		AgentConfigPath: file.Name(),
+	},
 		data,
 	)
 
