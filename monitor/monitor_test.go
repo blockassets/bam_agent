@@ -67,13 +67,14 @@ func TestStopMonitors(t *testing.T) {
 
 	// Test they start and run
 	stopGroup1 := StartMonitors(context.Background(), monitors)
-	time.Sleep(15 * time.Millisecond)
+	time.Sleep(18 * time.Millisecond)
 	stopGroup1()
 	// make sure they stop
 	time.Sleep(15 * time.Millisecond)
 
-	if count1 != 1 {
-		t.Fatalf("expected count1 to be 1, got %v", count1)
+	// Timing sensitive
+	if count1 == 0 {
+		t.Fatalf("expected count1 to be >=1, got %v", count1)
 	}
 
 	if count2 != 0 {
