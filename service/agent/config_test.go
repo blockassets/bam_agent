@@ -23,6 +23,26 @@ const priorConfigVersion = `{
 }
 `
 
+const failingConfig = `
+{
+  "cmdLine": {
+    "port": ":1111"
+  },
+  "controller": {
+    "reboot": {
+      "delay": "5s"
+    }
+  },
+  "monitor": {
+    "load": {
+      "period_secs": 60,
+      "high_load_Mark": 5,
+      "enabled": true
+    }
+  }
+}
+`
+
 func defaultConfig() []byte {
 	data, _ := ioutil.ReadFile("../../conf/bam_agent.json")
 	return data
@@ -69,6 +89,33 @@ func TestNewConfig(t *testing.T) {
 
 	if fileConfig.Controller.Reboot.Delay != time.Duration(5)*time.Second {
 		t.Fatalf("expected 5s and got %v", fileConfig.Controller.Reboot.Delay)
+	}
+}
+
+func TestLoadingOldConfig(t *testing.T) {
+	file, err := ioutil.TempFile("", "agent-config")
+	defer os.Remove(file.Name())
+
+	// Write out an old version of a file
+	ioutil.WriteFile(file.Name(), []byte(failingConfig), 644)
+	file.Close()
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cfg := NewConfig(tool.CmdLine{
+		AgentConfigPath: file.Name(),
+	}, defaultConfig())
+
+	if !cfg.Loaded().Monitor.HighLoad.Enabled {
+		t.Fatalf("expected highLoad to be enabled")
+	}
+
+	// We should have saved the file as part of the load
+	fileData, err := ioutil.ReadFile(file.Name())
+	if !strings.Contains(string(fileData), "highLoad") {
+		t.Fatalf("expected file data to have updated port number")
 	}
 }
 
