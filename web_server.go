@@ -15,17 +15,17 @@ import (
 )
 
 type WebServer struct {
-	echo  *echo.Echo
-	ctrl  controller.Manager
-	state overseer.State
+	echo          *echo.Echo
+	ctrl          controller.Manager
+	state         overseer.State
 	staticRiceBox tool.StaticRiceBox
 }
 
 func NewWebServer(e *echo.Echo, ctrl controller.Manager, state overseer.State, staticRiceBox tool.StaticRiceBox) *WebServer {
 	return &WebServer{
-		echo:  e,
-		ctrl:  ctrl,
-		state: state,
+		echo:          e,
+		ctrl:          ctrl,
+		state:         state,
 		staticRiceBox: staticRiceBox,
 	}
 }
