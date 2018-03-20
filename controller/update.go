@@ -69,7 +69,7 @@ func unZipAndUpdate(file io.Reader, script string) ([]byte, error) {
 				ctx, cancel := context.WithTimeout(context.Background(), execTimeout)
 				defer cancel()
 
-				cmd := exec.CommandContext(ctx, *updateSh, "")
+				cmd := exec.CommandContext(ctx, "/bin/sh", *updateSh)
 				dir, _ := filepath.Split(*updateSh)
 				cmd.Dir = dir
 
