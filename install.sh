@@ -23,7 +23,7 @@ dowork() {
 	echo "----------- ${ipaddr} start"
 	sshpass -e scp -o StrictHostKeychecking=no ${BINARY}.gz root@$ipaddr:${INSTALL_DIR}
 	sshpass -e scp -o StrictHostKeychecking=no bam_agent.service root@$ipaddr:/etc/systemd/system
-	sshpass -e ssh -o StrictHostKeychecking=no root@$ipaddr "systemctl stop ${SERVICE}; rm -f ${INSTALL_DIR}/${BINARY}; gunzip ${INSTALL_DIR}/${BINARY}.gz; chmod ugo+x ${INSTALL_DIR}/${BINARY}; systemctl daemon-reload; systemctl enable ${SERVICE}; systemctl start ${SERVICE}"
+	sshpass -e ssh -o StrictHostKeychecking=no root@$ipaddr "systemctl stop ${SERVICE}; rm -f ${INSTALL_DIR}/${BINARY}; gunzip ${INSTALL_DIR}/${BINARY}.gz; chmod ugo+x ${INSTALL_DIR}/${BINARY}; systemctl enable ${SERVICE}; systemctl daemon-reload; systemctl start ${SERVICE}"
 	echo "----------- ${ipaddr} finish"
 }
 
