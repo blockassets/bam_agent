@@ -12,13 +12,14 @@ import (
 )
 
 type StatusResponse struct {
-	Agent  *string       `json:"agent"`
-	Miner  *string       `json:"miner"`
-	Uptime time.Duration `json:"uptime"`
-	Mac    *string       `json:"mac"`
+	Agent    *string              `json:"agent"`
+	Miner    *string              `json:"miner"`
+	Uptime   time.Duration        `json:"uptime"`
+	Mac      *string              `json:"mac"`
+	Location agent.LocationConfig `json:"location"`
 }
 
-func NewStatusCtrl(agentVersion agent.Version, minerVersion miner.Version, getUptimeResult os.UptimeResultFunc, netInfo os.NetInfo) Result {
+func NewStatusCtrl(agentVersion agent.Version, minerVersion miner.Version, getUptimeResult os.UptimeResultFunc, netInfo os.NetInfo, location agent.ConfigLocation) Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/status",
@@ -27,10 +28,11 @@ func NewStatusCtrl(agentVersion agent.Version, minerVersion miner.Version, getUp
 				uptime := getUptimeResult()
 
 				status := StatusResponse{
-					Agent:  tool.TrimToNil(agentVersion.V),
-					Miner:  tool.TrimToNil(minerVersion.V),
-					Uptime: uptime.Duration,
-					Mac:    netInfo.GetMacAddress(),
+					Agent:    tool.TrimToNil(agentVersion.V),
+					Miner:    tool.TrimToNil(minerVersion.V),
+					Uptime:   uptime.Duration,
+					Mac:      netInfo.GetMacAddress(),
+					Location: location.Get(),
 				}
 
 				w.WriteHeader(http.StatusOK)

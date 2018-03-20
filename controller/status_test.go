@@ -21,7 +21,10 @@ func TestNewStatusCtrl(t *testing.T) {
 	}
 
 	netInfo := os.NewMockNetInfo()
-	result := NewStatusCtrl(agent.Version{V: "1"}, miner.Version{V: "2"}, uptimeFunc, &netInfo)
+	mc := agent.NewMockConfig()
+	cfg := agent.NewConfigLocation(mc)
+
+	result := NewStatusCtrl(agent.Version{V: "1"}, miner.Version{V: "2"}, uptimeFunc, &netInfo, cfg)
 	ctrl := result.Controller
 
 	if ctrl.Path != "/status" {
@@ -63,5 +66,8 @@ func TestNewStatusCtrl(t *testing.T) {
 
 	if status.Mac == nil {
 		t.Fatalf("expected not nil for Mac, got %v", status.Mac)
+	}
+	if status.Location.Position != 1 {
+		t.Fatalf("expected 1 for location position, got %v", status.Location.Position)
 	}
 }
