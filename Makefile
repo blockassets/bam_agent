@@ -43,6 +43,9 @@ fmt:
 rice:
 	rice append --exec $(BINARY_LINUX)
 
+rice-build:
+	rice append --exec $(BINARY)
+
 clean:
 	@rm -f $(BINARY) $(BINARY_LINUX).gz
 
