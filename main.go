@@ -17,7 +17,9 @@ import (
 )
 
 var (
-	cmdLine tool.CmdLine
+	cmdLine        tool.CmdLine
+	monitorManager monitor.Manager
+	webManager     *WebServer
 )
 
 const (
@@ -31,10 +33,12 @@ func setup(version agent.Version) {
 }
 
 func webServer(ws *WebServer) {
+	webManager = ws
 	ws.Start()
 }
 
 func monitors(mgr monitor.Manager) {
+	monitorManager = mgr
 	mgr.Start()
 }
 
@@ -119,6 +123,17 @@ func overseerRun(port string) {
 			User:     ghUser,
 			Repo:     ghRepo,
 			Interval: interval,
+		},
+		// Try to prevent /reboot from being called during an upgrade
+		PreUpgrade: func(tempBinaryPath string) error {
+			if monitorManager != nil {
+				monitorManager.Stop()
+			}
+
+			if webManager != nil {
+				webManager.Stop()
+			}
+			return nil
 		},
 	})
 }

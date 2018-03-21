@@ -20,7 +20,7 @@ import (
 
 const (
 	defaultUpdateScriptName = "update.sh"
-	execTimeout = time.Duration(60) * time.Second
+	execTimeout             = time.Duration(60) * time.Second
 )
 
 func NewUpdateCtrl() Result {
