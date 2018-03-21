@@ -172,6 +172,8 @@ updates to the miners.
 
 Returns the stdout/stderr of the script.
 
+Example: `curl -F "script=update.sh" -F "file=@/tmp/update.tar.gz" http://IP:1111/update`
+
 ## Monitors
 
 Monitors allow us to execute code periodically.
