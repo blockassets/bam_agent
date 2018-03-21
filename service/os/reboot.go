@@ -12,7 +12,7 @@ type Reboot interface {
 }
 
 type RebootData struct {
-	run func(cmd string, arg string) error
+	run  func(cmd string, arg string) error
 	sync func(cmd string) error
 }
 
