@@ -11,11 +11,7 @@ import (
 
 func makeHandler() http.Handler {
 	registry := prometheus.NewRegistry()
-	nc, err := collector.NewNodeCollector()
-	if err != nil {
-		log.Fatalf("Couldn't create collector: %s", err)
-	}
-
+	nc, _ := collector.NewNodeCollector()
 	registry.Register(nc)
 
 	return promhttp.HandlerFor(registry,
