@@ -16,7 +16,7 @@ func makeHandler() http.Handler {
 		log.Fatalf("Couldn't create collector: %s", err)
 	}
 
-	registry.MustRegister(nc)
+	registry.Register(nc)
 
 	return promhttp.HandlerFor(registry,
 		promhttp.HandlerOpts{
