@@ -6,7 +6,6 @@ import (
 	"github.com/blockassets/node_exporter/collector"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/log"
 )
 
 func makeHandler() http.Handler {
@@ -16,7 +15,7 @@ func makeHandler() http.Handler {
 
 	return promhttp.HandlerFor(registry,
 		promhttp.HandlerOpts{
-			ErrorLog:      log.NewErrorLogger(),
+			ErrorLog:      nil,
 			ErrorHandling: promhttp.ContinueOnError,
 		},
 	)
