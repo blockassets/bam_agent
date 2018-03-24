@@ -19,7 +19,7 @@ func TestNewRebootCtrl(t *testing.T) {
 	ctrl := result.Controller
 
 	if ctrl.Path != "/reboot" {
-		t.Fatalf("expected /config/pools, got %s", ctrl.Path)
+		t.Fatalf("expected /reboot, got %s", ctrl.Path)
 	}
 
 	if len(ctrl.Methods) != 1 {
