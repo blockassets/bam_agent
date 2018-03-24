@@ -1,4 +1,4 @@
-package miner
+package cgminer
 
 // Type insurance
 var _ Config = &MockConfig{}

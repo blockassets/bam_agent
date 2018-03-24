@@ -9,12 +9,13 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/json-iterator/go"
 )
 
 func TestNewConfigFrequencyCtrl(t *testing.T) {
-	cfg := miner.NewMockConfig("")
-	cfgFreq := miner.NewConfigFrequency(&cfg)
+	cfg := cgminer.NewMockConfig("")
+	cfgFreq := cgminer.NewConfigFrequency(&cfg)
 	client := miner.NewMockMinerClient(-1)
 	mgr := monitor.NewMockManager()
 

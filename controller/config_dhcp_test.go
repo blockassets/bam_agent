@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	sos "github.com/blockassets/bam_agent/service/os"
 	"github.com/json-iterator/go"
 )
@@ -23,8 +23,8 @@ func TestNewConfigDHCPCtrl(t *testing.T) {
 	}
 
 	networking := &sos.NetworkingData{File: file.Name()}
-	cfg := miner.NewMockConfig("")
-	cfgNet := miner.NewConfigNetwork(&cfg)
+	cfg := cgminer.NewMockConfig("")
+	cfgNet := cgminer.NewConfigNetwork(&cfg)
 	mgr := monitor.NewMockManager()
 
 	result := NewConfigDHCPCtrl(&mgr, networking, cfgNet)

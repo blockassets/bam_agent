@@ -1,4 +1,4 @@
-package miner
+package cgminer
 
 import (
 	"log"

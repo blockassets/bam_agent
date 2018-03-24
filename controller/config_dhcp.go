@@ -4,13 +4,13 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/blockassets/bam_agent/service/os"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner.ConfigNetwork) Result {
+func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet cgminer.ConfigNetwork) Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/config/dhcp",
@@ -22,7 +22,7 @@ func NewConfigDHCPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet min
 				mgr.Stop()
 				defer mgr.Start()
 
-				err := cfgNet.Save(&miner.NetworkData{})
+				err := cfgNet.Save(&cgminer.NetworkData{})
 				if err == nil {
 					err = networking.SetDHCP()
 				}

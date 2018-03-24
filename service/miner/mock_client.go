@@ -24,25 +24,11 @@ type MockMinerClient struct {
 
 	test     int
 	accepted int64
-	devs     []Dev
 }
 
 func (c *MockMinerClient) Quit() error {
 	c.CalledQuit = true
 	return nil
-}
-
-func (c *MockMinerClient) Devs() (*[]Dev, error) {
-	c.CalledDevs = true
-	switch c.test {
-	case Under100Temp:
-		c.devs[0].Temperature = 90.0
-	case Exactly100Temp:
-		c.devs[0].Temperature = 100.0
-	case Over100Temp:
-		c.devs[0].Temperature = 101.0
-	}
-	return &c.devs, nil
 }
 
 func (c *MockMinerClient) GetAccepted() (int64, error) {
@@ -66,18 +52,20 @@ func (c *MockMinerClient) GetAccepted() (int64, error) {
 }
 
 func (c *MockMinerClient) GetTemp() (float64, error) {
-	devs, err := c.Devs()
-	if err != nil {
-		return -1, err
+	switch c.test {
+	case Under100Temp:
+		return 90.0, nil
+	case Exactly100Temp:
+		return 100.0, nil
+	case Over100Temp:
+		return 101.0, nil
 	}
-	dev := (*devs)[0]
-	return dev.Temperature, nil
+	return -1, nil
 }
 
 func NewMockMinerClient(test int) MockMinerClient {
 	return MockMinerClient{
 		test:     test,
 		accepted: 0,
-		devs:     make([]Dev, 1),
 	}
 }

@@ -6,12 +6,13 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 	"go.uber.org/fx"
 )
 
-func NewPutPoolsCtrl(mgr monitor.Manager, poolCfg miner.ConfigPools, client miner.Client) Result {
+func NewPutPoolsCtrl(mgr monitor.Manager, poolCfg cgminer.ConfigPools, client miner.Client) Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/config/pools",
@@ -29,7 +30,7 @@ func NewPutPoolsCtrl(mgr monitor.Manager, poolCfg miner.ConfigPools, client mine
 					mgr.Stop()
 					defer mgr.Start()
 
-					var pools *miner.PoolAddresses
+					var pools *cgminer.PoolAddresses
 					pools, err = poolCfg.Parse(data)
 					if err == nil {
 						err = poolCfg.Save(pools)
@@ -52,7 +53,7 @@ func NewPutPoolsCtrl(mgr monitor.Manager, poolCfg miner.ConfigPools, client mine
 	}
 }
 
-func NewGetPoolsCtrl(poolCfg miner.ConfigPools) Result {
+func NewGetPoolsCtrl(poolCfg cgminer.ConfigPools) Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/config/pools",

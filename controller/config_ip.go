@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/blockassets/bam_agent/monitor"
-	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/blockassets/bam_agent/service/os"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner.ConfigNetwork) Result {
+func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet cgminer.ConfigNetwork) Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/config/ip",
@@ -29,7 +29,7 @@ func NewConfigIPCtrl(mgr monitor.Manager, networking os.Networking, cfgNet miner
 					mgr.Stop()
 					defer mgr.Start()
 
-					var netData *miner.NetworkData
+					var netData *cgminer.NetworkData
 					netData, err = cfgNet.Parse(data)
 
 					if err == nil {
