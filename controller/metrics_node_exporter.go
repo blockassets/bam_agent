@@ -10,8 +10,11 @@ import (
 
 func makeHandler() http.Handler {
 	registry := prometheus.NewRegistry()
-	nc, _ := collector.NewNodeCollector()
-	registry.Register(nc)
+
+	nc, err := collector.NewNodeCollector()
+	if err == nil {
+		registry.Register(nc)
+	}
 
 	return promhttp.HandlerFor(registry,
 		promhttp.HandlerOpts{
