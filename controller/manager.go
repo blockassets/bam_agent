@@ -79,10 +79,11 @@ var Module = fx.Options(
 		NewConfigDHCPCtrl,
 		NewConfigFrequencyCtrl,
 		NewConfigIPCtrl,
+		NewPutLocationCtrl,
 		NewGetPoolsCtrl,
+		NewNodeExporterCtrl,
 		NewRebootCtrl,
 		NewStatusCtrl,
-		NewPutLocationCtrl,
 		NewUpdateCtrl,
 	),
 )
