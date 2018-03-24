@@ -8,7 +8,7 @@ import (
 
 /*
 	Sadly, travis doesn't have /proc/stat so NE fails there. Thus, we can't do full testing.
- */
+*/
 func TestNewNodeExporterCtrl(t *testing.T) {
 	result := NewNodeExporterCtrl()
 	ctrl := result.Controller
