@@ -81,13 +81,19 @@
   branch = "master"
   name = "github.com/blockassets/cgminer_client"
   packages = ["."]
-  revision = "06e2deda689afbf0de638469c4b07f1cc1e908c3"
+  revision = "74d91ee226eb6ed3b810534373c6c2bb16c31e46"
 
 [[projects]]
-  branch = "blockassets"
-  name = "github.com/blockassets/node_exporter"
-  packages = ["collector"]
-  revision = "90ea0bf5569c27b65e14dbdab596932251a0876c"
+  name = "github.com/blockassets/cgminer_exporter"
+  packages = ["exporter"]
+  revision = "0029337d86dea6830870aaab1a6bdc7f8023f993"
+  version = "20180324-102338-0029337-arm"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/blockassets/prometheus_helper"
+  packages = ["."]
+  revision = "abb70902360d2f3e40ade51b29c1d23f5f88082d"
 
 [[projects]]
   name = "github.com/coreos/go-systemd"
@@ -313,10 +319,13 @@
   revision = "e4aa40a9169a88835b849a6efb71e05dc04b88f0"
 
 [[projects]]
+  branch = "master"
   name = "github.com/prometheus/node_exporter"
-  packages = ["collector/ganglia"]
-  revision = "98bc64930d34878b84a0f87dfe6e1a6da61e532d"
-  version = "v0.15.2"
+  packages = [
+    "collector",
+    "collector/ganglia"
+  ]
+  revision = "1f11a86d594173ca1146ac1d1715cd6263e9959d"
 
 [[projects]]
   branch = "master"
@@ -439,6 +448,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7700dcc5ec9f0af8690ef30b232ae99d71e5ad6f085b14bac0667302de076ad2"
+  inputs-digest = "ee9d777e98d073fb56ba634b911e0e4f2e667f9ba02298cd601e7d5e9dbe1653"
   solver-name = "gps-cdcl"
   solver-version = 1

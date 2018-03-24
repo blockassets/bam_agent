@@ -8,7 +8,7 @@ const (
 )
 
 // Type insurance
-var _ CgClient = &MockCgClient{}
+var _ cgminer_client.Client = &MockCgClient{}
 
 type MockCgClient struct {
 	quitCalled bool
@@ -25,18 +25,20 @@ func (cgClient *MockCgClient) Restart() error {
 }
 
 func (cgClient *MockCgClient) Summary() (*cgminer_client.Summary, error) {
-	return nil, nil
+	return &cgminer_client.Summary{}, nil
 }
 
 func (cgClient *MockCgClient) ChipStat() (*[]cgminer_client.ChipStat, error) {
-	return nil, nil
+	cs1 := cgminer_client.ChipStat{}
+	chipStats := &[]cgminer_client.ChipStat{cs1}
+	return chipStats, nil
 }
 
 func (cgClient *MockCgClient) Devs() (*[]cgminer_client.Dev, error) {
 	return &cgClient.devs, nil
 }
 
-func newMockCgClient() *MockCgClient {
+func NewMockCgClient() *MockCgClient {
 	devs := make([]cgminer_client.Dev, 1)
 	devs[0].Accepted = testAccepted
 	devs[0].Temperature = testTemp

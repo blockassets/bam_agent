@@ -3,25 +3,23 @@ package controller
 import (
 	"net/http"
 
+	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/cgminer_client"
+	"github.com/blockassets/cgminer_exporter/exporter"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/node_exporter/collector"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-func NewNodeExporterCtrl() Result {
+func NewCgMinerExporterCtrl(client cgminer_client.Client, version miner.Version) Result {
 	return Result{
 		Controller: &Controller{
-			Path:    "/metrics/node_exporter",
+			Path:    "/metrics/cgminer_exporter",
 			Methods: []string{http.MethodGet},
 			Handler: func() http.Handler {
-				kingpin.Parse() // lame
-				registry := prometheus.NewRegistry()
+				exporter := exporter.NewExporter(client, version.V)
 
-				nc, err := collector.NewNodeCollector("cpu", "filesystem", "loadavg", "meminfo", "netdev", "netstat", "stat", "time", "uname")
-				if err == nil {
-					registry.Register(nc)
-				}
+				registry := prometheus.NewRegistry()
+				registry.Register(exporter)
 
 				return promhttp.HandlerFor(registry,
 					promhttp.HandlerOpts{

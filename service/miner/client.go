@@ -15,7 +15,7 @@ var ClientModule = fx.Options(
 	cgminer.ClientModule,
 
 	// TODO: In the future, we may return different types of clients.
-	fx.Provide(func(client *cgminer.ClientWrapper) Client {
+	fx.Provide(func(client *cgminer.Wrapper) Client {
 		return client
 	}),
 )

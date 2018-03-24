@@ -2,15 +2,10 @@ package cgminer
 
 import (
 	"testing"
-
-	"github.com/blockassets/cgminer_client"
 )
 
-// Type insurance
-var _ CgClient = &cgminer_client.Client{}
-
 func TestCGMinerClient_Quit(t *testing.T) {
-	cgClient := newMockCgClient()
+	cgClient := NewMockCgClient()
 	client := NewClientWrapper(cgClient)
 
 	err := client.Quit()
@@ -23,7 +18,7 @@ func TestCGMinerClient_Quit(t *testing.T) {
 }
 
 func TestCGMinerClient_GetAccepted(t *testing.T) {
-	cgClient := newMockCgClient()
+	cgClient := NewMockCgClient()
 	client := NewClientWrapper(cgClient)
 
 	accepted, err := client.GetAccepted()
@@ -36,7 +31,7 @@ func TestCGMinerClient_GetAccepted(t *testing.T) {
 }
 
 func TestCGMinerClient_GetTemp(t *testing.T) {
-	cgClient := newMockCgClient()
+	cgClient := NewMockCgClient()
 	client := NewClientWrapper(cgClient)
 
 	temp, err := client.GetTemp()
