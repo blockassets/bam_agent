@@ -42,5 +42,8 @@ func NewMockCgClient() *MockCgClient {
 	devs := make([]cgminer_client.Dev, 1)
 	devs[0].Accepted = testAccepted
 	devs[0].Temperature = testTemp
+	devs[0].Status = "Alive"
+	devs[0].Enabled = "Y"
+
 	return &MockCgClient{devs: devs}
 }
