@@ -86,8 +86,8 @@
 [[projects]]
   name = "github.com/blockassets/cgminer_exporter"
   packages = ["exporter"]
-  revision = "0029337d86dea6830870aaab1a6bdc7f8023f993"
-  version = "20180324-102338-0029337-arm"
+  revision = "203658fe774d520621106f99a16e0d5a23a0e11d"
+  version = "20180325-025640-203658f-arm"
 
 [[projects]]
   branch = "master"
