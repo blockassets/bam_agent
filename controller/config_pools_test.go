@@ -9,6 +9,7 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/json-iterator/go"
 )
 
@@ -19,8 +20,8 @@ const (
 func TestNewConfigPoolsCtrl(t *testing.T) {
 
 	client := miner.NewMockMinerClient(-1)
-	cfg := miner.NewMockConfig(miner.DefaultConfigFile)
-	ph := miner.NewPoolHelper(&cfg)
+	cfg := cgminer.NewMockConfig(cgminer.DefaultConfigFile)
+	ph := cgminer.NewPoolHelper(&cfg)
 	mgr := monitor.NewMockManager()
 
 	result := NewPutPoolsCtrl(&mgr, ph, &client)
@@ -83,8 +84,8 @@ func TestNewConfigPoolsCtrl(t *testing.T) {
 }
 
 func TestNewGetPoolsCtrl(t *testing.T) {
-	cfg := miner.NewMockConfig(testPoolData)
-	ph := &miner.PoolHelper{Config: &cfg}
+	cfg := cgminer.NewMockConfig(testPoolData)
+	ph := cgminer.NewPoolHelper(&cfg)
 
 	result := NewGetPoolsCtrl(ph)
 	ctrl := result.Controller

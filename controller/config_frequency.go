@@ -6,11 +6,12 @@ import (
 
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/json-iterator/go"
 )
 
-func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq miner.ConfigFrequency, client miner.Client) Result {
+func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq cgminer.ConfigFrequency, client miner.Client) Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/config/frequency",
@@ -28,7 +29,7 @@ func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq miner.ConfigFrequency, 
 					mgr.Stop()
 					defer mgr.Start()
 
-					var freq *miner.FrequencyData
+					var freq *cgminer.FrequencyData
 					freq, err = cfgFreq.Parse(data)
 					if err == nil {
 						err = cfgFreq.Save(freq.Frequency)

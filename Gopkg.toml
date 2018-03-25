@@ -32,5 +32,9 @@
   branch = "master"
 
 [[constraint]]
-  name = "github.com/blockassets/node_exporter"
-  branch = "blockassets"
+  name = "github.com/prometheus/node_exporter"
+  branch = "master"
+
+[[constraint]]
+  name = "github.com/blockassets/cgminer_exporter"
+  branch = "master"

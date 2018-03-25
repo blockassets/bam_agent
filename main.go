@@ -10,6 +10,7 @@ import (
 	"github.com/blockassets/bam_agent/monitor"
 	"github.com/blockassets/bam_agent/service/agent"
 	"github.com/blockassets/bam_agent/service/miner"
+	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/blockassets/bam_agent/service/os"
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/jpillora/overseer"
@@ -69,7 +70,7 @@ func program(state overseer.State) {
 		agent.ConfigModule,
 		agent.VersionModule,
 
-		miner.ConfigModule,
+		cgminer.ConfigModule,
 		miner.ClientModule,
 		miner.VersionModule,
 
