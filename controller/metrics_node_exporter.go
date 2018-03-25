@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -9,12 +11,14 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-func nodeExporterHandler() http.Handler {
+func nodeExporterHandler(filters []string) http.Handler {
 	registry := prometheus.NewRegistry()
 
-	nc, err := collector.NewNodeCollector("cpu", "filesystem", "loadavg", "meminfo", "netdev", "netstat", "stat", "time", "uname")
+	nc, err := collector.NewNodeCollector(filters...)
 	if err == nil {
 		registry.Register(nc)
+	} else {
+		fmt.Println(err)
 	}
 
 	return promhttp.HandlerFor(registry,
@@ -25,17 +29,21 @@ func nodeExporterHandler() http.Handler {
 	)
 }
 
+var collectors = []string{"cpu", "filesystem", "loadavg", "meminfo", "netdev", "netstat", "stat", "time", "uname"}
+
 func NewNodeExporterCtrl() Result {
 	return Result{
 		Controller: &Controller{
 			Path:    "/metrics/node_exporter",
 			Methods: []string{http.MethodGet},
 			Handler: func() http.Handler {
-				// lame
-				kingpin.CommandLine.Terminate(nil)
+				// lame workaround due to node_exporter depending on kingpin
+				oldArgs := os.Args
+				os.Args = []string{""}
 				kingpin.Parse()
+				os.Args = oldArgs
 
-				return nodeExporterHandler()
+				return nodeExporterHandler(collectors)
 			}(),
 		},
 	}

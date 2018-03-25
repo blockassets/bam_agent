@@ -1,14 +1,13 @@
 package controller
 
 import (
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
-/*
-	Sadly, travis doesn't have /proc/stat so NE fails there. Thus, we can't do full testing.
-*/
 func TestNewNodeExporterCtrl(t *testing.T) {
 	result := NewNodeExporterCtrl()
 	ctrl := result.Controller
@@ -27,10 +26,17 @@ func TestNewNodeExporterCtrl(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
 	w := httptest.NewRecorder()
-	nodeExporterHandler().ServeHTTP(w, req)
+	nodeExporterHandler([]string{"cpu"}).ServeHTTP(w, req)
 
 	resp := w.Result()
 	if resp.Status != "200 OK" {
 		t.Fatalf("expected OK and got %s", resp.Status)
+	}
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	bodyStr := string(body)
+
+	if !strings.Contains(bodyStr, "# TYPE node_cpu_seconds_total counter") {
+		t.Fatalf("expected '# TYPE node_cpu_seconds_total counter', got %s", bodyStr)
 	}
 }
