@@ -27,7 +27,7 @@ func TestNewNodeExporterCtrl(t *testing.T) {
 
 	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
 	w := httptest.NewRecorder()
-	ctrl.Handler.ServeHTTP(w, req)
+	nodeExporterHandler().ServeHTTP(w, req)
 
 	resp := w.Result()
 	if resp.Status != "200 OK" {
