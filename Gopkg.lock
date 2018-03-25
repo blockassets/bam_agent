@@ -84,16 +84,16 @@
   revision = "74d91ee226eb6ed3b810534373c6c2bb16c31e46"
 
 [[projects]]
+  branch = "master"
   name = "github.com/blockassets/cgminer_exporter"
   packages = ["exporter"]
-  revision = "203658fe774d520621106f99a16e0d5a23a0e11d"
-  version = "20180325-025640-203658f-arm"
+  revision = "377dcfcf7e694aa40e2ed7dbeaa8e84696b572ac"
 
 [[projects]]
   branch = "master"
   name = "github.com/blockassets/prometheus_helper"
   packages = ["."]
-  revision = "abb70902360d2f3e40ade51b29c1d23f5f88082d"
+  revision = "88e9aac4ad60eb82f019ed07c09d0199eb79e530"
 
 [[projects]]
   name = "github.com/coreos/go-systemd"
