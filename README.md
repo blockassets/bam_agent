@@ -3,7 +3,8 @@
 # Block Assets Manager (BAM) Agent
 
 This is an agent that is intended to be installed on miners to help facilitate management of them via HTTP as well 
-as monitoring for issues internal to the miner.
+as monitoring for issues internal to the miner. The documentation below assumes you have the latest version of the
+agent installed.
 
 Currently, the agent targets the BW-L21 miner, but in the future we will target all miners. Pull requests welcome.
 
@@ -201,3 +202,43 @@ Disabled by default. Periodically quit the miner app to free up memory and start
 ### Reboot
 
 Disabled by default. Periodically reboot the entire miner to free up memory and start fresh.
+
+## Prometheus exporters
+
+[Prometheus](https://prometheus.io) is an amazing metrics collection system. Combine it with 
+[Grafana](https://grafana.com) and you have an extremely powerful visualization tool for your data.
+
+Included in the agent are two [prometheus exporters](https://prometheus.io/docs/instrumenting/exporters/):
+
+1. [node_exporter](https://github.com/prometheus/node_exporter) (operating system metrics)
+2. [cgminer_exporter](https://github.com/blockassets/cgminer_exporter) (cgminer metrics)
+
+By including them in the agent, you don't need to install those binaries separately. In order to configure
+prometheus, use configuration like this:
+
+`prometheus.yml`
+
+```yml
+  - job_name: 'cgminer_exporter'
+    metrics_path: '/metrics/cgminer_exporter'
+    file_sd_configs:
+      - files:
+        - 'workers.json'
+  - job_name: 'node_exporter'
+    metrics_path: '/metrics/node_exporter'
+    file_sd_configs:
+      - files:
+        - 'workers.json'
+```
+
+`workers.json`
+
+```
+[{
+        "targets": [
+          "10.10.0.11:1111",
+          "10.10.0.12:1111",
+          "10.10.0.13:1111"
+        ]
+}]
+```
