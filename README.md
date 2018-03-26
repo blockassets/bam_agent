@@ -145,6 +145,14 @@ Updates `/usr/app/conf.default` and `/etc/network/interfaces`
 
 Call `/reboot` to make the changes take effect
 
+### `PUT /config/location`
+
+Store the physical location of the miner. This is saved in `/etc/bam_agent.json` and exposed in the `/status` call.
+
+```
+{"facility": "", "rack": "", "row": "", "shelf": 1, "position": 1}
+```
+
 ### `GET /status`
 
 ```
@@ -152,7 +160,14 @@ Call `/reboot` to make the changes take effect
   "agent": "39892e1 2018-03-06 02:06:09",
   "miner": "value in /usr/app/version.txt",
   "uptime": "0s",
-  "mac": "ab:bc:32:b2:81:79"
+  "mac": "ab:bc:32:b2:81:79",
+  "location": {
+    "facility": "",
+    "rack": "",
+    "row": "",
+    "shelf": 1,
+    "position": 1
+  }
 }
 ```
 
@@ -206,15 +221,16 @@ Disabled by default. Periodically reboot the entire miner to free up memory and 
 ## Prometheus exporters
 
 [Prometheus](https://prometheus.io) is an amazing metrics collection system. Combine it with 
-[Grafana](https://grafana.com) and you have an extremely powerful visualization tool for your data.
+[Grafana](https://grafana.com) and you have an extremely powerful visualization and performance tracking tool for your miners.
 
 Included in the agent are two [prometheus exporters](https://prometheus.io/docs/instrumenting/exporters/):
 
 1. [node_exporter](https://github.com/prometheus/node_exporter) (operating system metrics)
 2. [cgminer_exporter](https://github.com/blockassets/cgminer_exporter) (cgminer metrics)
 
-By including them in the agent, you don't need to install those binaries separately. In order to configure
-prometheus, use configuration like this:
+By including them in the agent, you don't need to install those binaries separately.
+
+In order to configure prometheus, use configuration like this:
 
 `prometheus.yml`
 
