@@ -21,7 +21,7 @@ func NewLoadMonitor(config HighLoadConfig, retriever os.StatRetriever, reboot os
 			OnTick: func() TickerFunc {
 				return func(ctx context.Context) {
 					loads, err := retriever.GetLoadData()
-					if err == nil && loads.FiveMinAvg > config.HighLoadMark {
+					if err == nil && loads.OneMinAvg > config.HighLoadMark {
 						reboot.Reboot()
 					}
 				}

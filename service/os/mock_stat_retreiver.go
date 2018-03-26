@@ -33,9 +33,9 @@ func NewMockStatRetriever(dataSet int) MockStatRetriever {
 	case LevelBelowFive:
 		data = "0.0 4.999 0.0 1234 1234"
 	case LevelExactlyFive:
-		data = "0.0 5.0 0.0 1234 1234"
+		data = "5.0 5.0 0.0 1234 1234"
 	case LevelAboveFive:
-		data = "0.0 5.1 0.0 1234 1234"
+		data = "5.1 5.1 0.0 1234 1234"
 	case LevelMalformed:
 		data = "a b c d emnf,masfd"
 	}
