@@ -16,12 +16,14 @@ import (
 const (
 	testLocationData = `{
     "facility": "",
+    "rack": "",
     "row": "",
     "shelf": 5,
     "position": 5
 }`
 	testZeroShelfData = `{
     "facility": "",
+    "rack": "",
     "row": "",
     "shelf": 0,
     "position": 5
@@ -29,6 +31,7 @@ const (
 
 	testZeroPositionData = `{
     "facility": "",
+    "rack": "",
     "row": "",
     "shelf": 5,
     "position": 0

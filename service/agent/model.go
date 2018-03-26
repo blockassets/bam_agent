@@ -16,6 +16,7 @@ type FileConfig struct {
 // Location
 type LocationConfig struct {
 	Facility string `json:"facility"`
+	Rack     string `json:"rack"`
 	Row      string `json:"row"`
 	Shelf    int    `json:"shelf"`
 	Position int    `json:"position"`
