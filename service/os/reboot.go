@@ -13,23 +13,19 @@ type Reboot interface {
 
 type RebootData struct {
 	run  func(cmd string, arg string) error
-	sync func(cmd string) error
 }
 
 func (r *RebootData) Reboot() error {
 	log.Printf("Reboot Requested")
-	r.sync("/bin/sync")
-	r.sync("/bin/sync")
-	return r.run("/sbin/reboot", "-f")
+	r.run("/bin/sync", "")
+	r.run("/bin/sync", "")
+	return r.run("/bin/systemctl", "reboot")
 }
 
 var RebootModule = fx.Provide(func() Reboot {
 	return &RebootData{
 		run: func(cmd string, arg string) error {
 			return exec.Command(cmd, arg).Run()
-		},
-		sync: func(cmd string) error {
-			return exec.Command(cmd).Run()
 		},
 	}
 })
