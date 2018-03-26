@@ -15,10 +15,12 @@ func TestLocationHelper_Get(t *testing.T) {
 }
 
 func TestLocationHelper_Update(t *testing.T) {
+	const newRack = "rack1"
 	const newPosition = 5
 	const invalidPosition = 0
 	const defaultShelf = 1
 	const invalidShelf = 0
+
 	mc := NewMockConfig()
 	cfg := NewConfigLocation(mc)
 	data := cfg.Get()
@@ -27,6 +29,7 @@ func TestLocationHelper_Update(t *testing.T) {
 	}
 
 	updateCfg := LocationConfig{
+		Rack:     newRack,
 		Position: newPosition,
 		Shelf:    defaultShelf,
 	}
@@ -43,6 +46,10 @@ func TestLocationHelper_Update(t *testing.T) {
 	data = cfg.Get()
 	if data.Position != updateCfg.Position {
 		t.Fatalf("expected Position to be: %v, got: %v", newPosition, data.Position)
+	}
+
+	if data.Rack != updateCfg.Rack {
+		t.Fatalf("expected Rack to be: %v, got: %v", newRack, data.Rack)
 	}
 
 	path := mc.Original().Path("location.position").Data()
