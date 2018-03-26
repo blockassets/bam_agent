@@ -220,12 +220,12 @@ prometheus, use configuration like this:
 
 ```yml
   - job_name: 'cgminer_exporter'
-    metrics_path: '/metrics/cgminer_exporter'
+    metrics_path: /metrics/cgminer_exporter
     file_sd_configs:
       - files:
         - 'workers.json'
   - job_name: 'node_exporter'
-    metrics_path: '/metrics/node_exporter'
+    metrics_path: /metrics/node_exporter
     file_sd_configs:
       - files:
         - 'workers.json'
