@@ -17,8 +17,14 @@ type RebootData struct {
 
 func (r *RebootData) Reboot() error {
 	log.Printf("Reboot Requested")
-	r.run("/bin/sync", "")
-	r.run("/bin/sync", "")
+	err := r.run("/bin/sync", "")
+	if err != nil {
+		log.Println(err)
+	}
+	err = r.run("/bin/sync", "")
+	if err != nil {
+		log.Println(err)
+	}
 	return r.run("/bin/systemctl", "reboot")
 }
 
