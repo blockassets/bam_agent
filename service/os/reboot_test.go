@@ -3,27 +3,28 @@ package os
 import "testing"
 
 func TestReboot_Reboot(t *testing.T) {
-	expectedRebootCmd := "/sbin/reboot"
-	expectedRebootArg := "-f"
+	expectedRebootCmd := "/bin/systemctl"
+	expectedRebootArg := "reboot"
 
 	expectedSyncCmd := "/bin/sync"
 	syncCounter := 0
 
 	reboot := &RebootData{
-		sync: func(cmd string) error {
-			if cmd != expectedSyncCmd {
-				t.Fatalf("expected %s, got %s", expectedSyncCmd, cmd)
-			}
-			syncCounter++
-			return nil
-		},
 		run: func(cmd string, arg string) error {
-			if cmd != expectedRebootCmd {
-				t.Fatalf("expected %s, got %s", expectedRebootCmd, cmd)
+			if arg != "" {
+				if cmd != expectedRebootCmd {
+					t.Fatalf("expected %s, got %s", expectedRebootCmd, cmd)
+				}
+				if arg != expectedRebootArg {
+					t.Fatalf("expected %s, got %s", expectedRebootArg, arg)
+				}
+			} else {
+				if cmd != expectedSyncCmd {
+					t.Fatalf("expected %s, got %s", expectedSyncCmd, cmd)
+				}
+				syncCounter++
 			}
-			if arg != expectedRebootArg {
-				t.Fatalf("expected %s, got %s", expectedRebootArg, arg)
-			}
+
 			return nil
 		},
 	}

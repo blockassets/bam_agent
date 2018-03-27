@@ -2,6 +2,7 @@ package monitor
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/blockassets/bam_agent/service/os"
@@ -21,8 +22,16 @@ func NewLoadMonitor(config HighLoadConfig, retriever os.StatRetriever, reboot os
 			OnTick: func() TickerFunc {
 				return func(ctx context.Context) {
 					loads, err := retriever.GetLoadData()
-					if err == nil && loads.OneMinAvg > config.HighLoadMark {
-						reboot.Reboot()
+					if err == nil {
+						log.Printf("1m load: %v", loads.OneMinAvg)
+						if loads.OneMinAvg > config.HighLoadMark {
+							err = reboot.Reboot()
+							if err != nil {
+								log.Println(err)
+							}
+						}
+					} else {
+						log.Println(err)
 					}
 				}
 			},
