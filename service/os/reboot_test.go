@@ -3,8 +3,8 @@ package os
 import "testing"
 
 func TestReboot_Reboot(t *testing.T) {
-	expectedRebootCmd := "/bin/systemctl"
-	expectedRebootArg := "reboot"
+	expectedRebootCmd := "/sbin/reboot"
+	expectedRebootArg := "-f"
 
 	expectedSyncCmd := "/bin/sync"
 	syncCounter := 0

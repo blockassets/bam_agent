@@ -12,7 +12,7 @@ type Reboot interface {
 }
 
 type RebootData struct {
-	run  func(cmd string, arg string) error
+	run func(cmd string, arg string) error
 }
 
 func (r *RebootData) Reboot() error {
@@ -25,13 +25,13 @@ func (r *RebootData) Reboot() error {
 	if err != nil {
 		log.Println(err)
 	}
-	return r.run("/bin/systemctl", "reboot")
+	return r.run("/sbin/reboot", "-f")
 }
 
 var RebootModule = fx.Provide(func() Reboot {
 	return &RebootData{
 		run: func(cmd string, arg string) error {
-			return exec.Command(cmd, arg).Run()
+			return exec.Command(cmd, arg).Start()
 		},
 	}
 })
