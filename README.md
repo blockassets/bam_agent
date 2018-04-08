@@ -210,6 +210,11 @@ spikes and the miner stops submitting shares to the pool.
 **Enabled by default.** Runs every 5m and checks to see if the temperature is over 100c. If so, it uses systemd to 
 shut cgminer down. A reboot will enable things again.
 
+### Low memory
+
+**Enabled by default.** Runs every 1m and checks to see if the available system memory is under 140mb. If so, it reboots.
+This works around a bug where cgminer will randomly eat up available memory and freeze the machine.
+
 ### Quit cgminer
 
 Disabled by default. Periodically quit the miner app to free up memory and start fresh.

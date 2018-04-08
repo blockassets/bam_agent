@@ -85,6 +85,7 @@ var Module = fx.Options(
 		NewAcceptedMonitor,
 		NewCGMQuitMonitor,
 		NewHighTempMonitor,
+		NewLowMemoryMonitor,
 		NewLoadMonitor,
 		NewRebootMonitor,
 	),

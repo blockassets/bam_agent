@@ -35,6 +35,11 @@
 			"enabled": true,
 			"period": "5m",
 			"highTemp": 100.0
+		},
+		"lowMemory": {
+			"enabled": true,
+			"period": "1m",
+			"lowMemory": 140000000
 		}
 	}
 }

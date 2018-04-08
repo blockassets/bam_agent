@@ -50,4 +50,13 @@ var ConfigProviders = fx.Options(
 			Period:  value.Period.Duration,
 		}
 	}),
+
+	fx.Provide(func(cfg agent.MonitorConfig) LowMemoryConfig {
+		value := cfg.LowMemory
+		return LowMemoryConfig{
+			Enabled:   value.Enabled,
+			Period:    value.Period,
+			LowMemory: value.LowMemory,
+		}
+	}),
 )
