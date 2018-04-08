@@ -74,6 +74,7 @@ func program(state overseer.State) {
 		miner.ClientModule,
 		miner.VersionModule,
 
+		os.MemInfoModule,
 		os.MinerModule,
 		os.NetInfoModule,
 		os.NetworkingModule,

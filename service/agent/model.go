@@ -38,6 +38,7 @@ type MonitorConfig struct {
 	AcceptedShares AcceptedConfig      `json:"acceptedShares"`
 	CGMQuit        CGMQuitConfig       `json:"cgMinerQuit"`
 	Reboot         MonitorRebootConfig `json:"reboot"`
+	LowMemory      LowMemoryConfig     `json:"lowMemory"`
 }
 
 type MonitorRebootConfig struct {
@@ -65,4 +66,10 @@ type HighTempConfig struct {
 type CGMQuitConfig struct {
 	Enabled bool                `json:"enabled"`
 	Period  tool.RandomDuration `json:"period"`
+}
+
+type LowMemoryConfig struct {
+	Enabled   bool          `json:"enabled"`
+	Period    time.Duration `json:"period"`
+	LowMemory float64       `json:"lowMemory"`
 }
