@@ -19,6 +19,7 @@ var _ Client = &MockMinerClient{}
 
 type MockMinerClient struct {
 	CalledQuit     bool
+	CalledRestart  bool
 	CalledDevs     bool
 	CalledAccepted bool
 
@@ -28,6 +29,11 @@ type MockMinerClient struct {
 
 func (c *MockMinerClient) Quit() error {
 	c.CalledQuit = true
+	return nil
+}
+
+func (c *MockMinerClient) Restart() error {
+	c.CalledRestart = true
 	return nil
 }
 

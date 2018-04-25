@@ -96,6 +96,12 @@ Starts cgminer via systemd
 ### `GET /cgminer/quit`
 
 ```
+Stops cgminer via cgminer API call (systemd will restart it). Does not work with BW-L21.
+```
+
+### `GET /cgminer/restart`
+
+```
 Stops cgminer via cgminer API call (systemd will restart it)
 ```
 

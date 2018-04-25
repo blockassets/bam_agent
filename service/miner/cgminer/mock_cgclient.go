@@ -11,8 +11,9 @@ const (
 var _ cgminer_client.Client = &MockCgClient{}
 
 type MockCgClient struct {
-	quitCalled bool
-	devs       []cgminer_client.Dev
+	quitCalled    bool
+	restartCalled bool
+	devs          []cgminer_client.Dev
 }
 
 func (cgClient *MockCgClient) Quit() error {
@@ -21,6 +22,7 @@ func (cgClient *MockCgClient) Quit() error {
 }
 
 func (cgClient *MockCgClient) Restart() error {
+	cgClient.restartCalled = true
 	return nil
 }
 

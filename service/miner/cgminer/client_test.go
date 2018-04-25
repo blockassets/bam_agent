@@ -17,6 +17,19 @@ func TestCGMinerClient_Quit(t *testing.T) {
 	}
 }
 
+func TestCGMinerClient_Restart(t *testing.T) {
+	cgClient := NewMockCgClient()
+	client := NewClientWrapper(cgClient)
+
+	err := client.Restart()
+	if err != nil {
+		t.Fatal("Did not expected an error when calling restart!")
+	}
+	if !cgClient.restartCalled {
+		t.Fatal("Expected restartCalled to be true!")
+	}
+}
+
 func TestCGMinerClient_GetAccepted(t *testing.T) {
 	cgClient := NewMockCgClient()
 	client := NewClientWrapper(cgClient)

@@ -7,6 +7,7 @@ import (
 
 type Client interface {
 	Quit() error
+	Restart() error
 	GetAccepted() (int64, error)
 	GetTemp() (float64, error)
 }
