@@ -21,6 +21,10 @@ func (c *Wrapper) Quit() error {
 	return c.client.Quit()
 }
 
+func (c *Wrapper) Restart() error {
+	return c.client.Restart()
+}
+
 func (c *Wrapper) GetAccepted() (int64, error) {
 	devs, err := c.client.Devs()
 	if err != nil {
