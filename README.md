@@ -197,12 +197,12 @@ Monitors are configured by editing the `/etc/bam_agent.json` file. This file is 
 
 ### Accepted shares
 
-**Enabled by default.** If the miner has not accepted any shares after 5m, reboot. This works around a bug where the 
-miner software stops submitting shares to the pool, yet continues doing work.
+**Enabled by default.** Runs every 5m. If the miner has not accepted any new shares since the last run, reboot. This works around a bug 
+where the miner software stops submitting shares to the pool, yet continues doing work.
 
 ### High load
 
-**Enabled by default.** If the 5m average load is above 5, `reboot -f` the miner. This works around a bug where the load 
+**Enabled by default.** Runs every 1m. If the 1m average load is above 5, `reboot -f` the miner. This works around a bug where the load 
 spikes and the miner stops submitting shares to the pool.
 
 ### High temp
