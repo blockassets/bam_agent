@@ -111,7 +111,7 @@ func main() {
 }
 
 func overseerRun(port string) {
-	interval := time.Duration(rand.Intn(23)+1) * time.Hour // within the next 24 hours
+	interval := time.Duration(rand.Intn(5)+1) * time.Hour // within the next 6 hours
 
 	overseer.Run(overseer.Config{
 		Debug:     true,
