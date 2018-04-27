@@ -40,6 +40,23 @@ The [releases tab](https://github.com/blockassets/bam_agent/releases) has `maste
 suitable for running on the miner. These are built automatically on 
 [Travis](https://travis-ci.org/blockassets/bam_agent).
 
+Included in the repository is an [install.sh](https://github.com/blockassets/bam_agent/blob/master/install.sh) script 
+which can be used to install onto any number of machines.
+
+### Automated
+
+1. Install the required software ([sshpass](https://gist.github.com/arunoda/7790979)) and 
+([parallel](https://www.google.com/search?q=install+gnu+parallel))
+1. Clone the repository
+1. Download the latest bam_agent binary from the [releases](https://github.com/blockassets/bam_agent/releases) tab, 
+into the cloned folder. Keep it compressed with the .gz extension
+1. Create a `workers.txt` file in the folder and add all your IP addresses, one per line
+1. Run `./install.sh`
+
+### Manual
+
+The `./install.sh` script automates the manual steps, which are described below:
+
 Download the [latest release](https://github.com/blockassets/bam_agent/releases) and copy the gunzipped 
 `bam_agent-linux-arm` binary to `/usr/bin`
 
