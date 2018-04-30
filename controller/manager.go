@@ -75,6 +75,7 @@ var Module = fx.Options(
 		NewManager,
 
 		NewCGQuitCtrl,
+		NewCGRestartCtrl,
 		NewCGStartCtrl,
 		NewConfigDHCPCtrl,
 		NewConfigFrequencyCtrl,
