@@ -21,7 +21,7 @@ func TestJsonHandlerFunc_ServeHTTP(t *testing.T) {
 	}
 
 	if resp.Header.Get("Content-Type") != "application/json; charset=utf-8" {
-		t.Fatalf("got wrong cache-control header")
+		t.Fatalf("got wrong content-type header")
 	}
 
 	if resp.Header.Get("Cache-Control") != "no-cache, no-store, must-revalidate" {
