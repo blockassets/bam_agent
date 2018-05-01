@@ -11,7 +11,11 @@ func TestJsonHandlerFunc_ServeHTTP(t *testing.T) {
 	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
 	w := httptest.NewRecorder()
 
-	fun := JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+	var calledFunc = false
+
+	fun := JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calledFunc = true
+	})
 	fun.ServeHTTP(w, req)
 
 	resp := w.Result()
@@ -39,6 +43,11 @@ func TestJsonHandlerFunc_ServeHTTP(t *testing.T) {
 	if resp.Header.Get("Access-Control-Allow-Origin") != "*" {
 		t.Fatalf("got wrong ACAO header")
 	}
+
+	if ! calledFunc {
+		t.Fatalf("didn't call the function")
+	}
+}
 
 func TestJsonHandlerFunc_ServeHTTP_NoPurpose(t *testing.T) {
 	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
