@@ -7,6 +7,14 @@ import (
 type JsonHandlerFunc http.HandlerFunc
 
 func (f JsonHandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// https://www.google.com/search?q=X-Purpose%3A+preview
+	if len(r.Header.Get("X-Purpose")) > 0 {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("No preview allowed"))
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	// Prevent caching of any of the requests so that we can use GET for things like /reboot
