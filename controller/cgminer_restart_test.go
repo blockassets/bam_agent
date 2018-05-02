@@ -11,10 +11,10 @@ import (
 	"github.com/json-iterator/go"
 )
 
-func TestNewCGRestartCtrl(t *testing.T) {
+func TestNewCGRestartPostCtrl(t *testing.T) {
 	client := miner.NewMockMinerClient(-1)
 	mgr := monitor.NewMockManager()
-	result := NewCGRestartCtrl(&mgr, &client)
+	result := NewCGRestartPostCtrl(&mgr, &client)
 	ctrl := result.Controller
 
 	if ctrl.Path != "/cgminer/restart" {
@@ -25,11 +25,11 @@ func TestNewCGRestartCtrl(t *testing.T) {
 		t.Fatalf("expected 1 method, got %d", len(ctrl.Methods))
 	}
 
-	if ctrl.Methods[0] != http.MethodGet {
-		t.Fatalf("expected method get, got %s", ctrl.Methods[0])
+	if ctrl.Methods[0] != http.MethodPost {
+		t.Fatalf("expected method post, got %s", ctrl.Methods[0])
 	}
 
-	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
+	req := httptest.NewRequest("POST", "/doesnotmatter", nil)
 	w := httptest.NewRecorder()
 	ctrl.Handler.ServeHTTP(w, req)
 

@@ -35,7 +35,7 @@ func NewPutPoolsCtrl(mgr monitor.Manager, poolCfg cgminer.ConfigPools, client mi
 					if err == nil {
 						err = poolCfg.Save(pools)
 						if err == nil {
-							err = client.Quit()
+							err = client.Restart()
 						}
 					}
 				}

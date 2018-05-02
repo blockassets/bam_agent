@@ -68,24 +68,25 @@ var Module = fx.Options(
 		}
 	}),
 
-	// Separate since it provides the two controllers
+	// Separate since the module provides more than one controller
+	CgminerQuitModule,
+	CgminerRestartModule,
+	CgminerStartModule,
 	ConfigPoolsModule,
+	RebootModule,
 
 	fx.Provide(
 		NewManager,
 
-		NewCGQuitCtrl,
-		NewCGRestartCtrl,
-		NewCGStartCtrl,
 		NewConfigDHCPCtrl,
 		NewConfigFrequencyCtrl,
 		NewConfigIPCtrl,
 		NewPutLocationCtrl,
 		NewGetPoolsCtrl,
-		NewCgMinerExporterCtrl,
-		NewNodeExporterCtrl,
-		NewRebootCtrl,
 		NewStatusCtrl,
 		NewUpdateCtrl,
+
+		NewCgMinerExporterCtrl,
+		NewNodeExporterCtrl,
 	),
 )
