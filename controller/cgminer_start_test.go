@@ -11,10 +11,10 @@ import (
 	"github.com/json-iterator/go"
 )
 
-func TestNewCGStartCtrl(t *testing.T) {
+func TestNewCGStartPostCtrl(t *testing.T) {
 	mockMiner := os.NewMockMiner()
 	mgr := monitor.NewMockManager()
-	result := NewCGStartCtrl(&mgr, &mockMiner)
+	result := NewCGStartPostCtrl(&mgr, &mockMiner)
 	ctrl := result.Controller
 
 	if ctrl.Path != "/cgminer/start" {
@@ -25,11 +25,11 @@ func TestNewCGStartCtrl(t *testing.T) {
 		t.Fatalf("expected 1 method, got %d", len(ctrl.Methods))
 	}
 
-	if ctrl.Methods[0] != http.MethodGet {
-		t.Fatalf("expected method get, got %s", ctrl.Methods[0])
+	if ctrl.Methods[0] != http.MethodPost {
+		t.Fatalf("expected method post, got %s", ctrl.Methods[0])
 	}
 
-	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
+	req := httptest.NewRequest("POST", "/doesnotmatter", nil)
 	w := httptest.NewRecorder()
 	ctrl.Handler.ServeHTTP(w, req)
 
@@ -47,7 +47,7 @@ func TestNewCGStartCtrl(t *testing.T) {
 	}
 
 	if mockMiner.CalledStartMiner != true {
-		t.Fatalf("expected calledQuit and got %v", mockMiner.CalledStartMiner)
+		t.Fatalf("expected CalledStartMiner and got %v", mockMiner.CalledStartMiner)
 	}
 
 	if !mgr.CalledStop && !mgr.CalledStart {

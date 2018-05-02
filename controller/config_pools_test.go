@@ -74,8 +74,8 @@ func TestNewConfigPoolsCtrl(t *testing.T) {
 		t.Fatalf("expected pool1 = 1, got %s", res.Pool1)
 	}
 
-	if client.CalledQuit != true {
-		t.Fatalf("expected client.calledQuit and got %v", client.CalledQuit)
+	if client.CalledRestart != true {
+		t.Fatalf("expected client.CalledRestart and got %v", client.CalledRestart)
 	}
 
 	if !mgr.CalledStop && !mgr.CalledStart {

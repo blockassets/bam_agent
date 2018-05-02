@@ -34,7 +34,7 @@ func NewConfigFrequencyCtrl(mgr monitor.Manager, cfgFreq cgminer.ConfigFrequency
 					if err == nil {
 						err = cfgFreq.Save(freq.Frequency)
 						if err == nil {
-							err = client.Quit()
+							err = client.Restart()
 						}
 					}
 				}

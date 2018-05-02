@@ -11,11 +11,11 @@ import (
 	"github.com/json-iterator/go"
 )
 
-func TestNewRebootCtrl(t *testing.T) {
+func TestNewRebootCtrl_Post(t *testing.T) {
 	cfg := RebootConfig{Delay: time.Duration(50) * time.Millisecond}
 
 	reboot := os.NewMockReboot()
-	result := NewRebootCtrl(cfg, &reboot)
+	result := NewRebootPostCtrl(cfg, &reboot)
 	ctrl := result.Controller
 
 	if ctrl.Path != "/reboot" {
@@ -26,11 +26,11 @@ func TestNewRebootCtrl(t *testing.T) {
 		t.Fatalf("expected 1 method, got %d", len(ctrl.Methods))
 	}
 
-	if ctrl.Methods[0] != http.MethodGet {
-		t.Fatalf("expected method get, got %s", ctrl.Methods[0])
+	if ctrl.Methods[0] != http.MethodPost {
+		t.Fatalf("expected method post, got %s", ctrl.Methods[0])
 	}
 
-	req := httptest.NewRequest("GET", "/doesnotmatter", nil)
+	req := httptest.NewRequest("POST", "/doesnotmatter", nil)
 	w := httptest.NewRecorder()
 	ctrl.Handler.ServeHTTP(w, req)
 

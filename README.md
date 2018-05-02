@@ -104,25 +104,43 @@ We recommend that you download prebuilt binaries from the releases tab. However,
 
 ## API
 
-### `GET /cgminer/start`
+#### GET /cgminer/start
 
 ```
-Starts cgminer via systemd
+Presents a page with a button to start cgminer.
 ```
 
-### `GET /cgminer/quit`
+#### POST /cgminer/start
+
+```
+Starts cgminer
+```
+
+#### GET /cgminer/quit
+
+```
+Presents a page with a button to stop cgminer.
+```
+
+#### POST /cgminer/quit
 
 ```
 Stops cgminer via cgminer API call (systemd will restart it). Does not work with BW-L21.
 ```
 
-### `GET /cgminer/restart`
+#### GET /cgminer/restart
+
+```
+Presents a page with a button to restart cgminer.
+```
+
+#### POST /cgminer/restart
 
 ```
 Stops cgminer via cgminer API call (systemd will restart it)
 ```
 
-### `PUT /config/frequency`
+#### PUT /config/frequency
 
 Send PUT request with json body:
 
@@ -132,13 +150,13 @@ Send PUT request with json body:
 
 Restarts cgminer.
 
-### `GET /config/pools`
+#### GET /config/pools
 
 ```
 {"pool1": "", "pool2": "", "pool3": ""}
 ```
 
-### `PUT /config/pools`
+#### PUT /config/pools
 
 Send PUT request with json body:
 
@@ -148,7 +166,7 @@ Send PUT request with json body:
 
 Restarts cgminer.
 
-### `PUT /config/dhcp`
+#### PUT /config/dhcp
 
 Updates `/usr/app/conf.default` and `/etc/network/interfaces`
 
@@ -156,9 +174,14 @@ Updates `/usr/app/conf.default` and `/etc/network/interfaces`
 NO BODY NECESSARY
 ```
 
-Call `/reboot` to make the changes take effect
+Call `/reboot` to make the changes take effect.
 
-### `PUT /config/ip`
+Note, we don't recommend using DHCP for miners. While it sounds good, in practice, it makes it difficult to locate
+the miner, takes longer to boot, prevents wasted IP space, and has a dependency on a DHCP server. Since the miners 
+are all in specific locations, it is better just to maintain a mapping of location to ip address. This keeps things 
+simple. See below for managing locations.
+
+#### PUT /config/ip
 
 Updates `/usr/app/conf.default` and `/etc/network/interfaces`
 
@@ -168,7 +191,7 @@ Updates `/usr/app/conf.default` and `/etc/network/interfaces`
 
 Call `/reboot` to make the changes take effect
 
-### `PUT /config/location`
+#### PUT /config/location
 
 Store the physical location of the miner. This is saved in `/etc/bam_agent.json` and exposed in the `/status` call.
 
@@ -176,7 +199,13 @@ Store the physical location of the miner. This is saved in `/etc/bam_agent.json`
 {"facility": "", "rack": "", "row": "", "shelf": 1, "position": 1}
 ```
 
-### `GET /status`
+Facility is your 'data center'. Each rack of machines is numbered from the bottom to the top. 
+Each row resets the count. So if you have 3 miners on a shelf, you might say: row B, rack 20, self 5, position 3 or 
+more simply: DC1-B20-5-3
+
+Assign each location an IP address and you're done. Easy to find a needle in a haystack and no chance for duplicate IPs.
+
+#### GET /status
 
 ```
 {
@@ -194,12 +223,15 @@ Store the physical location of the miner. This is saved in `/etc/bam_agent.json`
 }
 ```
 
-### `GET /reboot`
+#### GET /reboot
 
-Reboots the miner. Obviously be careful with this one. :-) Do note that we send HTTP expiry headers so that
-if you do run this from your browser (not really advised), it won't get cached.
+Presents a page with a button to reboot the miner.
 
-### `POST /update`
+#### POST /reboot
+
+Reboots the miner.
+
+#### POST /update
 
 Upload a compressed archive of files and execute an enclosed shell script. This allows one to easily distribute
 updates to the miners.
@@ -220,13 +252,13 @@ Monitors are configured by editing the `/etc/bam_agent.json` file. This file is 
 
 ### Accepted shares
 
-**Enabled by default.** Runs every 5m. If the miner has not accepted any new shares since the last run, reboot. This works around a bug 
-where the miner software stops submitting shares to the pool, yet continues doing work.
+**Enabled by default.** Runs every 5m. If the miner has not accepted any new shares since the last run, reboot. 
+This works around a bug where the miner software stops submitting shares to the pool, yet continues doing work.
 
 ### High load
 
-**Enabled by default.** Runs every 1m. If the 1m average load is above 5, `reboot -f` the miner. This works around a bug where the load 
-spikes and the miner stops submitting shares to the pool.
+**Enabled by default.** Runs every 1m. If the 1m average load is above 5, `reboot -f` the miner. 
+This works around a bug where the load spikes and the miner stops submitting shares to the pool.
 
 ### High temp
 
@@ -235,8 +267,8 @@ shut cgminer down. A reboot will enable things again.
 
 ### Low memory
 
-**Enabled by default.** Runs every 1m and checks to see if the available system memory is under 140mb. If so, it reboots.
-This works around a bug where cgminer will randomly eat up available memory and freeze the machine.
+**Enabled by default.** Runs every 1m and checks to see if the available system memory is under 140mb. 
+If so, it reboots. This works around a bug where cgminer will randomly eat up available memory and freeze the machine.
 
 ### Quit cgminer
 
@@ -249,7 +281,8 @@ Disabled by default. Periodically reboot the entire miner to free up memory and 
 ## Prometheus exporters
 
 [Prometheus](https://prometheus.io) is an amazing metrics collection system. Combine it with 
-[Grafana](https://grafana.com) and you have an extremely powerful visualization and performance tracking tool for your miners.
+[Grafana](https://grafana.com) and you have an extremely powerful visualization and performance tracking tool 
+for your miners.
 
 Included in the agent are two [prometheus exporters](https://prometheus.io/docs/instrumenting/exporters/):
 

@@ -56,8 +56,8 @@ func TestNewConfigFrequencyCtrl(t *testing.T) {
 		t.Fatalf("expected cfg.Saved to have data, got %v", len(cfg.Saved))
 	}
 
-	if !client.CalledQuit {
-		t.Fatalf("expected client.Quit(), got %v", client.CalledQuit)
+	if !client.CalledRestart {
+		t.Fatalf("expected client.Restart(), got %v", client.CalledRestart)
 	}
 
 	if !mgr.CalledStop && !mgr.CalledStart {
