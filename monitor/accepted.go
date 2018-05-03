@@ -22,13 +22,12 @@ func NewAcceptedMonitor(config AcceptedConfig, client miner.Client, reboot os.Re
 				lastAccepted := int64(0)
 				return func(ctx context.Context) {
 					currentAccepted, err := client.GetAccepted()
-					if err != nil {
-						lastAccepted = 0
-					} else if lastAccepted > 0 && currentAccepted == lastAccepted {
+
+					if lastAccepted > 0 && (currentAccepted == lastAccepted || err != nil) {
 						reboot.Reboot()
-					} else {
-						lastAccepted = currentAccepted
 					}
+
+					lastAccepted = currentAccepted
 				}
 			},
 		},

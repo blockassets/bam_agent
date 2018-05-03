@@ -23,7 +23,7 @@ type MockMinerClient struct {
 	CalledDevs     bool
 	CalledAccepted bool
 
-	test     int
+	Test     int
 	accepted int64
 }
 
@@ -39,7 +39,7 @@ func (c *MockMinerClient) Restart() error {
 
 func (c *MockMinerClient) GetAccepted() (int64, error) {
 	c.CalledAccepted = true
-	switch c.test {
+	switch c.Test {
 	case AcceptedIncrement:
 		c.accepted++
 	case AcceptedSame:
@@ -51,14 +51,14 @@ func (c *MockMinerClient) GetAccepted() (int64, error) {
 	}
 
 	if c.accepted == -1 {
-		return -1, errors.New("some error")
+		return 0, errors.New("some error")
 	}
 
 	return c.accepted, nil
 }
 
 func (c *MockMinerClient) GetTemp() (float64, error) {
-	switch c.test {
+	switch c.Test {
 	case Under100Temp:
 		return 90.0, nil
 	case Exactly100Temp:
@@ -71,7 +71,7 @@ func (c *MockMinerClient) GetTemp() (float64, error) {
 
 func NewMockMinerClient(test int) MockMinerClient {
 	return MockMinerClient{
-		test:     test,
+		Test:     test,
 		accepted: 0,
 	}
 }
