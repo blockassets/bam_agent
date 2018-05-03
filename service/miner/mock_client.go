@@ -51,7 +51,7 @@ func (c *MockMinerClient) GetAccepted() (int64, error) {
 	}
 
 	if c.accepted == -1 {
-		return -1, errors.New("some error")
+		return 0, errors.New("some error")
 	}
 
 	return c.accepted, nil
