@@ -229,7 +229,15 @@ Presents a page with a button to reboot the miner.
 
 #### POST /reboot
 
-Reboots the miner.
+Reboots the miner based on a timer so that a proper response can be sent to the client.
+
+#### GET /reboot/force
+
+Presents a page with a button to reboot the miner.
+
+#### POST /reboot/force
+
+Reboots the miner without the timer.
 
 #### POST /update
 
