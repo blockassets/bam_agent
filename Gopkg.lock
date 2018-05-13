@@ -14,7 +14,7 @@
   branch = "master"
   name = "github.com/Jeffail/gabs"
   packages = ["."]
-  revision = "44cbc27138518b15305cb3eef220d04f2d641b9b"
+  revision = "7a0fed31069aba77993a518cc2f37b28ee7aa883"
 
 [[projects]]
   branch = "master"
@@ -62,8 +62,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "fb28e64a158b01377883badcc176216ac0fde3dd"
-  version = "v1.13.21"
+  revision = "31a85efbe3bc741eb539d6310c8e66030b7c5cb7"
+  version = "v1.13.47"
 
 [[projects]]
   name = "github.com/beevik/ntp"
@@ -98,8 +98,8 @@
 [[projects]]
   name = "github.com/coreos/go-systemd"
   packages = ["dbus"]
-  revision = "40e2722dffead74698ca12a750f64ef313ddce05"
-  version = "v16"
+  revision = "39ca1b05acc7ad1220e09f133283b8859a8b71ab"
+  version = "v17"
 
 [[projects]]
   branch = "master"
@@ -135,8 +135,8 @@
 [[projects]]
   name = "github.com/go-ini/ini"
   packages = ["."]
-  revision = "6333e38ac20b8949a8dd68baa3650f4dee8f39f0"
-  version = "v1.33.0"
+  revision = "6529cf7c58879c08d927016dde4477f18a0634cb"
+  version = "v1.36.0"
 
 [[projects]]
   name = "github.com/godbus/dbus"
@@ -147,8 +147,8 @@
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
-  version = "v1.0.0"
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -194,8 +194,8 @@
     ".",
     "middleware"
   ]
-  revision = "a5d81b8d4a627f3f49dcb3164ef2bb5239682227"
-  version = "3.3.4"
+  revision = "6d227dfea4d2e52cb76856120b3c17f758139b4e"
+  version = "3.3.5"
 
 [[projects]]
   name = "github.com/labstack/gommon"
@@ -205,8 +205,8 @@
     "log",
     "random"
   ]
-  revision = "6fe1405d73ec4bd4cd8a4ac8e2a2b2bf95d03954"
-  version = "0.2.4"
+  revision = "588f4e8bddc6cb45c27b448e925c7fd6a5545434"
+  version = "0.2.5"
 
 [[projects]]
   branch = "master"
@@ -245,7 +245,7 @@
     ".",
     "nlenc"
   ]
-  revision = "dc216978b479b434abd198aaf356d1412f3465b8"
+  revision = "f8bbad5585a18dfa832c763803d63abf42190ceb"
 
 [[projects]]
   branch = "master"
@@ -260,7 +260,7 @@
   branch = "master"
   name = "github.com/mholt/archiver"
   packages = ["."]
-  revision = "26cf5bb32d07aa4e8d0de15f56ce516f4641d7df"
+  revision = "e4ef56d48eb029648b0e895bb0b6a393ef0829c3"
 
 [[projects]]
   name = "github.com/modern-go/concurrent"
@@ -316,16 +316,13 @@
     "log",
     "model"
   ]
-  revision = "38c53a9f4bfcd932d1b00bfc65e256a7fba6b37a"
+  revision = "d811d2e9bf898806ecfb6ef6296774b13ffc314c"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/node_exporter"
-  packages = [
-    "collector",
-    "collector/ganglia"
-  ]
-  revision = "1f11a86d594173ca1146ac1d1715cd6263e9959d"
+  packages = ["collector"]
+  revision = "84dc362b05aeffecf2e8bc4541840e0744963060"
 
 [[projects]]
   branch = "master"
@@ -338,7 +335,7 @@
     "sysfs",
     "xfs"
   ]
-  revision = "780932d4fbbe0e69b84c34c20f5c8d0981e109ea"
+  revision = "8b1c2da0d56deffdbb9e48d4414b4e674bd8083e"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -378,8 +375,8 @@
 [[projects]]
   name = "go.uber.org/atomic"
   packages = ["."]
-  revision = "8474b86a5a6f79c443ce4b2992817ff32cf208b8"
-  version = "v1.3.1"
+  revision = "1ea20fb1cbb1cc08cbd0d913a96dead89aa18289"
+  version = "v1.3.2"
 
 [[projects]]
   name = "go.uber.org/dig"
@@ -398,8 +395,8 @@
     "internal/fxreflect",
     "internal/lifecycle"
   ]
-  revision = "35bf66c87beb2c8ec1a68cf00b54542e2d169c0b"
-  version = "v1.4.0"
+  revision = "ed7e99834c0a7099c6cb6434fe5a7b007ac00db9"
+  version = "v1.5.0"
 
 [[projects]]
   name = "go.uber.org/multierr"
@@ -415,7 +412,7 @@
     "acme/autocert",
     "ssh/terminal"
   ]
-  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
+  revision = "2d027ae1dddd4694d54f7a8b6cbe78dca8720226"
 
 [[projects]]
   branch = "master"
@@ -426,7 +423,7 @@
     "internal/socket",
     "ipv4"
   ]
-  revision = "6078986fec03a1dcc236c34816c71b0e05018fda"
+  revision = "2491c5de3490fced2f6cff376127c667efeed857"
 
 [[projects]]
   branch = "master"
@@ -437,7 +434,7 @@
     "windows/registry",
     "windows/svc/eventlog"
   ]
-  revision = "13d03a9a82fba647c21a0ef8fba44a795d0f0835"
+  revision = "d0faeb539838e250bd0a9db4182d48d4a1915181"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
