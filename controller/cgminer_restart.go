@@ -10,7 +10,6 @@ import (
 	"go.uber.org/fx"
 )
 
-
 func NewCGRestartGetCtrl(mgr monitor.Manager, client miner.Client) Result {
 	const HTML = `
 <html>

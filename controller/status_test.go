@@ -67,7 +67,12 @@ func TestNewStatusCtrl(t *testing.T) {
 	if status.Mac == nil {
 		t.Fatalf("expected not nil for Mac, got %v", status.Mac)
 	}
+
 	if status.Location.Position != 1 {
 		t.Fatalf("expected 1 for location position, got %v", status.Location.Position)
+	}
+
+	if !status.Date.Before(time.Now()) {
+		t.Fatalf("expected Date to be before now(), got %v", status.Date)
 	}
 }

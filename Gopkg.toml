@@ -12,8 +12,8 @@
   name = "github.com/blockassets/cgminer_client"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/jpillora/overseer"
+  branch = "syncfix"
+  name = "github.com/lookfirst/overseer"
 
 [[constraint]]
   name = "go.uber.org/fx"
