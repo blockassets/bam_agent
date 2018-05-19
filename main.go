@@ -78,6 +78,7 @@ func program(state overseer.State) {
 		os.MinerModule,
 		os.NetInfoModule,
 		os.NetworkingModule,
+		os.NtpdateModule,
 		os.RebootModule,
 		os.StatRetrieverModule,
 		os.UptimeModule,
