@@ -164,10 +164,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/jpillora/overseer"
-  packages = [
-    ".",
-    "fetcher"
-  ]
+  packages = ["fetcher"]
   revision = "bc46621374e633f50348a3aa1b852169aa386364"
 
 [[projects]]
@@ -207,6 +204,12 @@
   ]
   revision = "588f4e8bddc6cb45c27b448e925c7fd6a5545434"
   version = "0.2.5"
+
+[[projects]]
+  branch = "syncfix"
+  name = "github.com/lookfirst/overseer"
+  packages = ["."]
+  revision = "7e1063766656fec25f5336d7ac3a5fc05fef0426"
 
 [[projects]]
   branch = "master"
@@ -445,6 +448,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ee9d777e98d073fb56ba634b911e0e4f2e667f9ba02298cd601e7d5e9dbe1653"
+  inputs-digest = "01cfdb17855062eb677d65d713a498d9c7ea14f1b397c30d6e6cb97f5de3ac4f"
   solver-name = "gps-cdcl"
   solver-version = 1
