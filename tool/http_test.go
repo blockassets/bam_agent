@@ -44,7 +44,7 @@ func TestJsonHandlerFunc_ServeHTTP(t *testing.T) {
 		t.Fatalf("got wrong ACAO header")
 	}
 
-	if ! calledFunc {
+	if !calledFunc {
 		t.Fatalf("didn't call the function")
 	}
 }
@@ -86,7 +86,7 @@ func TestHtmlHandlerFunc_ServeHTTP(t *testing.T) {
 		t.Fatalf("got wrong ACAO header")
 	}
 
-	if ! calledFunc {
+	if !calledFunc {
 		t.Fatalf("didn't call the function")
 	}
 }
