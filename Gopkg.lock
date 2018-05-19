@@ -11,10 +11,10 @@
   revision = "c02ca9a983da5807ddf7d796784928f5be4afd09"
 
 [[projects]]
-  branch = "master"
   name = "github.com/Jeffail/gabs"
   packages = ["."]
   revision = "7a0fed31069aba77993a518cc2f37b28ee7aa883"
+  version = "1.1"
 
 [[projects]]
   branch = "master"
@@ -62,8 +62,8 @@
     "service/s3",
     "service/sts"
   ]
-  revision = "31a85efbe3bc741eb539d6310c8e66030b7c5cb7"
-  version = "v1.13.47"
+  revision = "5f796043d63bfddca929cfbcffce01e5a894aad5"
+  version = "v1.13.52"
 
 [[projects]]
   name = "github.com/beevik/ntp"
@@ -154,7 +154,7 @@
   branch = "master"
   name = "github.com/golang/snappy"
   packages = ["."]
-  revision = "553a641470496b2327abcac10b36396bd98e45c9"
+  revision = "2e65f85255dbc3072edf28d6b5b8efc472979f5a"
 
 [[projects]]
   name = "github.com/jmespath/go-jmespath"
@@ -168,7 +168,7 @@
     ".",
     "fetcher"
   ]
-  revision = "7516f444813ce395f57562c049a0c2ac5e0283cb"
+  revision = "bc46621374e633f50348a3aa1b852169aa386364"
 
 [[projects]]
   name = "github.com/json-iterator/go"
@@ -245,7 +245,7 @@
     ".",
     "nlenc"
   ]
-  revision = "f8bbad5585a18dfa832c763803d63abf42190ceb"
+  revision = "ef6039541fbbf993388d903ab2cb9ccc1b2c1546"
 
 [[projects]]
   branch = "master"
@@ -316,13 +316,13 @@
     "log",
     "model"
   ]
-  revision = "d811d2e9bf898806ecfb6ef6296774b13ffc314c"
+  revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/node_exporter"
   packages = ["collector"]
-  revision = "84dc362b05aeffecf2e8bc4541840e0744963060"
+  revision = "699b6d7f159d6d0be00b8733d225674cd67f98ff"
 
 [[projects]]
   branch = "master"
@@ -412,7 +412,7 @@
     "acme/autocert",
     "ssh/terminal"
   ]
-  revision = "2d027ae1dddd4694d54f7a8b6cbe78dca8720226"
+  revision = "1a580b3eff7814fc9b40602fd35256c63b50f491"
 
 [[projects]]
   branch = "master"
@@ -434,7 +434,7 @@
     "windows/registry",
     "windows/svc/eventlog"
   ]
-  revision = "d0faeb539838e250bd0a9db4182d48d4a1915181"
+  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
