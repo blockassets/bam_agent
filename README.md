@@ -239,6 +239,14 @@ Presents a page with a button to reboot the miner.
 
 Reboots the miner without the timer.
 
+#### GET /ntpdate
+
+Presents a page with a button to run ntpdate.
+
+#### POST /ntpdate
+
+Calls `ntpdate -u time.google.com` to set the date on the miner.
+
 #### POST /update
 
 Upload a compressed archive of files and execute an enclosed shell script. This allows one to easily distribute

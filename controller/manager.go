@@ -73,6 +73,7 @@ var Module = fx.Options(
 	CgminerRestartModule,
 	CgminerStartModule,
 	ConfigPoolsModule,
+	NtpdateModule,
 	RebootModule,
 
 	fx.Provide(

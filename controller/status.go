@@ -15,6 +15,7 @@ type StatusResponse struct {
 	Agent    *string              `json:"agent"`
 	Miner    *string              `json:"miner"`
 	Uptime   time.Duration        `json:"uptime"`
+	Date     time.Time            `json:"date"`
 	Mac      *string              `json:"mac"`
 	Location agent.LocationConfig `json:"location"`
 }
@@ -33,6 +34,7 @@ func NewStatusCtrl(agentVersion agent.Version, minerVersion miner.Version, getUp
 					Uptime:   uptime.Duration,
 					Mac:      netInfo.GetMacAddress(),
 					Location: location.Get(),
+					Date:     time.Now(),
 				}
 
 				w.WriteHeader(http.StatusOK)
