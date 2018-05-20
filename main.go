@@ -13,7 +13,7 @@ import (
 	"github.com/blockassets/bam_agent/service/miner/cgminer"
 	"github.com/blockassets/bam_agent/service/os"
 	"github.com/blockassets/bam_agent/tool"
-	"github.com/lookfirst/overseer"
+	"github.com/jpillora/overseer"
 	"go.uber.org/fx"
 )
 

@@ -31,7 +31,7 @@ func (r *RebootData) Reboot() error {
 var RebootModule = fx.Provide(func() Reboot {
 	return &RebootData{
 		run: func(cmd string, arg string) error {
-			return exec.Command(cmd, arg).Start()
+			return exec.Command(cmd, arg).Run()
 		},
 	}
 })

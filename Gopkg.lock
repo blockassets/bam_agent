@@ -164,8 +164,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/jpillora/overseer"
-  packages = ["fetcher"]
-  revision = "bc46621374e633f50348a3aa1b852169aa386364"
+  packages = [
+    ".",
+    "fetcher"
+  ]
+  revision = "9891188db5a5bdae87416218253ac3a5ed4aed8a"
 
 [[projects]]
   name = "github.com/json-iterator/go"
@@ -204,12 +207,6 @@
   ]
   revision = "588f4e8bddc6cb45c27b448e925c7fd6a5545434"
   version = "0.2.5"
-
-[[projects]]
-  branch = "syncfix"
-  name = "github.com/lookfirst/overseer"
-  packages = ["."]
-  revision = "7e1063766656fec25f5336d7ac3a5fc05fef0426"
 
 [[projects]]
   branch = "master"
@@ -325,7 +322,7 @@
   branch = "master"
   name = "github.com/prometheus/node_exporter"
   packages = ["collector"]
-  revision = "699b6d7f159d6d0be00b8733d225674cd67f98ff"
+  revision = "04d69158b40cc89fb34b0a6f08d6e136b1a9fde9"
 
 [[projects]]
   branch = "master"
@@ -426,7 +423,7 @@
     "internal/socket",
     "ipv4"
   ]
-  revision = "2491c5de3490fced2f6cff376127c667efeed857"
+  revision = "57065200b4b034a1c8ad54ff77069408c2218ae6"
 
 [[projects]]
   branch = "master"
@@ -448,6 +445,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "01cfdb17855062eb677d65d713a498d9c7ea14f1b397c30d6e6cb97f5de3ac4f"
+  inputs-digest = "ee9d777e98d073fb56ba634b911e0e4f2e667f9ba02298cd601e7d5e9dbe1653"
   solver-name = "gps-cdcl"
   solver-version = 1
