@@ -23,7 +23,7 @@ func (r *NtpdateData) Ntpdate() error {
 var NtpdateModule = fx.Provide(func() Ntpdate {
 	return &NtpdateData{
 		run: func(cmd string, arg string) error {
-			return exec.Command(cmd, arg).Start()
+			return exec.Command(cmd, arg).Run()
 		},
 	}
 })
