@@ -1,7 +1,9 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/blockassets/bam_agent/service/os"
 	"github.com/blockassets/bam_agent/tool"
@@ -48,13 +50,18 @@ func NewNtpdatePostCtrl(ntpdate os.Ntpdate) Result {
 			Handler: tool.JsonHandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				var resp []byte
 
+				before := time.Now()
 				err := ntpdate.Ntpdate()
+				after := time.Now()
+
+				message := fmt.Sprintf("Before: %s, After: %s", before, after)
+
 				if err != nil {
-					w.WriteHeader(http.StatusOK)
-					resp, _ = jsoniter.Marshal(BAMStatus{Status: "Error", Error: err})
+					w.WriteHeader(http.StatusInternalServerError)
+					resp, _ = jsoniter.Marshal(BAMStatus{Status: "Error", Error: err, Message: message})
 				} else {
 					w.WriteHeader(http.StatusOK)
-					resp, _ = jsoniter.Marshal(BAMStatus{Status: "OK"})
+					resp, _ = jsoniter.Marshal(BAMStatus{Status: "OK", Message: message})
 				}
 
 				w.Write(resp)
