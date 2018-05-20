@@ -10,7 +10,7 @@ import (
 	"github.com/blockassets/bam_agent/tool"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/lookfirst/overseer"
+	"github.com/jpillora/overseer"
 	"go.uber.org/fx"
 )
 
