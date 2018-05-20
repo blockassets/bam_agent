@@ -8,9 +8,9 @@ import (
 
 	"github.com/blockassets/bam_agent/controller"
 	"github.com/blockassets/bam_agent/tool"
+	"github.com/jpillora/overseer"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/jpillora/overseer"
 	"go.uber.org/fx"
 )
 
