@@ -16,7 +16,7 @@
 	"monitor": {
 		"highLoad": {
 			"enabled": true,
-			"period": "60s",
+			"period": "1m",
 			"highLoadMark": 5.0
 		},
 		"reboot": {
