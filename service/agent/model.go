@@ -6,6 +6,7 @@ import (
 	"github.com/blockassets/bam_agent/tool"
 )
 
+// Top level config for the bam_agent.json file
 type FileConfig struct {
 	CmdLine    tool.CmdLine     `json:"cmdLine"`
 	Location   LocationConfig   `json:"location"`
@@ -33,17 +34,24 @@ type ControllerRebootConfig struct {
 
 // Monitor
 type MonitorConfig struct {
-	HighLoad       HighLoadConfig      `json:"highLoad"`
-	HighTemp       HighTempConfig      `json:"highTemperature"`
-	AcceptedShares AcceptedConfig      `json:"acceptedShares"`
-	CGMQuit        CGMQuitConfig       `json:"cgMinerQuit"`
-	Reboot         MonitorRebootConfig `json:"reboot"`
-	LowMemory      LowMemoryConfig     `json:"lowMemory"`
+	HighLoad       HighLoadConfig  `json:"highLoad"`
+	HighTemp       HighTempConfig  `json:"highTemperature"`
+	AcceptedShares AcceptedConfig  `json:"acceptedShares"`
+	CGMQuit        CGMQuitConfig   `json:"cgMinerQuit"`
+	Reboot         RebootConfig    `json:"reboot"`
+	LowMemory      LowMemoryConfig `json:"lowMemory"`
+	Ntpdate        NtpdateConfig   `json:"ntpdate"`
 }
 
-type MonitorRebootConfig struct {
+type RebootConfig struct {
 	Enabled bool                `json:"enabled"`
 	Period  tool.RandomDuration `json:"period"`
+}
+
+type NtpdateConfig struct {
+	Enabled bool          `json:"enabled"`
+	Period  time.Duration `json:"period"`
+	Server  string        `json:"server"`
 }
 
 type HighLoadConfig struct {

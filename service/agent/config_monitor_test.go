@@ -26,7 +26,7 @@ func TestMonitorHelper_Update(t *testing.T) {
 	}
 
 	updateCfg := MonitorConfig{
-		Reboot: MonitorRebootConfig{
+		Reboot: RebootConfig{
 			Period: tool.RandomDuration{
 				Duration: time.Duration(100) * time.Hour,
 			},
