@@ -40,6 +40,11 @@
 			"enabled": true,
 			"period": "1m",
 			"lowMemory": 140000000
+		},
+		"ntpdate": {
+			"enabled": true,
+			"period": "30m",
+			"server": "time.google.com"
 		}
 	}
 }
