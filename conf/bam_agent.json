@@ -16,7 +16,7 @@
 	"monitor": {
 		"highLoad": {
 			"enabled": true,
-			"period": "60s",
+			"period": "1m",
 			"highLoadMark": 5.0
 		},
 		"reboot": {
@@ -40,6 +40,11 @@
 			"enabled": true,
 			"period": "1m",
 			"lowMemory": 140000000
+		},
+		"ntpdate": {
+			"enabled": true,
+			"period": "30m",
+			"server": "time.google.com"
 		}
 	}
 }

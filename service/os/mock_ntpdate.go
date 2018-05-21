@@ -8,7 +8,7 @@ type MockNtpdate struct {
 	CalledNtpdate bool
 }
 
-func (ms *MockNtpdate) Ntpdate() error {
+func (ms *MockNtpdate) Ntpdate(server string) error {
 	ms.Counter++
 	ms.CalledNtpdate = true
 	return nil

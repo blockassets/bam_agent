@@ -4,7 +4,7 @@ import "testing"
 
 func TestNtpdate_Ntpdate(t *testing.T) {
 	expectedNtpdateCmd := "/usr/bin/ntpdate"
-	expectedNtpdateArgs := []string{"-u", "time.google.com"}
+	expectedNtpdateArgs := []string{"-u", "time.foo.com"}
 
 	ntpdate := &NtpdateData{
 		run: func(cmd string, arg ...string) error {
@@ -23,5 +23,5 @@ func TestNtpdate_Ntpdate(t *testing.T) {
 			return nil
 		},
 	}
-	ntpdate.Ntpdate()
+	ntpdate.Ntpdate(expectedNtpdateArgs[1])
 }

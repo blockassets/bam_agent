@@ -59,4 +59,12 @@ var ConfigProviders = fx.Options(
 			LowMemory: value.LowMemory,
 		}
 	}),
+
+	fx.Provide(func(cfg agent.MonitorConfig) NtpdateConfig {
+		value := cfg.Ntpdate
+		return NtpdateConfig{
+			Enabled: value.Enabled,
+			Period:  value.Period,
+		}
+	}),
 )

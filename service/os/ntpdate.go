@@ -7,17 +7,23 @@ import (
 	"go.uber.org/fx"
 )
 
+const defaultNtpServer = "time.google.com"
+const defaultNtpCmd = "/usr/bin/ntpdate"
+
 type Ntpdate interface {
-	Ntpdate() error
+	Ntpdate(server string) error
 }
 
 type NtpdateData struct {
 	run func(cmd string, arg ...string) error
 }
 
-func (r *NtpdateData) Ntpdate() error {
-	log.Printf("ntpdate requested")
-	return r.run("/usr/bin/ntpdate", "-u", "time.google.com")
+func (r *NtpdateData) Ntpdate(server string) error {
+	if len(server) == 0 {
+		server = defaultNtpServer
+	}
+	log.Printf("%s -u %s", defaultNtpCmd, server)
+	return r.run(defaultNtpCmd, "-u", server)
 }
 
 var NtpdateModule = fx.Provide(func() Ntpdate {

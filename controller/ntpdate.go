@@ -51,7 +51,7 @@ func NewNtpdatePostCtrl(ntpdate os.Ntpdate) Result {
 				var resp []byte
 
 				before := time.Now()
-				err := ntpdate.Ntpdate()
+				err := ntpdate.Ntpdate("")
 				after := time.Now()
 
 				message := fmt.Sprintf("Before: %s, After: %s", before, after)
